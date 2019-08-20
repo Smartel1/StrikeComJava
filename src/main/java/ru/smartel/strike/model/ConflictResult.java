@@ -1,11 +1,10 @@
 package ru.smartel.strike.model;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-@Table(name="conflict_reasons")
-public class ConflictReason {
+@Table(name="conflict_results")
+public class ConflictResult {
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -20,17 +19,17 @@ public class ConflictReason {
     @Column(name = "name_es")
     private String nameEs;
 
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "conflictReason")
-    private List<Conflict> conflicts;
-
-    public ConflictReason(String nameRu, String nameEn, String nameEs) {
+    public ConflictResult(String nameRu, String nameEn, String nameEs) {
         this.nameRu = nameRu;
         this.nameEn = nameEn;
         this.nameEs = nameEs;
     }
 
-    public ConflictReason() {
+    public ConflictResult() {
     }
+
+//    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "conflictResult")
+//    private List<Conflict> conflicts;
 
     public int getId() {
         return id;

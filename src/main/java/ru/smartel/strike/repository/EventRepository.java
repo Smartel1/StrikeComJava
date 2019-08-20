@@ -7,4 +7,5 @@ import java.util.List;
 public interface EventRepository {
     Event find(int id);
     List<Event> get(int count);
+    void store(Event event);
 }

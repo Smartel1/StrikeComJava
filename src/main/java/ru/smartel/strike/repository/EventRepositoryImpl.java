@@ -1,7 +1,9 @@
 package ru.smartel.strike.repository;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.model.Event;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -35,5 +37,14 @@ public class EventRepositoryImpl implements EventRepository {
                 .createQuery(query)
                 .setMaxResults(count)
                 .list();
+    }
+
+    @Override
+    public void store(Event event) {
+        Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+        sessionFactory.getCurrentSession().save(event);
+        sessionFactory.getCurrentSession().persist(event);
+        sessionFactory.getCurrentSession().flush();
+        transaction.commit();
     }
 }

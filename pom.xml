@@ -13,7 +13,7 @@
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>strike</name>
-	<description>Demo project for Spring Boot</description>
+	<description>strikecom</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -60,18 +60,53 @@
 			<artifactId>tomcat-dbcp</artifactId>
 			<version>9.0.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
 			<version>RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
-	</dependencies>
+
+		<!--Firebase SDK-->
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>6.8.1</version>
+		</dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>5.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!--flyway-->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>5.2.4</version>
+                <configuration>
+<!-- Указаны примеры конфигурации. Если указаны параметры в командной строке, то они имеют приоритет -->
+                    <url>jdbc:postgresql://localhost:5432/strike1</url>
+                    <user>postgres</user>
+                    <password>postgres</password>
+<!-- Поиск идёт среди скомпилированных класов, а не среди исходников! -->
+                    <locations>
+                        <location>ru.smartel.strike.db.migration</location>
+                        <location>db/migration</location>
+                    </locations>
+                </configuration>
 			</plugin>
 		</plugins>
 	</build>

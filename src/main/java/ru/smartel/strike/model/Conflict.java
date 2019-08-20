@@ -3,6 +3,7 @@ package ru.smartel.strike.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Conflict {
     @Id
+    @GeneratedValue
     @Column(name = "id")
     private int id;
 
@@ -23,13 +25,14 @@ public class Conflict {
     @Column(name = "title_es")
     private String titleEs;
 
-    @Column(name = "latitude")
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @Column(name = "company_name")
+    @Size(max = 500)
+    @Column(name = "company_name", length = 500)
     private String companyName;
 
     @Column(name = "date_from")
@@ -44,6 +47,10 @@ public class Conflict {
     @ManyToOne
     @JoinColumn(name = "conflict_reason_id")
     private ConflictReason conflictReason;
+
+    @ManyToOne
+    @JoinColumn(name = "conflict_result_id")
+    private ConflictResult conflictResult;
 
     public int getId() {
         return id;
@@ -123,5 +130,13 @@ public class Conflict {
 
     public void setConflictReason(ConflictReason conflictReason) {
         this.conflictReason = conflictReason;
+    }
+
+    public ConflictResult getConflictResult() {
+        return conflictResult;
+    }
+
+    public void setConflictResult(ConflictResult conflictResult) {
+        this.conflictResult = conflictResult;
     }
 }

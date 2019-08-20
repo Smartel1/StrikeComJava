@@ -9,22 +9,24 @@ import ru.smartel.strike.model.Event;
 import ru.smartel.strike.repository.EventRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/{locale}/event/")
-public class Controller {
+@RequestMapping("/api/{locale}/event")
+public class EventController {
 
     private EventRepository eventRepository;
 
-    public Controller(EventRepository eventRepository) {
+    public EventController(EventRepository eventRepository) {
         this.eventRepository = eventRepository;
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public String index(HttpServletRequest request,
-                        @PathVariable("locale") String locale) throws JsonProcessingException {
-        List<Event> events = eventRepository.get(5);
+                        @PathVariable("locale") String locale, @RequestParam(name = "per_page", required = false, defaultValue = "20") Integer perPage) throws JsonProcessingException {
+        List<Event> events = eventRepository.get(perPage);
+
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule simpleModule = new SimpleModule();
 
@@ -51,5 +53,11 @@ public class Controller {
 //
 //        objectMapper.registerModule(simpleModule);
 //        return objectMapper.writeValueAsString(event);
+    }
+
+    @PostMapping()
+    public String store(HttpServletRequest request, @Valid @RequestBody Event event) {
+        eventRepository.store(event);
+        return "ok";
     }
 }

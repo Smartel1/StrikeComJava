@@ -32,7 +32,7 @@ public class HibernateConf {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("ru.smartel.strike.model" );
+        sessionFactory.setPackagesToScan("ru.smartel.strike.model");
         sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;
