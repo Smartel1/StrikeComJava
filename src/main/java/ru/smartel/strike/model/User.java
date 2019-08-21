@@ -3,10 +3,13 @@ package ru.smartel.strike.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -16,9 +19,17 @@ public class User {
     public static final String ROLE_MODERATOR = "MODERATOR";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Column(unique = true)
     private String uuid;
@@ -40,10 +51,6 @@ public class User {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUuid() {
@@ -92,5 +99,13 @@ public class User {
 
     public void setRoles(String[] roles) throws JsonProcessingException {
         this.roles = new ObjectMapper().writeValueAsString(roles);
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }

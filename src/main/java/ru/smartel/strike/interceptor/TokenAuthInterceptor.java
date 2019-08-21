@@ -4,7 +4,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import ru.smartel.strike.exception.UnauthtenticatedException;
@@ -12,7 +11,6 @@ import ru.smartel.strike.model.User;
 import ru.smartel.strike.repository.UserRepository;
 import ru.smartel.strike.service.AuthService;
 
-import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,9 +46,8 @@ public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
 
         User user;
 
-        try {
-            user = userRepository.findOneByUuid(uuid);
-        } catch (PersistenceException e) {
+        user = userRepository.findFirstByUuid(uuid);
+        if (null == user) {
             user = new User();
             updateUserFields(user, uuid);
         }

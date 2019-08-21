@@ -8,11 +8,11 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-@Table(name="tags")
+@Table(name = "tags")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tag {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
 
@@ -21,10 +21,6 @@ public class Tag {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

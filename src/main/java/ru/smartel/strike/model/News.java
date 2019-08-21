@@ -7,7 +7,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.smartel.strike.model.interfaces.Commentable;
 import ru.smartel.strike.model.interfaces.Post;
-import ru.smartel.strike.model.interfaces.Titles;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,9 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "events")
+@Table(name = "news")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Event implements Commentable, Post, Titles {
+public class News implements Commentable, Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -51,14 +50,6 @@ public class Event implements Commentable, Post, Titles {
     private String contentEs;
 
     @NotNull
-    @Column(name = "longitude", nullable = false)
-    private Float longitude;
-
-    @NotNull
-    @Column(name = "latitude", nullable = false)
-    private Float latitude;
-
-    @NotNull
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
@@ -75,32 +66,42 @@ public class Event implements Commentable, Post, Titles {
     @ManyToOne(targetEntity = User.class)
     private User author;
 
+    @ManyToMany(targetEntity = Comment.class, cascade = {CascadeType.REMOVE})
+    @JoinTable(name = "comment_news",
+            inverseJoinColumns = {@JoinColumn(name = "comment_id")},
+            joinColumns = {@JoinColumn(name = "news_id")}
+    )
+    private List<Comment> comments;
+
     @ManyToMany(targetEntity = Photo.class, cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "event_photo",
-            joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
+    @JoinTable(name = "news_photo",
+            joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Photo> photos;
 
     @ManyToMany(targetEntity = Video.class, cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "event_video",
-            joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
+    @JoinTable(name = "news_video",
+            joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Video> videos;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conflict_id")
-    private Conflict conflict;
+    public int getId() {
+        return id;
+    }
 
-    @ManyToMany(targetEntity = Comment.class, cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "comment_event",
-            inverseJoinColumns = {@JoinColumn(name = "comment_id")},
-            joinColumns = {@JoinColumn(name = "event_id")}
-    )
-    private List<Comment> comments;
+    @Override
+    public User getAuthor() {
+        return author;
+    }
+
+    @Override
+    public void setAuthor(User author) {
+        this.author = author;
+    }
 
     public String getTitleEn() {
         return titleEn;
@@ -116,20 +117,6 @@ public class Event implements Commentable, Post, Titles {
 
     public void setTitleEs(String titleEs) {
         this.titleEs = titleEs;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public User getAuthor() {
-        return author;
-    }
-
-    @Override
-    public void setAuthor(User author) {
-        this.author = author;
     }
 
     public String getTitleRu() {
@@ -164,22 +151,6 @@ public class Event implements Commentable, Post, Titles {
         this.contentEs = contentEs;
     }
 
-    public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
-    }
-
     public LocalDateTime getDate() {
         return date;
     }
@@ -210,14 +181,6 @@ public class Event implements Commentable, Post, Titles {
 
     public void setSourceLink(String sourceLink) {
         this.sourceLink = sourceLink;
-    }
-
-    public Conflict getConflict() {
-        return conflict;
-    }
-
-    public void setConflict(Conflict conflict) {
-        this.conflict = conflict;
     }
 
     @Override
