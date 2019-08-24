@@ -5,20 +5,23 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.model.reference.ConflictResult;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 @Service
 public class ConflictResultSeeder implements Seeder {
-    private SessionFactory sessionFactory;
+    private EntityManagerFactory entityManagerFactory;
 
-    public ConflictResultSeeder(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public ConflictResultSeeder(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
     public void seed() {
 
-        Session session = sessionFactory.openSession();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-        Long count = (Long) session
+        Long count = (Long) entityManager
                 .createQuery("select count(*) from " + ConflictResult.class.getName())
                 .getSingleResult();
 
@@ -30,11 +33,11 @@ public class ConflictResultSeeder implements Seeder {
                 new ConflictResult("Не удовлетворены", "Not satisfied", "No satisfecho")
         };
 
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
 
         for (ConflictResult item : conflictResults) {
-            session.save(item);
+            entityManager.persist(item);
         }
-        session.getTransaction().commit();
+        entityManager.getTransaction().commit();
     }
 }

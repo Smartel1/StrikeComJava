@@ -58,6 +58,10 @@ public class Conflict implements Titles {
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "conflict", fetch = FetchType.LAZY)
     private List<Event> events;
 
+    @ManyToOne(targetEntity = Event.class)
+    @JoinColumn(name = "parent_event_id")
+    private Event parentEvent;
+
     @ManyToOne
     @JoinColumn(name = "conflict_reason_id")
     private ConflictReason conflictReason;
@@ -159,6 +163,14 @@ public class Conflict implements Titles {
 
     public void setEvents(List<Event> events) {
         this.events = events;
+    }
+
+    public Event getParentEvent() {
+        return parentEvent;
+    }
+
+    public void setParentEvent(Event parentEvent) {
+        this.parentEvent = parentEvent;
     }
 
     public Industry getIndustry() {

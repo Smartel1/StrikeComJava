@@ -1,18 +1,26 @@
 package ru.smartel.strike.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
+@TypeDef(
+        name = "jsonb",
+        typeClass = JsonNodeBinaryType.class
+)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     public static final String ROLE_ADMIN = "ADMIN";
@@ -47,7 +55,8 @@ public class User {
     private String email;
 
     @Column
-    private String roles = "[]";
+    @Type(type = "jsonb")
+    private JsonNode roles = new ArrayNode(JsonNodeFactory.instance);
 
     public int getId() {
         return id;
@@ -93,12 +102,20 @@ public class User {
         this.email = email;
     }
 
-    public String[] getRoles() throws IOException {
-        return new ObjectMapper().readValue(roles, String[].class);
+    public JsonNode getRoles() {
+        return roles;
     }
 
-    public void setRoles(String[] roles) throws JsonProcessingException {
-        this.roles = new ObjectMapper().writeValueAsString(roles);
+    public List<String> getRolesAsList() {
+        List<String> roles = new ArrayList<>();
+        for (JsonNode role : this.roles) {
+            roles.add(role.asText());
+        }
+        return roles;
+    }
+
+    public void setRoles(JsonNode roles) {
+        this.roles = roles;
     }
 
     public LocalDateTime getCreatedAt() {

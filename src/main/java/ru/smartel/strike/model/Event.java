@@ -8,17 +8,22 @@ import org.hibernate.annotations.UpdateTimestamp;
 import ru.smartel.strike.model.interfaces.Commentable;
 import ru.smartel.strike.model.interfaces.Post;
 import ru.smartel.strike.model.interfaces.Titles;
+import ru.smartel.strike.model.reference.EventStatus;
+import ru.smartel.strike.model.reference.EventType;
+import ru.smartel.strike.model.reference.Locality;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "events")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Event implements Commentable, Post, Titles {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -66,7 +71,7 @@ public class Event implements Commentable, Post, Titles {
     private Integer views = 0;
 
     @Column(name = "published", nullable = false)
-    private Boolean published = false;
+    private boolean published = false;
 
     @Size(max = 500)
     @Column(name = "source_link", length = 500)
@@ -81,7 +86,7 @@ public class Event implements Commentable, Post, Titles {
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Photo> photos;
+    private List<Photo> photos = new ArrayList<>();
 
     @ManyToMany(targetEntity = Video.class, cascade = {CascadeType.REMOVE})
     @JoinTable(name = "event_video",
@@ -89,11 +94,27 @@ public class Event implements Commentable, Post, Titles {
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Video> videos;
+    private List<Video> videos = new ArrayList<>();
+
+    @ManyToMany(targetEntity = Tag.class)
+    @JoinTable(name = "event_tag",
+            joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<Tag> tags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_id")
     private Conflict conflict;
+
+    @ManyToOne(targetEntity = EventStatus.class)
+    @JoinColumn(name = "event_status_id")
+    private EventStatus status;
+
+    @ManyToOne(targetEntity = EventType.class)
+    @JoinColumn(name = "event_type_id")
+    private EventType type;
 
     @ManyToMany(targetEntity = Comment.class, cascade = {CascadeType.REMOVE})
     @JoinTable(name = "comment_event",
@@ -101,6 +122,10 @@ public class Event implements Commentable, Post, Titles {
             joinColumns = {@JoinColumn(name = "event_id")}
     )
     private List<Comment> comments;
+
+    @ManyToOne(targetEntity = Locality.class)
+    @JoinColumn(name = "locality_id")
+    private Locality locality;
 
     public String getTitleEn() {
         return titleEn;
@@ -196,11 +221,11 @@ public class Event implements Commentable, Post, Titles {
         this.views = views;
     }
 
-    public Boolean getPublished() {
+    public boolean isPublished() {
         return published;
     }
 
-    public void setPublished(Boolean published) {
+    public void setPublished(boolean published) {
         this.published = published;
     }
 
@@ -220,6 +245,22 @@ public class Event implements Commentable, Post, Titles {
         this.conflict = conflict;
     }
 
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+
+    public EventType getType() {
+        return type;
+    }
+
+    public void setType(EventType type) {
+        this.type = type;
+    }
+
     @Override
     public List<Comment> getComments() {
         return comments;
@@ -228,6 +269,14 @@ public class Event implements Commentable, Post, Titles {
     @Override
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Locality getLocality() {
+        return locality;
+    }
+
+    public void setLocality(Locality locality) {
+        this.locality = locality;
     }
 
     public List<Photo> getPhotos() {
@@ -244,6 +293,14 @@ public class Event implements Commentable, Post, Titles {
 
     public void setVideos(List<Video> videos) {
         this.videos = videos;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public LocalDateTime getCreatedAt() {

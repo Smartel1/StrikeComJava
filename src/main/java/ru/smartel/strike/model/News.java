@@ -57,7 +57,7 @@ public class News implements Commentable, Post {
     private Integer views = 0;
 
     @Column(name = "published", nullable = false)
-    private Boolean published = false;
+    private boolean published = false;
 
     @Size(max = 500)
     @Column(name = "source_link", length = 500)
@@ -167,11 +167,11 @@ public class News implements Commentable, Post {
         this.views = views;
     }
 
-    public Boolean getPublished() {
+    public boolean isPublished() {
         return published;
     }
 
-    public void setPublished(Boolean published) {
+    public void setPublished(boolean published) {
         this.published = published;
     }
 

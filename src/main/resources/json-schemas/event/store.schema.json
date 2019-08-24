@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "description": "Схема данных для запроса на создание события",
+  "required": [
+    "conflict_id",
+    "latitude",
+    "longitude",
+    "date"
+  ],
+  "properties": {
+    "conflict_id": { "type": "integer" },
+    "locality_id": { "type": ["null","integer"] },
+    "event_status_id": { "type": ["null","integer"] },
+    "event_type_id": { "type": ["null","integer"] },
+    "published": { "type": "boolean" },
+    "date": { "$ref": "../definitions.schema.json#/timestamp" },
+    "title": { "type": ["null", "string"], "maxLength": 255 },
+    "title_ru": { "type": ["null", "string"], "maxLength": 255 },
+    "title_en": { "type": ["null", "string"], "maxLength": 255 },
+    "title_es": { "type": ["null", "string"], "maxLength": 500 },
+    "content": { "type": ["null", "string"], "minLength": 3 },
+    "content_ru": { "type": ["null", "string"], "minLength": 3 },
+    "content_en": { "type": ["null", "string"], "minLength": 3 },
+    "content_es": { "type": ["null", "string"], "minLength": 3 },
+    "latitude": { "type": "number" },
+    "longitude": { "type": "number" },
+    "source_link": { "type": ["null", "string"], "maxLength": 500 },
+    "tags": {"type": "array", "items":  { "$ref":  "../definitions.schema.json#/tag" }},
+    "photo_urls": {"type": "array", "items":  { "$ref":  "../definitions.schema.json#/photo-url" }},
+    "videos": { "type": "array", "items": { "$ref":  "../definitions.schema.json#/video" }, "uniqueItems": true}
+  }
+}

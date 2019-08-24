@@ -2,27 +2,33 @@ package ru.smartel.strike;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.smartel.strike.model.User;
-import ru.smartel.strike.repository.UserRepository;
+import ru.smartel.strike.model.Event;
 
-import java.io.IOException;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class StrikeApplicationTests {
 
-    @Autowired
-    UserRepository userRepository;
-
+	@PersistenceContext
+	EntityManager entityManager;
 	@Test
 	public void contextLoads() {
 	}
 
 	@Test
-    public void user() {
-	    User user = userRepository.findFirstByUuid("yBjIs0BELQSsWvyPAHcrGZa2hJi2");
+    public void experiment() {
+		long relatedConflictsCount =  entityManager
+				.createQuery("select c.id " +
+						"from ru.smartel.strike.model.Conflict c " +
+						"where c.parentEvent = :event")
+				.setMaxResults(1)
+				.setParameter("event", entityManager.getReference(Event.class, 21))
+				.getResultList().size();
+		System.out.println(relatedConflictsCount);
     }
 }

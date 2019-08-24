@@ -4,20 +4,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import ru.smartel.strike.interceptor.LocaleInterceptor;
-import ru.smartel.strike.interceptor.TokenAuthInterceptor;
+import ru.smartel.strike.interceptor.BindInterceptor;
 
 @Configuration
 public class InterceptorsConf implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LocaleInterceptor()).addPathPatterns("/api/**");
-        registry.addInterceptor(tokenAuthInterceptor()).addPathPatterns("/api/**");
+        registry.addInterceptor(bindInterceptor()).addPathPatterns("/**");
     }
 
     @Bean
-    TokenAuthInterceptor tokenAuthInterceptor() {
-        return new TokenAuthInterceptor();
+    BindInterceptor bindInterceptor() {
+        return new BindInterceptor();
     }
 }

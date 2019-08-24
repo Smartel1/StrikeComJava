@@ -1,20 +1,38 @@
 package ru.smartel.strike.handler;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.smartel.strike.exception.BusinessRuleValidationException;
+import ru.smartel.strike.exception.JsonSchemaValidationException;
 import ru.smartel.strike.exception.UnauthtenticatedException;
 
-@ControllerAdvice
-public class Handler extends ResponseEntityExceptionHandler {
+import java.util.*;
 
-    @ExceptionHandler(value = { UnauthtenticatedException.class })
-    protected ResponseEntity<Object> handleConflict(Exception ex, WebRequest request) {
-        String bodyOfResponse = "Проблемы с аутентификацией: " + ex.getMessage();
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+@ControllerAdvice
+public class Handler {
+
+    @ExceptionHandler(value = {UnauthtenticatedException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    protected String handleConflict(Exception ex, WebRequest request) {
+        return "Проблемы с аутентификацией: " + ex.getMessage();
+    }
+
+    @ExceptionHandler(JsonSchemaValidationException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public Map<String, String> processJsonSchemaValidationException(JsonSchemaValidationException ex) {
+        return ex.getErrors();
+    }
+
+    @ExceptionHandler(BusinessRuleValidationException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public Map<String, List<String>> processBusinessRuleValidationError(BusinessRuleValidationException ex) {
+        return Collections.singletonMap("error", ex.getErrors());
     }
 }

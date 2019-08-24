@@ -1,11 +1,14 @@
 package ru.smartel.strike.configuration;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -13,7 +16,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
@@ -28,18 +30,6 @@ public class HibernateConf {
     private String password;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
-    @Value("${spring.jpa.hibernate.ddl-auto}")
-    private String ddlAuto;
-
-    @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan("ru.smartel.strike.model");
-        sessionFactory.setHibernateProperties(hibernateProperties());
-
-        return sessionFactory;
-    }
 
     @Bean
     public DataSource dataSource() {
@@ -53,27 +43,18 @@ public class HibernateConf {
     }
 
     @Bean
-    public PlatformTransactionManager hibernateTransactionManager() {
-        HibernateTransactionManager transactionManager
-                = new HibernateTransactionManager();
-        transactionManager.setSessionFactory(sessionFactory().getObject());
-        return transactionManager;
+    public PlatformTransactionManager transactionManager(@Autowired EntityManagerFactory emf) {
+        JpaTransactionManager tm = new JpaTransactionManager();
+        tm.setEntityManagerFactory(emf);
+        tm.setDataSource(dataSource());
+        return tm;
     }
 
-    private Properties hibernateProperties() {
-        Properties hibernateProperties = new Properties();
-        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
-        hibernateProperties.setProperty("hibernate.dialect", dialect);
-
-        return hibernateProperties;
-    }
-
-    //этот бин нужен для JPA-репозиториев
     @Bean
-    public EntityManagerFactory entityManagerFactory() {
-
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setGenerateDdl(true);
+        vendorAdapter.setGenerateDdl(false);
+        vendorAdapter.setShowSql(true);
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
@@ -81,6 +62,6 @@ public class HibernateConf {
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
 
-        return factory.getObject();
+        return factory;
     }
 }

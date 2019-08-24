@@ -5,20 +5,23 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.model.reference.ConflictReason;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 @Service
 public class ConflictReasonSeeder implements Seeder {
-    private SessionFactory sessionFactory;
+    private EntityManagerFactory entityManagerFactory;
 
-    public ConflictReasonSeeder(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public ConflictReasonSeeder(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @Override
     public void seed() {
 
-        Session session = sessionFactory.openSession();
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-        Long count = (Long) session
+        Long count = (Long) entityManager
                 .createQuery("select count(*) from " + ConflictReason.class.getName())
                 .getSingleResult();
 
@@ -37,11 +40,11 @@ public class ConflictReasonSeeder implements Seeder {
                 new ConflictReason("Коллективный договор", "Collective agreement", "Convenio colectivo")
         };
 
-        session.beginTransaction();
+        entityManager.getTransaction().begin();
 
         for (ConflictReason item : array) {
-            session.save(item);
+            entityManager.persist(item);
         }
-        session.getTransaction().commit();
+        entityManager.getTransaction().commit();
     }
 }
