@@ -40,7 +40,10 @@ public class EventService {
     public Event create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
-                new UserCanModerate(user).when(data.get("published").asBoolean() || data.has("locality_id"))
+                new UserCanModerate(user).when(
+                        data.has("published")
+                                && data.get("published").asBoolean()
+                                || data.has("locality_id"))
         );
 
         Event event = new Event();
