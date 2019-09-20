@@ -18,7 +18,7 @@ public class Country extends EntityWithNames implements Reference {
         this.regions = regions;
     }
 
-    @OneToMany(targetEntity = Region.class, mappedBy = "country")
+    @OneToMany(mappedBy = "country")
     private List<Region> regions;
 
     public List<Region> getRegions() {

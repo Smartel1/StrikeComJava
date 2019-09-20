@@ -20,17 +20,17 @@ public class Claim {
     @Column
     private int id;
 
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(nullable = false)
     private User user;
 
-    @ManyToOne(targetEntity = Comment.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(nullable = false)
     private Comment comment;
 
-    @ManyToOne(targetEntity = ClaimType.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "claim_type_id", nullable = false)
     private ClaimType claimType;

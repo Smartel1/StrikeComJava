@@ -17,12 +17,12 @@ public class Region {
     @Column
     private String name;
 
-    @ManyToOne(targetEntity = Country.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Country country;
 
-    @OneToMany(targetEntity = Locality.class, mappedBy = "region")
+    @OneToMany(mappedBy = "region")
     private List<Locality> localities;
 
     public int getId() {

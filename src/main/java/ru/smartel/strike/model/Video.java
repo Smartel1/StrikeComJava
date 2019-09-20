@@ -31,7 +31,7 @@ public class Video {
     @Column(name = "preview_url", length = 500)
     private String previewUrl;
 
-    @ManyToOne(targetEntity = VideoType.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "video_type_id", referencedColumnName = "id")
     private VideoType videoType;
 

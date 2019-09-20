@@ -3,7 +3,7 @@ package ru.smartel.strike.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.JsonSchemaValidationException;

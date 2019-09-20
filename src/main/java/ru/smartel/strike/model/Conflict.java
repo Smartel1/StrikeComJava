@@ -30,6 +30,19 @@ public class Conflict implements Titles {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Conflict parent;
+
+    @Column(name = "lft")
+    private int lft;
+
+    @Column(name = "rgt")
+    private int rgt;
+
+    @Column(name = "lvl")
+    private int lvl;
+
     @Column(name = "title_ru")
     private String titleRu;
 
@@ -58,23 +71,55 @@ public class Conflict implements Titles {
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "conflict", fetch = FetchType.LAZY)
     private List<Event> events;
 
-    @ManyToOne(targetEntity = Event.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_event_id")
     private Event parentEvent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_reason_id")
     private ConflictReason conflictReason;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_result_id")
     private ConflictResult conflictResult;
 
-    @ManyToOne(targetEntity = Industry.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
 
     public int getId() {
         return id;
+    }
+
+    public Conflict getParent() {
+        return parent;
+    }
+
+    public void setParent(Conflict parent) {
+        this.parent = parent;
+    }
+
+    public int getLft() {
+        return lft;
+    }
+
+    public void setLft(int lft) {
+        this.lft = lft;
+    }
+
+    public int getRgt() {
+        return rgt;
+    }
+
+    public void setRgt(int rgt) {
+        this.rgt = rgt;
+    }
+
+    public int getLvl() {
+        return lvl;
+    }
+
+    public void setLvl(int lvl) {
+        this.lvl = lvl;
     }
 
     public String getTitleRu() {

@@ -77,10 +77,10 @@ public class Event implements Commentable, Post, Titles {
     @Column(name = "source_link", length = 500)
     private String sourceLink;
 
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-    @ManyToMany(targetEntity = Photo.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "event_photo",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
@@ -88,7 +88,7 @@ public class Event implements Commentable, Post, Titles {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Photo> photos = new ArrayList<>();
 
-    @ManyToMany(targetEntity = Video.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "event_video",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
@@ -96,7 +96,7 @@ public class Event implements Commentable, Post, Titles {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Video> videos = new ArrayList<>();
 
-    @ManyToMany(targetEntity = Tag.class)
+    @ManyToMany
     @JoinTable(name = "event_tag",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
@@ -108,22 +108,22 @@ public class Event implements Commentable, Post, Titles {
     @JoinColumn(name = "conflict_id")
     private Conflict conflict;
 
-    @ManyToOne(targetEntity = EventStatus.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_status_id")
     private EventStatus status;
 
-    @ManyToOne(targetEntity = EventType.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_type_id")
     private EventType type;
 
-    @ManyToMany(targetEntity = Comment.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "comment_event",
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
             joinColumns = {@JoinColumn(name = "event_id")}
     )
     private List<Comment> comments;
 
-    @ManyToOne(targetEntity = Locality.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id")
     private Locality locality;
 

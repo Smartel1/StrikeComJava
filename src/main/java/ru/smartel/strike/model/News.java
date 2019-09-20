@@ -63,17 +63,17 @@ public class News implements Commentable, Post {
     @Column(name = "source_link", length = 500)
     private String sourceLink;
 
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
-    @ManyToMany(targetEntity = Comment.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "comment_news",
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
             joinColumns = {@JoinColumn(name = "news_id")}
     )
     private List<Comment> comments;
 
-    @ManyToMany(targetEntity = Photo.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "news_photo",
             joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
@@ -81,7 +81,7 @@ public class News implements Commentable, Post {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Photo> photos;
 
-    @ManyToMany(targetEntity = Video.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "news_video",
             joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}

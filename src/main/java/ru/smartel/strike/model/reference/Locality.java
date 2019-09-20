@@ -16,7 +16,7 @@ public class Locality {
     @Column
     private String name;
 
-    @ManyToOne(targetEntity = Region.class)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Region region;

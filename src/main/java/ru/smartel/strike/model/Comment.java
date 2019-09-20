@@ -30,11 +30,11 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @ManyToMany(targetEntity = Photo.class, cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "comment_photo",
         joinColumns = {@JoinColumn(name = "comment_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id", unique = true)}
@@ -42,13 +42,13 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Photo> photos;
 
-    @ManyToMany(targetEntity = Event.class, mappedBy = "comments")
+    @ManyToMany(mappedBy = "comments")
     private List<Event> events;
 
-    @ManyToMany(targetEntity = News.class, mappedBy = "comments")
+    @ManyToMany(mappedBy = "comments")
     private List<News> news;
 
-    @OneToMany(targetEntity = Claim.class, mappedBy = "comment")
+    @OneToMany(mappedBy = "comment")
     private List<Claim> claims;
 
     public int getId() {
