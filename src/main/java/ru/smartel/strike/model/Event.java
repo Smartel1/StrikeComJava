@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.AccessType;
 import ru.smartel.strike.model.interfaces.Commentable;
 import ru.smartel.strike.model.interfaces.Post;
 import ru.smartel.strike.model.interfaces.Titles;
@@ -17,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -27,6 +29,7 @@ public class Event implements Commentable, Post, Titles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
     private int id;
 
     @CreationTimestamp
@@ -102,7 +105,7 @@ public class Event implements Commentable, Post, Titles {
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Tag> tags = new ArrayList<>();
+    private List<Tag> tags  = Collections.emptyList();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_id")
@@ -110,6 +113,7 @@ public class Event implements Commentable, Post, Titles {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_status_id")
+    @AccessType(AccessType.Type.PROPERTY)
     private EventStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -121,7 +125,7 @@ public class Event implements Commentable, Post, Titles {
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
             joinColumns = {@JoinColumn(name = "event_id")}
     )
-    private List<Comment> comments;
+    private List<Comment> comments = Collections.emptyList();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id")
@@ -145,6 +149,10 @@ public class Event implements Commentable, Post, Titles {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

@@ -39,6 +39,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!--  lombok  -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.10</version>
+			<scope>provided</scope>
+		</dependency>
+
         <!--  Эта зависимость позволяет джексону работать с Optional и другими типами Java8 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

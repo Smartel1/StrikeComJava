@@ -1,16 +1,14 @@
-package ru.smartel.strike.interceptor;
+package ru.smartel.strike.security.filter;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import ru.smartel.strike.model.User;
 import ru.smartel.strike.repository.UserRepository;
 import ru.smartel.strike.security.FirebaseAuthenticationException;

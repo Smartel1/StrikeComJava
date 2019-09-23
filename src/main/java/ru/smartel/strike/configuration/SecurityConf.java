@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import ru.smartel.strike.interceptor.FirebaseTokenFilter;
+import ru.smartel.strike.security.filter.FirebaseTokenFilter;
 import ru.smartel.strike.repository.UserRepository;
 
 @Configuration

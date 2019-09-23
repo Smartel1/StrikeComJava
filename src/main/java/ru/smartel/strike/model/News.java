@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.AccessType;
 import ru.smartel.strike.model.interfaces.Commentable;
 import ru.smartel.strike.model.interfaces.Post;
 
@@ -21,6 +22,7 @@ public class News implements Commentable, Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
     private int id;
 
     @CreationTimestamp
@@ -91,6 +93,10 @@ public class News implements Commentable, Post {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

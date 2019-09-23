@@ -15,12 +15,14 @@ import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 
 @Service
+@Transactional
 public class EventService {
 
     @PersistenceContext
@@ -36,7 +38,21 @@ public class EventService {
         this.businessValidationService = businessValidationService;
     }
 
-    @Transactional
+    public Event get(int id) throws EntityNotFoundException {
+        Event event = entityManager.find(Event.class, id);
+        if (null == event) throw new EntityNotFoundException("Событие с id " + id + " не найдено");
+        return event;
+    }
+
+    /**
+     * Увеличить число просмотров события
+     * @param event
+     */
+    public void incrementViews(Event event) {
+        event.setViews(event.getViews() + 1);
+        entityManager.persist(event);
+    }
+
     public Event create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
@@ -51,8 +67,6 @@ public class EventService {
         fillEventFields(event, data, locale);
 
         entityManager.persist(event);
-        entityManager.flush();
-        entityManager.close();
 
         //Если обычный пользователь предлагает событие, посылаем пуш админам. Если модератор публикует - то всем
         if (!event.isPublished()) {
@@ -68,9 +82,7 @@ public class EventService {
         return event;
     }
 
-    @Transactional
-    public Event update(int eventId, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
-        Event event = entityManager.find(Event.class, eventId);
+    public Event update(Event event, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
 
         boolean userChangesPublishStatus =
                 data.has("published") && data.get("published").asBoolean() != event.isPublished();
@@ -94,8 +106,7 @@ public class EventService {
 
         fillEventFields(event, data, locale);
 
-        entityManager.persist(event);
-        entityManager.flush();
+        entityManager.merge(event);
 //
 //        //Если событие опубликовано, то посылаем пуши в те топики по языкам, на которые переведено событие в этом обновлении.
 //        //Если событие публикуется в этом действии, то посылаются пуши на все языки, на которые локализовано событие
