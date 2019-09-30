@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ru.smartel.strike.model.User;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.repository.UserRepository;
 import ru.smartel.strike.security.FirebaseAuthenticationException;
 import ru.smartel.strike.security.token.UserAuthenticationToken;

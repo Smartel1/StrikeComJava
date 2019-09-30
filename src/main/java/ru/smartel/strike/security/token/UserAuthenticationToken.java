@@ -3,7 +3,7 @@ package ru.smartel.strike.security.token;
 import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import ru.smartel.strike.model.User;
+import ru.smartel.strike.entity.User;
 
 import java.util.Collection;
 import java.util.Set;

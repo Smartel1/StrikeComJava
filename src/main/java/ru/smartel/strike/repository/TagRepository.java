@@ -2,7 +2,7 @@ package ru.smartel.strike.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.smartel.strike.model.Tag;
+import ru.smartel.strike.entity.Tag;
 
 @Repository
 public interface TagRepository extends CrudRepository<Tag, Integer> {

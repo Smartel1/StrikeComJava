@@ -1,7 +1,7 @@
 package ru.smartel.strike.dto.response.user;
 
 import lombok.Data;
-import ru.smartel.strike.model.User;
+import ru.smartel.strike.entity.User;
 
 @Data
 public class UserDTO {

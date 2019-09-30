@@ -2,7 +2,7 @@ package ru.smartel.strike.dto.request;
 
 
 import com.fasterxml.jackson.annotation.*;
-import ru.smartel.strike.model.Conflict;
+import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.validation.Exists;
 
 import javax.validation.constraints.NotNull;

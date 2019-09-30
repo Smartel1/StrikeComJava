@@ -1,6 +1,6 @@
 package ru.smartel.strike.rules;
 
-import ru.smartel.strike.model.User;
+import ru.smartel.strike.entity.User;
 
 import java.util.List;
 

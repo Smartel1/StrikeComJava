@@ -1,14 +1,17 @@
 package ru.smartel.strike.dto.response.conflict;
 
 import lombok.Data;
-import ru.smartel.strike.model.Conflict;
+import ru.smartel.strike.dto.response.TitlesExtendableDTO;
+import ru.smartel.strike.entity.Conflict;
+import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
 
 @Data
-public class ConflictDetailDTO {
+public class ConflictDetailDTO extends TitlesExtendableDTO {
 
-    public ConflictDetailDTO (Conflict conflict) {
+    public ConflictDetailDTO (Conflict conflict, Locale locale) {
+        super(conflict, locale);
         id = conflict.getId();
         latitude = conflict.getLatitude();
         longitude = conflict.getLongitude();

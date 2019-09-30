@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.model.*;
-import ru.smartel.strike.model.reference.EventStatus;
-import ru.smartel.strike.model.reference.EventType;
-import ru.smartel.strike.model.reference.Locality;
-import ru.smartel.strike.model.reference.VideoType;
+import ru.smartel.strike.entity.*;
+import ru.smartel.strike.entity.reference.EventStatus;
+import ru.smartel.strike.entity.reference.EventType;
+import ru.smartel.strike.entity.reference.Locality;
+import ru.smartel.strike.entity.reference.VideoType;
 import ru.smartel.strike.repository.TagRepository;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
@@ -22,7 +23,7 @@ import java.time.ZoneOffset;
 
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class EventService {
 
     @PersistenceContext
@@ -46,14 +47,23 @@ public class EventService {
 
     /**
      * Увеличить число просмотров события
-     * @param event
+     * @param eventId id события
      */
-    public void incrementViews(Event event) {
+    public EventDetailDTO getAndIncrementViews(int eventId, Locale locale, boolean withRelatives) {
+        Event event = entityManager.find(Event.class, eventId);
+        if (null == event) throw new EntityNotFoundException("Событие не найдено");
+
         event.setViews(event.getViews() + 1);
-        entityManager.persist(event);
+        EventDetailDTO dto = new EventDetailDTO(event, locale);
+
+        if (withRelatives) {
+            dto.add("relatives", null);
+        }
+
+        return dto;
     }
 
-    public Event create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
+    public EventDetailDTO create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
                 new UserCanModerate(user).when(
@@ -79,10 +89,12 @@ public class EventService {
 //            ));
         }
 
-        return event;
+        return new EventDetailDTO(event, locale);
     }
 
-    public Event update(Event event, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
+    public EventDetailDTO update(int eventId, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
+        Event event = entityManager.find(Event.class, eventId);
+        if (null == event) throw new EntityNotFoundException("Событие не найдено");
 
         boolean userChangesPublishStatus =
                 data.has("published") && data.get("published").asBoolean() != event.isPublished();
@@ -106,7 +118,6 @@ public class EventService {
 
         fillEventFields(event, data, locale);
 
-        entityManager.merge(event);
 //
 //        //Если событие опубликовано, то посылаем пуши в те топики по языкам, на которые переведено событие в этом обновлении.
 //        //Если событие публикуется в этом действии, то посылаются пуши на все языки, на которые локализовано событие
@@ -128,7 +139,7 @@ public class EventService {
 //            }
 //        }
 //
-        return event;
+        return new EventDetailDTO(event, locale);
     }
 
     private void fillEventFields(Event event, JsonNode data, Locale locale) {

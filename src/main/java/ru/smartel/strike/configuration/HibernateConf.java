@@ -55,7 +55,7 @@ public class HibernateConf {
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("ru.smartel.strike.model");
+        factory.setPackagesToScan("ru.smartel.strike.entity");
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
 

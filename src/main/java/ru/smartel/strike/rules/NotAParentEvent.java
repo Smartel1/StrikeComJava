@@ -1,6 +1,6 @@
 package ru.smartel.strike.rules;
 
-import ru.smartel.strike.model.Event;
+import ru.smartel.strike.entity.Event;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,7 +20,7 @@ public class NotAParentEvent extends BusinessRule {
     public boolean passes() {
         int relatedConflictsCount =  entityManager
                 .createQuery("select c.id " +
-                        "from ru.smartel.strike.model.Conflict c " +
+                        "from ru.smartel.strike.entity.Conflict c " +
                         "where c.parentEvent = :event")
                 .setMaxResults(1)
                 .setParameter("event", entityManager.getReference(Event.class, 21))

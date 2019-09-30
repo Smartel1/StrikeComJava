@@ -1,7 +1,7 @@
 package ru.smartel.strike.dto.response.video;
 
 import lombok.Data;
-import ru.smartel.strike.model.Video;
+import ru.smartel.strike.entity.Video;
 
 @Data
 public class VideoDTO {
