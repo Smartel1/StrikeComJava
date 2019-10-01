@@ -29,5 +29,17 @@ public interface Contents {
         }
     }
 
-    ;
+    default void setContentByLocale(Locale locale, String content) {
+        switch (locale) {
+            case RU:
+                setContentRu(content);
+                break;
+            case EN:
+                setContentEn(content);
+                break;
+            case ES:
+                setContentEs(content);
+                break;
+        }
+    }
 }

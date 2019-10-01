@@ -29,5 +29,17 @@ public interface Titles {
         }
     }
 
-    ;
+    default void setTitleByLocale(Locale locale, String title) {
+        switch (locale) {
+            case RU:
+                setTitleRu(title);
+                break;
+            case EN:
+                setTitleEn(title);
+                break;
+            case ES:
+                setTitleEs(title);
+                break;
+        }
+    }
 }

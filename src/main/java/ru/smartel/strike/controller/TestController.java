@@ -5,7 +5,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.JsonSchemaValidationException;
-import ru.smartel.strike.service.EventService;
+import ru.smartel.strike.service.EventServiceImpl;
 import ru.smartel.strike.service.JsonSchemaValidator;
 import ru.smartel.strike.service.Locale;
 
@@ -17,9 +17,9 @@ import java.io.IOException;
 public class TestController {
 
     private JsonSchemaValidator validator;
-    private EventService eventService;
+    private EventServiceImpl eventService;
 
-    public TestController(JsonSchemaValidator validator, EventService eventService) {
+    public TestController(JsonSchemaValidator validator, EventServiceImpl eventService) {
         this.validator = validator;
         this.eventService = eventService;
     }

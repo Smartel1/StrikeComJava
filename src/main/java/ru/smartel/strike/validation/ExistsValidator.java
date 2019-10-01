@@ -7,7 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class ExistsValidator implements ConstraintValidator<Exists, String> {
+public class ExistsValidator implements ConstraintValidator<Exists, Integer> {
     @Autowired
     EntityManagerFactory entityManagerFactory;
 
@@ -21,7 +21,7 @@ public class ExistsValidator implements ConstraintValidator<Exists, String> {
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
+    public boolean isValid(Integer value, ConstraintValidatorContext context) {
         EntityManager em = entityManagerFactory.createEntityManager();
         try {
             return !em

@@ -13,8 +13,7 @@ import ru.smartel.strike.repository.UserRepository;
 
 @Configuration
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
-@EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecurityConf extends WebSecurityConfigurerAdapter {
+public class WebSecurityConf extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserRepository userRepository;
