@@ -5,7 +5,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
-import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 
 @Service
@@ -13,14 +12,20 @@ import ru.smartel.strike.exception.BusinessRuleValidationException;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    EventDetailDTO getAndIncrementViews(Integer id, Locale locale, boolean withRelatives);
+    EventDetailDTO index(Integer eventId, Locale locale, boolean withRelatives);
+
+    @PreAuthorize("permitAll()")
+    EventDetailDTO getAndIncrementViews(Integer eventId, Locale locale, boolean withRelatives);
 
     @PreAuthorize("isFullyAuthenticated()")
-    EventDetailDTO create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException;
+    void setFavourite(Integer eventId, Integer userId, boolean isFavourite);
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#id)")
-    EventDetailDTO update(Integer id, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException;
+    @PreAuthorize("isFullyAuthenticated()")
+    EventDetailDTO create(JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException;
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#eventId)")
+    EventDetailDTO update(Integer eventId, JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    void delete(Integer id);
+    void delete(Integer eventId);
 }

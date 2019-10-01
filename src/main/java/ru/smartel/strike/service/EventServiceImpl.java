@@ -12,6 +12,7 @@ import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.entity.reference.VideoType;
 import ru.smartel.strike.repository.EventRepository;
 import ru.smartel.strike.repository.TagRepository;
+import ru.smartel.strike.repository.UserRepository;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 
@@ -19,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -28,19 +30,21 @@ public class EventServiceImpl implements EventService {
     private TagRepository tagRepository;
     private BusinessValidationService businessValidationService;
     private EventRepository eventRepository;
+    private UserRepository userRepository;
 
     public EventServiceImpl(
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
-            EventRepository eventRepository) {
+            EventRepository eventRepository, UserRepository userRepository) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public EventDetailDTO getAndIncrementViews(Integer id, Locale locale, boolean withRelatives) {
-        Event event = eventRepository.findOrThrow(id);
+    public EventDetailDTO getAndIncrementViews(Integer eventId, Locale locale, boolean withRelatives) {
+        Event event = eventRepository.findOrThrow(eventId);
 
         event.setViews(event.getViews() + 1);
         EventDetailDTO dto = new EventDetailDTO(event, locale);
@@ -51,8 +55,28 @@ public class EventServiceImpl implements EventService {
 
         return dto;
     }
+
     @Override
-    public EventDetailDTO create(JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
+    public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
+        User user = userRepository.findById(userId).get();
+        Event event = entityManager.getReference(Event.class, eventId);
+
+        List<Event> currentFavourites = user.getFavouriteEvents();
+
+        if (isFavourite) {
+            //Добавим в избранное, если ещё не в избранном
+            if (!currentFavourites.contains(event)) {
+                currentFavourites.add(event);
+            }
+        } else {
+            currentFavourites.remove(event);
+        }
+    }
+
+    @Override
+    public EventDetailDTO create(JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException {
+        User user = userRepository.findById(userId).get();
+
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
                 new UserCanModerate(user).when(
@@ -80,9 +104,11 @@ public class EventServiceImpl implements EventService {
 
         return new EventDetailDTO(event, locale);
     }
+
     @Override
-    public EventDetailDTO update(Integer id, JsonNode data, User user, Locale locale) throws BusinessRuleValidationException {
-        Event event = eventRepository.findOrThrow(id);
+    public EventDetailDTO update(Integer eventId, JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException {
+        Event event = eventRepository.findOrThrow(eventId);
+        User user = userRepository.findById(userId).get();
 
         boolean userChangesPublishStatus =
                 data.has("published") && data.get("published").asBoolean() != event.isPublished();
@@ -130,8 +156,8 @@ public class EventServiceImpl implements EventService {
         return new EventDetailDTO(event, locale);
     }
     @Override
-    public void delete(Integer id) {
-        Event event = eventRepository.findOrThrow(id);
+    public void delete(Integer eventId) {
+        Event event = eventRepository.findOrThrow(eventId);
         entityManager.remove(event);
     };
 

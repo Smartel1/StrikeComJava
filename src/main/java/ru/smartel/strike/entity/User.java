@@ -5,18 +5,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Data;
+import org.hibernate.annotations.*;
 import org.springframework.data.annotation.AccessType;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Data
 @Table(name = "users")
 @TypeDef(
         name = "jsonb",
@@ -60,57 +61,21 @@ public class User {
     @Type(type = "jsonb")
     private JsonNode roles = new ArrayNode(JsonNodeFactory.instance);
 
-    public int getId() {
-        return id;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "favourite_events",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<Event> favouriteEvents;
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFcm() {
-        return fcm;
-    }
-
-    public void setFcm(String fcm) {
-        this.fcm = fcm;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public JsonNode getRoles() {
-        return roles;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "favourite_news",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "news_id")
+    )
+    private List<News> favouriteNews;
 
     public List<String> getRolesAsList() {
         List<String> roles = new ArrayList<>();
@@ -118,17 +83,5 @@ public class User {
             roles.add(role.asText());
         }
         return roles;
-    }
-
-    public void setRoles(JsonNode roles) {
-        this.roles = roles;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

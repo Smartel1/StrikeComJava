@@ -47,6 +47,15 @@ public class EventController {
         return eventService.getAndIncrementViews(eventId, locale, withRelatives);
     }
 
+    @GetMapping("{id}/favourite")
+    public void setFavourite(
+            @PathVariable("id") int eventId,
+            @AuthenticationPrincipal User user,
+            @RequestParam(value = "favourite") boolean isFavourite
+    ) {
+        eventService.setFavourite(eventId, user.getId(), isFavourite);
+    }
+
     @PostMapping(consumes = {"application/json"})
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
@@ -56,7 +65,7 @@ public class EventController {
 
         validator.validate(data, "event/store");
 
-        return eventService.create(data, user, locale);
+        return eventService.create(data, user.getId(), locale);
     }
 
     @PutMapping(path = "{id}", consumes = {"application/json"})
@@ -69,7 +78,7 @@ public class EventController {
 
         validator.validate(data, "event/update");
 
-        return eventService.update(eventId, data, user, locale);
+        return eventService.update(eventId, data, user.getId(), locale);
     }
 
     @DeleteMapping(path = "{id}")
