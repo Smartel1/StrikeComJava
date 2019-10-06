@@ -15,11 +15,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-@Entity
+@Entity(name = "Event")
 @Table(name = "events")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Event implements Commentable, Post, TitlesContents {
@@ -87,7 +85,7 @@ public class Event implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Photo> photos = new ArrayList<>();
+    private Set<Photo> photos = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "event_video",
@@ -95,7 +93,7 @@ public class Event implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Video> videos = new ArrayList<>();
+    private Set<Video> videos = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "event_tag",
@@ -103,7 +101,7 @@ public class Event implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Tag> tags  = Collections.emptyList();
+    private Set<Tag> tags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_id")
@@ -123,7 +121,7 @@ public class Event implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
             joinColumns = {@JoinColumn(name = "event_id")}
     )
-    private List<Comment> comments = Collections.emptyList();
+    private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id")
@@ -272,27 +270,27 @@ public class Event implements Commentable, Post, TitlesContents {
         this.author = author;
     }
 
-    public List<Photo> getPhotos() {
+    public Set<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
     }
 
-    public List<Video> getVideos() {
+    public Set<Video> getVideos() {
         return videos;
     }
 
-    public void setVideos(List<Video> videos) {
+    public void setVideos(Set<Video> videos) {
         this.videos = videos;
     }
 
-    public List<Tag> getTags() {
+    public Set<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(Set<Tag> tags) {
         this.tags = tags;
     }
 
@@ -321,12 +319,12 @@ public class Event implements Commentable, Post, TitlesContents {
     }
 
     @Override
-    public List<Comment> getComments() {
+    public Set<Comment> getComments() {
         return comments;
     }
 
     @Override
-    public void setComments(List<Comment> comments) {
+    public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 

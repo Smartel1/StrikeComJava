@@ -12,7 +12,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "news")
@@ -72,7 +74,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
             joinColumns = {@JoinColumn(name = "news_id")}
     )
-    private List<Comment> comments;
+    private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "news_photo",
@@ -80,7 +82,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Photo> photos;
+    private Set<Photo> photos;
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "news_video",
@@ -88,7 +90,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Video> videos;
+    private Set<Video> videos;
 
     public int getId() {
         return id;
@@ -189,28 +191,28 @@ public class News implements Commentable, Post, TitlesContents {
     }
 
     @Override
-    public List<Comment> getComments() {
+    public Set<Comment> getComments() {
         return comments;
     }
 
     @Override
-    public void setComments(List<Comment> comments) {
+    public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
 
-    public List<Photo> getPhotos() {
+    public Set<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
     }
 
-    public List<Video> getVideos() {
+    public Set<Video> getVideos() {
         return videos;
     }
 
-    public void setVideos(List<Video> videos) {
+    public void setVideos(Set<Video> videos) {
         this.videos = videos;
     }
 

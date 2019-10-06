@@ -3,8 +3,10 @@ package ru.smartel.strike.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
+import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.JsonSchemaValidationException;
@@ -12,10 +14,14 @@ import ru.smartel.strike.service.EventService;
 import ru.smartel.strike.service.JsonSchemaValidator;
 import ru.smartel.strike.service.Locale;
 
+import javax.validation.constraints.Min;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/{locale}/event")
+@RequestMapping("/api/{locale}")
+@Validated
 public class EventController {
 
     private JsonSchemaValidator validator;
@@ -26,37 +32,59 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping()
-    public Object index(
+    @GetMapping("/event")
+    public List<EventListDTO> index(
             @PathVariable("locale") Locale locale,
-            @RequestParam(
-                    name = "per_page",
-                    required = false,
-                    defaultValue = "20"
-            ) Integer perPage
+            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
+            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
+            @RequestBody JsonNode data,
+            @AuthenticationPrincipal User user
     ) {
-        return eventService.index(locale, true);
+        return eventService.index(
+                data.get("filters"),
+                perPage,
+                page,
+                locale,
+                null != user ? user.getRolesAsList() : Collections.emptyList()
+        );
     }
 
-    @GetMapping("{id}")
+    @PostMapping("/event-list")
+    public List<EventListDTO> postIndex(
+            @PathVariable("locale") Locale locale,
+            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
+            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
+            @RequestBody JsonNode data,
+            @AuthenticationPrincipal User user
+    ) {
+        return eventService.index(
+                data.get("filters"),
+                perPage,
+                page,
+                locale,
+                null != user ? user.getRolesAsList() : Collections.emptyList()
+        );
+    }
+
+    @GetMapping("/event/{id}")
     public EventDetailDTO show(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
             @RequestParam(value = "with_relatives", required = false) boolean withRelatives
     ) {
-        return eventService.getAndIncrementViews(eventId, locale, withRelatives);
+        return eventService.incrementViewsAndGet(eventId, locale, withRelatives);
     }
 
-    @PostMapping("{id}/favourite")
+    @PostMapping("/event/{id}/favourite")
     public void setFavourite(
             @PathVariable("id") int eventId,
-            @AuthenticationPrincipal User user,
-            @RequestParam(value = "favourite") boolean isFavourite
+            @RequestParam(value = "favourite") boolean isFavourite,
+            @AuthenticationPrincipal User user
     ) {
         eventService.setFavourite(eventId, user.getId(), isFavourite);
     }
 
-    @PostMapping(consumes = {"application/json"})
+    @PostMapping(path = "/event/", consumes = {"application/json"})
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody JsonNode data,
@@ -68,7 +96,7 @@ public class EventController {
         return eventService.create(data, user.getId(), locale);
     }
 
-    @PutMapping(path = "{id}", consumes = {"application/json"})
+    @PutMapping(path = "/event/{id}", consumes = {"application/json"})
     public EventDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
@@ -81,7 +109,7 @@ public class EventController {
         return eventService.update(eventId, data, user.getId(), locale);
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/event/{id}")
     public void delete(
             @PathVariable("id") int eventId
     ) {

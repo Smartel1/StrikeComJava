@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
+import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.reference.EventStatus;
@@ -21,9 +22,15 @@ import ru.smartel.strike.service.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -38,20 +45,49 @@ public class EventServiceImpl implements EventService {
     public EventServiceImpl(
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
-            EventRepository eventRepository, UserRepository userRepository) {
+            EventRepository eventRepository,
+            UserRepository userRepository
+    ) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
 
+
     @Override
-    public EventDetailDTO index(Locale locale, boolean withRelatives) {
-        return null; //todo implement
+    public List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles) {
+
+        //Get list of events' ids first. That's because pagination and fetching dont work together
+        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles);
+
+        if (ids.isEmpty()) return Collections.emptyList();
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Event> eventQuery = cb.createQuery(Event.class);
+
+        Root<Event> eventRoot = eventQuery.from(Event.class);
+        eventRoot.fetch("photos", JoinType.LEFT);
+        eventRoot.fetch("videos", JoinType.LEFT);
+        eventRoot.fetch("tags", JoinType.LEFT);
+        eventRoot.fetch("comments", JoinType.LEFT);
+        eventRoot.fetch("conflict", JoinType.LEFT);
+
+        eventQuery.select(eventRoot)
+                .distinct(true)
+                .orderBy(cb.desc(eventRoot.get("date")))
+                .where(cb.in(eventRoot.get("id")).value(ids));
+
+        return entityManager
+                .createQuery(eventQuery)
+                .getResultList()
+                .stream()
+                .map(e -> new EventListDTO(e, locale))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public EventDetailDTO getAndIncrementViews(Integer eventId, Locale locale, boolean withRelatives) {
+    public EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives) {
         Event event = eventRepository.findOrThrow(eventId);
 
         event.setViews(event.getViews() + 1);
@@ -163,11 +199,87 @@ public class EventServiceImpl implements EventService {
 //
         return new EventDetailDTO(event, locale);
     }
+
     @Override
     public void delete(Integer eventId) {
         Event event = eventRepository.findOrThrow(eventId);
         entityManager.remove(event);
-    };
+    }
+
+    /**
+     * Get ids of events matching filters, locale, permissions and pagination
+     */
+    private List<Integer> getEventIds(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
+        Root<Event> root = idQuery.from(Event.class);
+        idQuery.select(root.get("id"))
+                .orderBy(cb.desc(root.get("date")));
+        //Usual users can see published events only
+        if (!userRoles.contains(User.ROLE_MODERATOR) && !userRoles.contains(User.ROLE_ADMIN)) {
+            idQuery.where(cb.equal(root.get("published"), true));
+        }
+
+        if (null != filters) {
+            applyFilters(idQuery, root, filters);
+        }
+        //Only localized events
+        if (!locale.equals(Locale.ALL)){
+            List<Predicate> predicates = new LinkedList<>();
+            if (null != idQuery.getRestriction()) predicates.add(idQuery.getRestriction());
+            predicates.add(cb.isNotNull(root.get("title" + locale.getPascalCase())));
+            predicates.add(cb.isNotNull(root.get("content" + locale.getPascalCase())));
+            idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
+        }
+
+        return entityManager
+                .createQuery(idQuery)
+                .setMaxResults(perPage)
+                .setFirstResult((page - 1) * perPage)
+                .getResultList();
+    }
+
+    /**
+     * Apply filters to id criteria query
+     */
+    private void applyFilters(CriteriaQuery<Integer> idQuery, Root<Event> root, JsonNode filters) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        //Create predicates for each filter
+        List<Predicate> predicates = new ArrayList<>();
+        //add restriction applied before this method
+        if (null != idQuery.getRestriction()) predicates.add(idQuery.getRestriction());
+
+        if (filters.has("published")) {
+            predicates.add(cb.equal(root.get("published"), filters.get("published").asBoolean()));
+        }
+        if (filters.has("date_from")) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("date"),
+                    LocalDateTime.ofEpochSecond(filters.get("date_from").asInt(), 0, ZoneOffset.UTC)));
+        }
+        if (filters.has("date_to")) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("date"),
+                    LocalDateTime.ofEpochSecond(filters.get("date_to").asInt(), 0, ZoneOffset.UTC)));
+        }
+        if (filters.has("event_status_ids")) {
+            List<Integer> statusIds = StreamSupport.stream(filters.get("event_status_ids").spliterator(), false)
+                    .map(JsonNode::asInt)
+                    .collect(Collectors.toList());
+            predicates.add(cb.in(root.get("status").get("id")).value(statusIds));
+        }
+        if (filters.has("event_type_ids")) {
+            List<Integer> typeIds = StreamSupport.stream(filters.get("event_type_ids").spliterator(), false)
+                    .map(JsonNode::asInt)
+                    .collect(Collectors.toList());
+            predicates.add(cb.in(root.get("type").get("id")).value(typeIds));
+        }
+        if (filters.has("tag_id")) {
+            predicates.add(cb.equal(root.join("tags").get("id"), filters.get("tag_id").asInt()));
+        }
+        //apply predicates to criteriaQuery with AND operator
+        if (!predicates.isEmpty()) {
+            idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
+        }
+    }
 
     private void fillEventFields(Event event, JsonNode data, Locale locale) {
         if (data.has("conflict_id")) attachConflict(event, data.get("conflict_id").asInt());
@@ -193,7 +305,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Связать конфликт с событием
+     * Set event's conflict
      */
     private void attachConflict(Event event, Integer conflictId) {
         Conflict conflict = entityManager.getReference(Conflict.class, conflictId);
@@ -201,7 +313,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Установить населенный пункт события. Если localityIdNode пришёл равным null, то обнуляем поле
+     * Set locality. If received localityIdNode equals null, then set to null
      */
     private void setLocality(Event event, JsonNode localityIdNode) {
         Locality locality = null;
@@ -214,7 +326,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Установить статус события. Если eventStatusIdNode пришёл равным null, то обнуляем поле
+     * Set event's status. If received eventStatusIdNode equals null, then set to null
      */
     private void setEventStatus(Event event, JsonNode eventStatusIdNode) {
         EventStatus eventStatus = null;
@@ -227,7 +339,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Установить тип события. Если eventTypeIdNode пришёл равным null, то обнуляем поле
+     * Set event's type. If received eventTypeIdNode equals null, then set to null
      */
     private void setEventType(Event event, JsonNode eventTypeIdNode) {
         EventType eventType = null;
@@ -240,7 +352,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Если фото переданы в запросе, то удалить старые фото события и прикрепить новые
+     * If client has sent photos, then remove old ones and save received
      */
     private void syncPhotos(Event event, JsonNode photoURLsNode) {
         if (null == photoURLsNode) return;
@@ -258,7 +370,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Если видео переданы в запросе, то удалить старые видео события и прикрепить новые
+     *  If client has sent videos, then remove old ones and save received
      */
     private void syncVideos(Event event, JsonNode videosNode) {
         if (null == videosNode) return;
@@ -280,7 +392,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Если теги переданы в запросе, то открепить старые теги события и прикрепить новые
+     * If client has sent tags, then detach (not remove because tags are shared between events) old ones and save received
      */
     private void syncTags(Event event, JsonNode receivedTags) {
         if (null == receivedTags) return;
