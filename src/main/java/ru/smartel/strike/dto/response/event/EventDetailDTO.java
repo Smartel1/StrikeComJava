@@ -1,6 +1,5 @@
 package ru.smartel.strike.dto.response.event;
 
-import lombok.Data;
 import ru.smartel.strike.dto.response.TitlesContentExtendableDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
@@ -15,7 +14,6 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
 public class EventDetailDTO extends TitlesContentExtendableDTO {
 
     public EventDetailDTO(Event event, Locale locale) {
@@ -56,4 +54,140 @@ public class EventDetailDTO extends TitlesContentExtendableDTO {
     private ConflictDetailDTO conflict;
     private int commentsCount;
     private ExtendedLocalityDTO locality;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getSourceLink() {
+        return sourceLink;
+    }
+
+    public void setSourceLink(String sourceLink) {
+        this.sourceLink = sourceLink;
+    }
+
+    public int getConflictId() {
+        return conflictId;
+    }
+
+    public void setConflictId(int conflictId) {
+        this.conflictId = conflictId;
+    }
+
+    public Integer getEventStatusId() {
+        return eventStatusId;
+    }
+
+    public void setEventStatusId(Integer eventStatusId) {
+        this.eventStatusId = eventStatusId;
+    }
+
+    public Integer getEventTypeId() {
+        return eventTypeId;
+    }
+
+    public void setEventTypeId(Integer eventTypeId) {
+        this.eventTypeId = eventTypeId;
+    }
+
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<String> photos) {
+        this.photos = photos;
+    }
+
+    public List<VideoDTO> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<VideoDTO> videos) {
+        this.videos = videos;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public UserDTO getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(UserDTO author) {
+        this.author = author;
+    }
+
+    public ConflictDetailDTO getConflict() {
+        return conflict;
+    }
+
+    public void setConflict(ConflictDetailDTO conflict) {
+        this.conflict = conflict;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    public ExtendedLocalityDTO getLocality() {
+        return locality;
+    }
+
+    public void setLocality(ExtendedLocalityDTO locality) {
+        this.locality = locality;
+    }
 }

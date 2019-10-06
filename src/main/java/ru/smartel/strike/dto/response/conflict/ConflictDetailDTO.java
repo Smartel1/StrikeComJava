@@ -1,13 +1,11 @@
 package ru.smartel.strike.dto.response.conflict;
 
-import lombok.Data;
 import ru.smartel.strike.dto.response.TitlesExtendableDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
 
-@Data
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
     public ConflictDetailDTO (Conflict conflict, Locale locale) {
@@ -34,4 +32,84 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
     private Integer conflictResultId;
     private Integer industryId;
     private Integer parentEventId;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public Long getDateFrom() {
+        return dateFrom;
+    }
+
+    public void setDateFrom(Long dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public Long getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(Long dateTo) {
+        this.dateTo = dateTo;
+    }
+
+    public Integer getConflictReasonId() {
+        return conflictReasonId;
+    }
+
+    public void setConflictReasonId(Integer conflictReasonId) {
+        this.conflictReasonId = conflictReasonId;
+    }
+
+    public Integer getConflictResultId() {
+        return conflictResultId;
+    }
+
+    public void setConflictResultId(Integer conflictResultId) {
+        this.conflictResultId = conflictResultId;
+    }
+
+    public Integer getIndustryId() {
+        return industryId;
+    }
+
+    public void setIndustryId(Integer industryId) {
+        this.industryId = industryId;
+    }
+
+    public Integer getParentEventId() {
+        return parentEventId;
+    }
+
+    public void setParentEventId(Integer parentEventId) {
+        this.parentEventId = parentEventId;
+    }
 }

@@ -12,7 +12,7 @@ import ru.smartel.strike.exception.BusinessRuleValidationException;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    EventDetailDTO index(Integer eventId, Locale locale, boolean withRelatives);
+    EventDetailDTO index(Locale locale, boolean withRelatives);
 
     @PreAuthorize("permitAll()")
     EventDetailDTO getAndIncrementViews(Integer eventId, Locale locale, boolean withRelatives);

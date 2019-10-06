@@ -2,7 +2,6 @@ package ru.smartel.strike.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import lombok.Data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +10,6 @@ import java.util.Map;
  * Класс-заготовка для DTO, которые содержат необязательные поля.
  * Такие поля сериализуются в json как обычные поля класса
  */
-@Data
 public abstract class ExtendableDTO {
 
     private Map<String, Object> optionalFields = new HashMap<>();

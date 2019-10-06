@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import lombok.Data;
 import org.hibernate.annotations.*;
 import org.springframework.data.annotation.AccessType;
 
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
 @Table(name = "users")
 @TypeDef(
         name = "jsonb",
@@ -83,5 +81,93 @@ public class User {
             roles.add(role.asText());
         }
         return roles;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getFcm() {
+        return fcm;
+    }
+
+    public void setFcm(String fcm) {
+        this.fcm = fcm;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public JsonNode getRoles() {
+        return roles;
+    }
+
+    public void setRoles(JsonNode roles) {
+        this.roles = roles;
+    }
+
+    public List<Event> getFavouriteEvents() {
+        return favouriteEvents;
+    }
+
+    public void setFavouriteEvents(List<Event> favouriteEvents) {
+        this.favouriteEvents = favouriteEvents;
+    }
+
+    public List<News> getFavouriteNews() {
+        return favouriteNews;
+    }
+
+    public void setFavouriteNews(List<News> favouriteNews) {
+        this.favouriteNews = favouriteNews;
     }
 }

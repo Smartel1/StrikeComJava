@@ -1,9 +1,7 @@
 package ru.smartel.strike.dto.response.video;
 
-import lombok.Data;
 import ru.smartel.strike.entity.Video;
 
-@Data
 public class VideoDTO {
 
     public VideoDTO(Video video) {
@@ -15,4 +13,28 @@ public class VideoDTO {
     private String url;
     private String previewUrl;
     private int videoTypeId;
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
+    }
+
+    public int getVideoTypeId() {
+        return videoTypeId;
+    }
+
+    public void setVideoTypeId(int videoTypeId) {
+        this.videoTypeId = videoTypeId;
+    }
 }

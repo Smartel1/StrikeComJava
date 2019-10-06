@@ -1,7 +1,6 @@
 package ru.smartel.strike.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -21,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Data
 @Table(name = "events")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Event implements Commentable, Post, TitlesContents {
@@ -130,4 +128,213 @@ public class Event implements Commentable, Post, TitlesContents {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id")
     private Locality locality;
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String getTitleRu() {
+        return titleRu;
+    }
+
+    @Override
+    public void setTitleRu(String titleRu) {
+        this.titleRu = titleRu;
+    }
+
+    @Override
+    public String getTitleEn() {
+        return titleEn;
+    }
+
+    @Override
+    public void setTitleEn(String titleEn) {
+        this.titleEn = titleEn;
+    }
+
+    @Override
+    public String getTitleEs() {
+        return titleEs;
+    }
+
+    @Override
+    public void setTitleEs(String titleEs) {
+        this.titleEs = titleEs;
+    }
+
+    @Override
+    public String getContentRu() {
+        return contentRu;
+    }
+
+    @Override
+    public void setContentRu(String contentRu) {
+        this.contentRu = contentRu;
+    }
+
+    @Override
+    public String getContentEn() {
+        return contentEn;
+    }
+
+    @Override
+    public void setContentEn(String contentEn) {
+        this.contentEn = contentEn;
+    }
+
+    @Override
+    public String getContentEs() {
+        return contentEs;
+    }
+
+    @Override
+    public void setContentEs(String contentEs) {
+        this.contentEs = contentEs;
+    }
+
+    public Float getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Float longitude) {
+        this.longitude = longitude;
+    }
+
+    public Float getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Float latitude) {
+        this.latitude = latitude;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public Integer getViews() {
+        return views;
+    }
+
+    public void setViews(Integer views) {
+        this.views = views;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
+    }
+
+    public String getSourceLink() {
+        return sourceLink;
+    }
+
+    public void setSourceLink(String sourceLink) {
+        this.sourceLink = sourceLink;
+    }
+
+    @Override
+    public User getAuthor() {
+        return author;
+    }
+
+    @Override
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public Conflict getConflict() {
+        return conflict;
+    }
+
+    public void setConflict(Conflict conflict) {
+        this.conflict = conflict;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+
+    public EventType getType() {
+        return type;
+    }
+
+    public void setType(EventType type) {
+        this.type = type;
+    }
+
+    @Override
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    @Override
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public Locality getLocality() {
+        return locality;
+    }
+
+    public void setLocality(Locality locality) {
+        this.locality = locality;
+    }
 }

@@ -5,7 +5,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.JsonSchemaValidationException;
-import ru.smartel.strike.service.EventServiceImpl;
+import ru.smartel.strike.service.impl.EventServiceImpl;
 import ru.smartel.strike.service.JsonSchemaValidator;
 import ru.smartel.strike.service.Locale;
 

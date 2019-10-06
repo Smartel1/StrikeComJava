@@ -27,7 +27,7 @@ public class EventController {
     }
 
     @GetMapping()
-    public String index(
+    public Object index(
             @PathVariable("locale") Locale locale,
             @RequestParam(
                     name = "per_page",
@@ -35,7 +35,7 @@ public class EventController {
                     defaultValue = "20"
             ) Integer perPage
     ) {
-        return "method needs to be implemented";
+        return eventService.index(locale, true);
     }
 
     @GetMapping("{id}")
@@ -47,7 +47,7 @@ public class EventController {
         return eventService.getAndIncrementViews(eventId, locale, withRelatives);
     }
 
-    @GetMapping("{id}/favourite")
+    @PostMapping("{id}/favourite")
     public void setFavourite(
             @PathVariable("id") int eventId,
             @AuthenticationPrincipal User user,
