@@ -49,7 +49,7 @@ tasks.withType(JavaCompile) {
 }
 
 flyway {
-    url = 'jdbc:postgresql://localhost:5432/strike1'
-    user = 'postgres'
-    password = 'postgres'
+    url = strikeDatabaseURL
+    user = strikeDatabaseUsername
+    password = strikeDatabasePassword
 }
