@@ -45,7 +45,8 @@ public class EventController {
                 perPage,
                 page,
                 locale,
-                null != user ? user.getRolesAsList() : Collections.emptyList()
+                null != user ? user.getRolesAsList() : Collections.emptyList(),
+                null != user ? user.getId() : null
         );
     }
 
@@ -62,7 +63,8 @@ public class EventController {
                 perPage,
                 page,
                 locale,
-                null != user ? user.getRolesAsList() : Collections.emptyList()
+                null != user ? user.getRolesAsList() : Collections.emptyList(),
+                null != user ? user.getId() : null
         );
     }
 

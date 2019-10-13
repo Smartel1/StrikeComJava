@@ -19,7 +19,6 @@ import java.util.*;
 
 @Entity(name = "Event")
 @Table(name = "events")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Event implements Commentable, Post, TitlesContents {
 
     @Id
@@ -78,6 +77,9 @@ public class Event implements Commentable, Post, TitlesContents {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
+
+    @ManyToMany(mappedBy = "favouriteEvents")
+    private Set<User> likedUsers = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "event_photo",
@@ -268,6 +270,14 @@ public class Event implements Commentable, Post, TitlesContents {
     @Override
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public Set<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(Set<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 
     public Set<Photo> getPhotos() {

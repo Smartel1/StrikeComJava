@@ -15,7 +15,7 @@ import java.util.List;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles);
+    List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userid);
 
     @PreAuthorize("permitAll()")
     EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);

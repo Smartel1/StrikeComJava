@@ -12,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "comments")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,7 +25,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,10 +55,10 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles) {
+    public List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userid) {
 
         //Get list of events' ids first. That's because pagination and fetching dont work together
-        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles);
+        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles, userid);
 
         if (ids.isEmpty()) return Collections.emptyList();
 
@@ -208,29 +207,34 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Get ids of events matching filters, locale, permissions and pagination
+     * todo simplify, split up into atomic methods
      */
-    private List<Integer> getEventIds(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles) {
+    private List<Integer> getEventIds(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<Event> root = idQuery.from(Event.class);
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("date")));
+
+        List<Predicate> predicates = new LinkedList<>();
+
         //Usual users can see published events only
         if (!userRoles.contains(User.ROLE_MODERATOR) && !userRoles.contains(User.ROLE_ADMIN)) {
-            idQuery.where(cb.equal(root.get("published"), true));
+            predicates.add(cb.equal(root.get("published"), true));
         }
 
         if (null != filters) {
-            applyFilters(idQuery, root, filters);
+            predicates.addAll(filtersToPredicates(root, filters, userId));
         }
+
         //Only localized events
-        if (!locale.equals(Locale.ALL)){
-            List<Predicate> predicates = new LinkedList<>();
-            if (null != idQuery.getRestriction()) predicates.add(idQuery.getRestriction());
+        if (!locale.equals(Locale.ALL)) {
             predicates.add(cb.isNotNull(root.get("title" + locale.getPascalCase())));
             predicates.add(cb.isNotNull(root.get("content" + locale.getPascalCase())));
-            idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
         }
+
+        //Union all predicates (filters, restrictions) with AND operator
+        idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
 
         return entityManager
                 .createQuery(idQuery)
@@ -240,14 +244,13 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Apply filters to id criteria query
+     * Transform filters to predicates
+     * todo make readable (possible approach: make filter->predicate transform layer)
      */
-    private void applyFilters(CriteriaQuery<Integer> idQuery, Root<Event> root, JsonNode filters) {
+    private List<Predicate> filtersToPredicates(Root<Event> root, JsonNode filters, Integer userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         //Create predicates for each filter
-        List<Predicate> predicates = new ArrayList<>();
-        //add restriction applied before this method
-        if (null != idQuery.getRestriction()) predicates.add(idQuery.getRestriction());
+        List<Predicate> predicates = new LinkedList<>();
 
         if (filters.has("published")) {
             predicates.add(cb.equal(root.get("published"), filters.get("published").asBoolean()));
@@ -275,10 +278,31 @@ public class EventServiceImpl implements EventService {
         if (filters.has("tag_id")) {
             predicates.add(cb.equal(root.join("tags").get("id"), filters.get("tag_id").asInt()));
         }
-        //apply predicates to criteriaQuery with AND operator
-        if (!predicates.isEmpty()) {
-            idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
+        if (filters.has("conflict_ids")) {
+            List<Integer> conflictIds = StreamSupport.stream(filters.get("conflict_ids").spliterator(), false)
+                    .map(JsonNode::asInt)
+                    .collect(Collectors.toList());
+
+            //additional query to find ids of parent events of conflicts with given ids
+            List<Integer> parentEventIds = entityManager
+                    .createQuery("select parentEvent.id from Conflict where id in :ids")
+                    .setParameter("ids", conflictIds)
+                    .getResultList();
+
+            predicates.add(
+                    cb.or(
+                            //Events which belong to conflicts with given ids
+                            cb.in(root.get("conflict").get("id")).value(conflictIds),
+                            //or parent-events of conflicts with given ids
+                            cb.in(root.get("id")).value(parentEventIds)
+                    )
+            );
         }
+        if (filters.has("favourites") && null != userId) {
+            predicates.add(cb.in(root.join("likedUsers").get("id")).value(userId));
+        }
+
+        return predicates;
     }
 
     private void fillEventFields(Event event, JsonNode data, Locale locale) {
@@ -370,7 +394,7 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     *  If client has sent videos, then remove old ones and save received
+     * If client has sent videos, then remove old ones and save received
      */
     private void syncVideos(Event event, JsonNode videosNode) {
         if (null == videosNode) return;

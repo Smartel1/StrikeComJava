@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "videos")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

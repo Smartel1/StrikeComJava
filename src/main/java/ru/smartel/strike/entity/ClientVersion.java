@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "client_versions")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ClientVersion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

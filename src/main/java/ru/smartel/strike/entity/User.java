@@ -21,7 +21,6 @@ import java.util.List;
         name = "jsonb",
         typeClass = JsonNodeBinaryType.class
 )
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_MODERATOR = "MODERATOR";

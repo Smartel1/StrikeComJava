@@ -18,7 +18,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "news")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class News implements Commentable, Post, TitlesContents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

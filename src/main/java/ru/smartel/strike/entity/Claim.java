@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "claims")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Claim {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

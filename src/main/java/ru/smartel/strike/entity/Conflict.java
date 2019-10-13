@@ -15,7 +15,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "conflicts")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Conflict implements Titles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
