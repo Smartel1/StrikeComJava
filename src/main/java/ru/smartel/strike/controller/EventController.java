@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.JsonSchemaValidationException;
@@ -33,7 +34,7 @@ public class EventController {
     }
 
     @GetMapping("/event")
-    public List<EventListDTO> index(
+    public EventListWrapperDTO index(
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
@@ -51,7 +52,7 @@ public class EventController {
     }
 
     @PostMapping("/event-list")
-    public List<EventListDTO> postIndex(
+    public EventListWrapperDTO postIndex(
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userid);
+    EventListWrapperDTO index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId);
 
     @PreAuthorize("permitAll()")
     EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);

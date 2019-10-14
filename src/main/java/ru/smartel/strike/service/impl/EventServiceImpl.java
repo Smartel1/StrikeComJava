@@ -2,9 +2,11 @@ package ru.smartel.strike.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.reference.EventStatus;
@@ -18,6 +20,7 @@ import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.BusinessValidationService;
 import ru.smartel.strike.service.EventService;
+import ru.smartel.strike.service.FiltersTransformer;
 import ru.smartel.strike.service.Locale;
 
 import javax.persistence.EntityManager;
@@ -29,7 +32,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -40,27 +42,31 @@ public class EventServiceImpl implements EventService {
     private BusinessValidationService businessValidationService;
     private EventRepository eventRepository;
     private UserRepository userRepository;
+    private FiltersTransformer filtersTransformer;
 
     public EventServiceImpl(
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
             EventRepository eventRepository,
-            UserRepository userRepository
-    ) {
+            UserRepository userRepository,
+            FiltersTransformer filtersTransformer) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.filtersTransformer = filtersTransformer;
     }
 
 
     @Override
-    public List<EventListDTO> index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userid) {
+    public EventListWrapperDTO index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId) {
+
+        Long eventsCount = getEventsCount(filters, locale, userRoles, userId);
+
+        if (eventsCount == 0) return new EventListWrapperDTO(Collections.emptyList(), eventsCount);
 
         //Get list of events' ids first. That's because pagination and fetching dont work together
-        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles, userid);
-
-        if (ids.isEmpty()) return Collections.emptyList();
+        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles, userId);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> eventQuery = cb.createQuery(Event.class);
@@ -77,12 +83,14 @@ public class EventServiceImpl implements EventService {
                 .orderBy(cb.desc(eventRoot.get("date")))
                 .where(cb.in(eventRoot.get("id")).value(ids));
 
-        return entityManager
+        List<EventListDTO> eventListDTOS = entityManager
                 .createQuery(eventQuery)
                 .getResultList()
                 .stream()
                 .map(e -> new EventListDTO(e, locale))
                 .collect(Collectors.toList());
+
+        return new EventListWrapperDTO(eventListDTOS, eventsCount);
     }
 
     @Override
@@ -207,7 +215,6 @@ public class EventServiceImpl implements EventService {
 
     /**
      * Get ids of events matching filters, locale, permissions and pagination
-     * todo simplify, split up into atomic methods
      */
     private List<Integer> getEventIds(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -216,25 +223,7 @@ public class EventServiceImpl implements EventService {
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("date")));
 
-        List<Predicate> predicates = new LinkedList<>();
-
-        //Usual users can see published events only
-        if (!userRoles.contains(User.ROLE_MODERATOR) && !userRoles.contains(User.ROLE_ADMIN)) {
-            predicates.add(cb.equal(root.get("published"), true));
-        }
-
-        if (null != filters) {
-            predicates.addAll(filtersToPredicates(root, filters, userId));
-        }
-
-        //Only localized events
-        if (!locale.equals(Locale.ALL)) {
-            predicates.add(cb.isNotNull(root.get("title" + locale.getPascalCase())));
-            predicates.add(cb.isNotNull(root.get("content" + locale.getPascalCase())));
-        }
-
-        //Union all predicates (filters, restrictions) with AND operator
-        idQuery.where(cb.and(predicates.toArray(Predicate[]::new)));
+        applyPredicatesToQuery(idQuery, root, filters, locale, userRoles, userId);
 
         return entityManager
                 .createQuery(idQuery)
@@ -244,65 +233,51 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * Transform filters to predicates
-     * todo make readable (possible approach: make filter->predicate transform layer)
+     * Get count of events matching filters, locale and permissions
      */
-    private List<Predicate> filtersToPredicates(Root<Event> root, JsonNode filters, Integer userId) {
+    private Long getEventsCount(JsonNode filters, Locale locale, List<String> userRoles, Integer userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        //Create predicates for each filter
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Event> root = countQuery.from(Event.class);
+        countQuery.select(cb.count(root));
+
+        applyPredicatesToQuery(countQuery, root, filters, locale, userRoles, userId);
+
+        return entityManager
+                .createQuery(countQuery)
+                .getSingleResult();
+    }
+
+    /**
+     * Add restrictions by filters, user permissions and locale
+     */
+    private void applyPredicatesToQuery(CriteriaQuery query, Root root, JsonNode filters, Locale locale, List<String> userRoles, Integer userId) {
         List<Predicate> predicates = new LinkedList<>();
 
-        if (filters.has("published")) {
-            predicates.add(cb.equal(root.get("published"), filters.get("published").asBoolean()));
-        }
-        if (filters.has("date_from")) {
-            predicates.add(cb.greaterThanOrEqualTo(root.get("date"),
-                    LocalDateTime.ofEpochSecond(filters.get("date_from").asInt(), 0, ZoneOffset.UTC)));
-        }
-        if (filters.has("date_to")) {
-            predicates.add(cb.lessThanOrEqualTo(root.get("date"),
-                    LocalDateTime.ofEpochSecond(filters.get("date_to").asInt(), 0, ZoneOffset.UTC)));
-        }
-        if (filters.has("event_status_ids")) {
-            List<Integer> statusIds = StreamSupport.stream(filters.get("event_status_ids").spliterator(), false)
-                    .map(JsonNode::asInt)
-                    .collect(Collectors.toList());
-            predicates.add(cb.in(root.get("status").get("id")).value(statusIds));
-        }
-        if (filters.has("event_type_ids")) {
-            List<Integer> typeIds = StreamSupport.stream(filters.get("event_type_ids").spliterator(), false)
-                    .map(JsonNode::asInt)
-                    .collect(Collectors.toList());
-            predicates.add(cb.in(root.get("type").get("id")).value(typeIds));
-        }
-        if (filters.has("tag_id")) {
-            predicates.add(cb.equal(root.join("tags").get("id"), filters.get("tag_id").asInt()));
-        }
-        if (filters.has("conflict_ids")) {
-            List<Integer> conflictIds = StreamSupport.stream(filters.get("conflict_ids").spliterator(), false)
-                    .map(JsonNode::asInt)
-                    .collect(Collectors.toList());
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-            //additional query to find ids of parent events of conflicts with given ids
-            List<Integer> parentEventIds = entityManager
-                    .createQuery("select parentEvent.id from Conflict where id in :ids")
-                    .setParameter("ids", conflictIds)
-                    .getResultList();
-
-            predicates.add(
-                    cb.or(
-                            //Events which belong to conflicts with given ids
-                            cb.in(root.get("conflict").get("id")).value(conflictIds),
-                            //or parent-events of conflicts with given ids
-                            cb.in(root.get("id")).value(parentEventIds)
-                    )
-            );
-        }
-        if (filters.has("favourites") && null != userId) {
-            predicates.add(cb.in(root.join("likedUsers").get("id")).value(userId));
+        //Usual users can see published events only
+        if (!userRoles.contains(User.ROLE_MODERATOR) && !userRoles.contains(User.ROLE_ADMIN)) {
+            predicates.add(cb.equal(root.get("published"), true));
         }
 
-        return predicates;
+        if (null != filters) {
+            predicates.addAll(
+                    filtersTransformer
+                            .toSpecifications((ObjectNode) filters, userId)
+                            .stream()
+                            .map(spec -> spec.toPredicate(root, query, cb))
+                            .collect(Collectors.toList()));
+        }
+
+        //Only localized events
+        if (!locale.equals(Locale.ALL)) {
+            predicates.add(cb.isNotNull(root.get("title" + locale.getPascalCase())));
+            predicates.add(cb.isNotNull(root.get("content" + locale.getPascalCase())));
+        }
+
+        //Union all predicates (filters, restrictions) with AND operator
+        query.where(cb.and(predicates.toArray(Predicate[]::new)));
     }
 
     private void fillEventFields(Event event, JsonNode data, Locale locale) {
