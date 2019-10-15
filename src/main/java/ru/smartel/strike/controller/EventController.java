@@ -59,13 +59,8 @@ public class EventController {
             @RequestBody EventListRequestDTO data,
             @AuthenticationPrincipal User user
     ) {
-        return eventService.index(
-                data.getFilters(),
-                perPage,
-                page,
-                locale,
-                user
-        );
+        //alias of index method
+        return index(locale, perPage, page, data, user);
     }
 
     @GetMapping("/event/{id}")

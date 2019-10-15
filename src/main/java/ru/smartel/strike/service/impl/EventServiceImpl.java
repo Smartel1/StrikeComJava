@@ -61,9 +61,18 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user) {
 
-        Long eventsCount = getEventsCount(filters, locale, user);
+        int eventsCount = getEventsCount(filters, locale, user);
 
-        if (eventsCount == 0) return new EventListWrapperDTO(Collections.emptyList(), eventsCount);
+        EventListWrapperDTO.Meta responseMeta = new EventListWrapperDTO.Meta(
+                eventsCount,
+                page,
+                perPage,
+                eventsCount/perPage + 1
+        );
+
+        if (eventsCount == 0) {
+            return new EventListWrapperDTO(Collections.emptyList(), responseMeta);
+        }
 
         //Get list of events' ids first. That's because pagination and fetching dont work together
         List<Integer> ids = getEventIds(filters, perPage, page, locale, user);
@@ -90,7 +99,7 @@ public class EventServiceImpl implements EventService {
                 .map(e -> new EventListDTO(e, locale))
                 .collect(Collectors.toList());
 
-        return new EventListWrapperDTO(eventListDTOS, eventsCount);
+        return new EventListWrapperDTO(eventListDTOS, responseMeta);
     }
 
     @Override
@@ -235,7 +244,7 @@ public class EventServiceImpl implements EventService {
     /**
      * Get count of events matching filters, locale and permissions
      */
-    private Long getEventsCount(EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
+    private int getEventsCount(EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Event> root = countQuery.from(Event.class);
@@ -245,7 +254,8 @@ public class EventServiceImpl implements EventService {
 
         return entityManager
                 .createQuery(countQuery)
-                .getSingleResult();
+                .getSingleResult()
+                .intValue();
     }
 
     /**

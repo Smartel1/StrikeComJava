@@ -1,16 +1,14 @@
 package ru.smartel.strike.dto.response.event;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class EventListWrapperDTO {
     private List<EventListDTO> data;
-    private Map<String, Object> meta = new HashMap<>();
+    private Meta meta;
 
-    public EventListWrapperDTO(List<EventListDTO> data, Long count) {
+    public EventListWrapperDTO(List<EventListDTO> data, Meta meta) {
         this.data = data;
-        meta.put("total", count);
+        this.meta = meta;
     }
 
     public List<EventListDTO> getData() {
@@ -21,11 +19,57 @@ public class EventListWrapperDTO {
         this.data = data;
     }
 
-    public Map<String, Object> getMeta() {
+    public Meta getMeta() {
         return meta;
     }
 
-    public void setMeta(Map<String, Object> meta) {
+    public void setMeta(Meta meta) {
         this.meta = meta;
+    }
+
+    public static class Meta {
+        private Integer total;
+        private Integer currentPage;
+        private Integer perPage;
+        private Integer lastPage;
+
+        public Meta(Integer total, Integer currentPage, Integer perPage, Integer lastPage) {
+            this.total = total;
+            this.currentPage = currentPage;
+            this.perPage = perPage;
+            this.lastPage = lastPage;
+        }
+
+        public Integer getTotal() {
+            return total;
+        }
+
+        public void setTotal(Integer total) {
+            this.total = total;
+        }
+
+        public Integer getCurrentPage() {
+            return currentPage;
+        }
+
+        public void setCurrentPage(Integer currentPage) {
+            this.currentPage = currentPage;
+        }
+
+        public Integer getPerPage() {
+            return perPage;
+        }
+
+        public void setPerPage(Integer perPage) {
+            this.perPage = perPage;
+        }
+
+        public Integer getLastPage() {
+            return lastPage;
+        }
+
+        public void setLastPage(Integer lastPage) {
+            this.lastPage = lastPage;
+        }
     }
 }
