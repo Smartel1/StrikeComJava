@@ -1,6 +1,5 @@
 package ru.smartel.strike.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "client_versions")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ClientVersion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

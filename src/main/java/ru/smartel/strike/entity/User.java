@@ -1,6 +1,5 @@
 package ru.smartel.strike.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -21,7 +20,6 @@ import java.util.List;
         name = "jsonb",
         typeClass = JsonNodeBinaryType.class
 )
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String ROLE_MODERATOR = "MODERATOR";

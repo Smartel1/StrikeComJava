@@ -3,11 +3,12 @@ package ru.smartel.strike.entity.interfaces;
 
 import ru.smartel.strike.entity.Comment;
 
-import java.util.List;
+import java.util.Set;
+
 
 public interface Commentable {
 
-    List<Comment> getComments();
+    Set<Comment> getComments();
 
-    void setComments(List<Comment> comments);
+    void setComments(Set<Comment> comments);
 }

@@ -1,6 +1,5 @@
 package ru.smartel.strike.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import ru.smartel.strike.entity.reference.VideoType;
@@ -10,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "videos")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

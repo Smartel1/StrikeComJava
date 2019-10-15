@@ -4,18 +4,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.smartel.strike.dto.request.EventListRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
+import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
+
+import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    EventDetailDTO index(Locale locale, boolean withRelatives);
+    EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user);
 
     @PreAuthorize("permitAll()")
-    EventDetailDTO getAndIncrementViews(Integer eventId, Locale locale, boolean withRelatives);
+    EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);
 
     @PreAuthorize("isFullyAuthenticated()")
     void setFavourite(Integer eventId, Integer userId, boolean isFavourite);

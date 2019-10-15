@@ -1,6 +1,5 @@
 package ru.smartel.strike.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "claims")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Claim {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
