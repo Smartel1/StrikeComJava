@@ -5,6 +5,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.smartel.strike.dto.request.EventListRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
@@ -38,16 +39,15 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody JsonNode data,
+            @RequestBody EventListRequestDTO data,
             @AuthenticationPrincipal User user
     ) {
         return eventService.index(
-                data.get("filters"),
+                data.getFilters(),
                 perPage,
                 page,
                 locale,
-                null != user ? user.getRolesAsList() : Collections.emptyList(),
-                null != user ? user.getId() : null
+                user
         );
     }
 
@@ -56,16 +56,15 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody JsonNode data,
+            @RequestBody EventListRequestDTO data,
             @AuthenticationPrincipal User user
     ) {
         return eventService.index(
-                data.get("filters"),
+                data.getFilters(),
                 perPage,
                 page,
                 locale,
-                null != user ? user.getRolesAsList() : Collections.emptyList(),
-                null != user ? user.getId() : null
+                user
         );
     }
 

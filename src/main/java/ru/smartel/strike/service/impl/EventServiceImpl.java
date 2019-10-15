@@ -2,8 +2,8 @@ package ru.smartel.strike.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
+import ru.smartel.strike.dto.request.EventListRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
@@ -20,7 +20,7 @@ import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.BusinessValidationService;
 import ru.smartel.strike.service.EventService;
-import ru.smartel.strike.service.FiltersTransformer;
+import ru.smartel.strike.service.EventFiltersTransformer;
 import ru.smartel.strike.service.Locale;
 
 import javax.persistence.EntityManager;
@@ -42,14 +42,14 @@ public class EventServiceImpl implements EventService {
     private BusinessValidationService businessValidationService;
     private EventRepository eventRepository;
     private UserRepository userRepository;
-    private FiltersTransformer filtersTransformer;
+    private EventFiltersTransformer filtersTransformer;
 
     public EventServiceImpl(
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
             EventRepository eventRepository,
             UserRepository userRepository,
-            FiltersTransformer filtersTransformer) {
+            EventFiltersTransformer filtersTransformer) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -59,14 +59,14 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public EventListWrapperDTO index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId) {
+    public EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user) {
 
-        Long eventsCount = getEventsCount(filters, locale, userRoles, userId);
+        Long eventsCount = getEventsCount(filters, locale, user);
 
         if (eventsCount == 0) return new EventListWrapperDTO(Collections.emptyList(), eventsCount);
 
         //Get list of events' ids first. That's because pagination and fetching dont work together
-        List<Integer> ids = getEventIds(filters, perPage, page, locale, userRoles, userId);
+        List<Integer> ids = getEventIds(filters, perPage, page, locale, user);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> eventQuery = cb.createQuery(Event.class);
@@ -216,14 +216,14 @@ public class EventServiceImpl implements EventService {
     /**
      * Get ids of events matching filters, locale, permissions and pagination
      */
-    private List<Integer> getEventIds(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId) {
+    private List<Integer> getEventIds(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<Event> root = idQuery.from(Event.class);
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("date")));
 
-        applyPredicatesToQuery(idQuery, root, filters, locale, userRoles, userId);
+        applyPredicatesToQuery(idQuery, root, filters, locale, user);
 
         return entityManager
                 .createQuery(idQuery)
@@ -235,13 +235,13 @@ public class EventServiceImpl implements EventService {
     /**
      * Get count of events matching filters, locale and permissions
      */
-    private Long getEventsCount(JsonNode filters, Locale locale, List<String> userRoles, Integer userId) {
+    private Long getEventsCount(EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         Root<Event> root = countQuery.from(Event.class);
         countQuery.select(cb.count(root));
 
-        applyPredicatesToQuery(countQuery, root, filters, locale, userRoles, userId);
+        applyPredicatesToQuery(countQuery, root, filters, locale, user);
 
         return entityManager
                 .createQuery(countQuery)
@@ -251,20 +251,22 @@ public class EventServiceImpl implements EventService {
     /**
      * Add restrictions by filters, user permissions and locale
      */
-    private void applyPredicatesToQuery(CriteriaQuery query, Root root, JsonNode filters, Locale locale, List<String> userRoles, Integer userId) {
+    private void applyPredicatesToQuery(CriteriaQuery query, Root root, EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
         List<Predicate> predicates = new LinkedList<>();
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
         //Usual users can see published events only
-        if (!userRoles.contains(User.ROLE_MODERATOR) && !userRoles.contains(User.ROLE_ADMIN)) {
+        if (null == user
+                || !user.getRolesAsList().contains(User.ROLE_MODERATOR)
+                && !user.getRolesAsList().contains(User.ROLE_ADMIN)) {
             predicates.add(cb.equal(root.get("published"), true));
         }
 
         if (null != filters) {
             predicates.addAll(
                     filtersTransformer
-                            .toSpecifications((ObjectNode) filters, userId)
+                            .toSpecifications(filters, user)
                             .stream()
                             .map(spec -> spec.toPredicate(root, query, cb))
                             .collect(Collectors.toList()));

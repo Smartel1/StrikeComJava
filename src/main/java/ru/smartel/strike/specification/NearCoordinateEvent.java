@@ -17,9 +17,9 @@ import javax.persistence.criteria.Root;
 public class NearCoordinateEvent implements Specification<Event> {
     private Double latitude;
     private Double longitude;
-    private Double radius;
+    private Integer radius;
 
-    public NearCoordinateEvent(Double latitude, Double longitude, Double radius) {
+    public NearCoordinateEvent(Double latitude, Double longitude, Integer radius) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
@@ -71,7 +71,7 @@ public class NearCoordinateEvent implements Specification<Event> {
 
                         )
                 ),
-                radius
+                Double.valueOf(radius)
         );
     }
 }

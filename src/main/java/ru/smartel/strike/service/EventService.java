@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.smartel.strike.dto.request.EventListRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    EventListWrapperDTO index(JsonNode filters, int perPage, int page, Locale locale, List<String> userRoles, Integer userId);
+    EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user);
 
     @PreAuthorize("permitAll()")
     EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);
