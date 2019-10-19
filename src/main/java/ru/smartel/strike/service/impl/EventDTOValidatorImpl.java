@@ -1,6 +1,7 @@
 package ru.smartel.strike.service.impl;
 
 import org.springframework.stereotype.Service;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.entity.Conflict;
@@ -27,7 +28,19 @@ public class EventDTOValidatorImpl extends AbstractDTOValidator implements Event
     }
 
     @Override
-    public void validateStore(EventRequestDTO dto) throws DTOValidationException {
+    public void validateListQueryDTO(EventListRequestDTO dto) throws DTOValidationException {
+        Map<String, String> errors = new HashMap<>();
+
+        check(dto.getPage(), "page", errors).min(1);
+        check(dto.getPerPage(), "per_page", errors).min(1);
+
+        if (!errors.isEmpty()) {
+            throw new DTOValidationException("validation errors", errors);
+        }
+    }
+
+    @Override
+    public void validateStoreDTO(EventRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getConflictId(), "conflict_id", errors).requiredOptional().notNull(true).existsAsId(Conflict.class);
@@ -42,7 +55,7 @@ public class EventDTOValidatorImpl extends AbstractDTOValidator implements Event
     }
 
     @Override
-    public void validateUpdate(EventRequestDTO dto) throws DTOValidationException {
+    public void validateUpdateDTO(EventRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getConflictId(), "conflict_id", errors).notNull(true).existsAsId(Conflict.class);

@@ -34,16 +34,10 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO data,
+            @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) {
-        return eventService.index(
-                data.getFilters(),
-                perPage,
-                page,
-                locale,
-                user
-        );
+    ) throws DTOValidationException {
+        return eventService.list(dto, perPage, page, locale, user);
     }
 
     @PostMapping("/event-list")
@@ -51,11 +45,11 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO data,
+            @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) {
+    ) throws DTOValidationException {
         //alias of index method
-        return index(locale, perPage, page, data, user);
+        return index(locale, perPage, page, dto, user);
     }
 
     @GetMapping("/event/{id}")
@@ -79,10 +73,10 @@ public class EventController {
     @PostMapping(path = "/event/", consumes = {"application/json"})
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody EventRequestDTO data,
+            @RequestBody EventRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.create(data, user.getId(), locale);
+        return eventService.create(dto, user.getId(), locale);
     }
 
     @PutMapping(path = "/event/{id}", consumes = {"application/json"})
@@ -90,9 +84,9 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
             @AuthenticationPrincipal User user,
-            @RequestBody EventRequestDTO data
+            @RequestBody EventRequestDTO dto
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.update(eventId, data, user.getId(), locale);
+        return eventService.update(eventId, dto, user.getId(), locale);
     }
 
     @DeleteMapping(path = "/event/{id}")

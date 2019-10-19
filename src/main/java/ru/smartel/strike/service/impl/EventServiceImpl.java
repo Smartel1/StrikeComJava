@@ -61,9 +61,15 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user) {
+    public EventListWrapperDTO list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
+        validator.validateListQueryDTO(dto);
 
-        int eventsCount = getEventsCount(filters, locale, user);
+        //Body has precedence over query params.
+        //If perPage and Page of body (dto) aren't equal to default values then use values of dto
+        if (!dto.getPerPage().equals(20)) perPage = dto.getPerPage();
+        if (!dto.getPage().equals(1)) page = dto.getPage();
+
+        int eventsCount = getEventsCount(dto.getFilters(), locale, user);
 
         EventListWrapperDTO.Meta responseMeta = new EventListWrapperDTO.Meta(
                 eventsCount,
@@ -77,7 +83,7 @@ public class EventServiceImpl implements EventService {
         }
 
         //Get list of events' ids first. That's because pagination and fetching dont work together
-        List<Integer> ids = getEventIds(filters, perPage, page, locale, user);
+        List<Integer> ids = getEventIds(dto.getFilters(), perPage, page, locale, user);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Event> eventQuery = cb.createQuery(Event.class);
@@ -136,21 +142,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDetailDTO create(EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
-        validator.validateStore(data);
+    public EventDetailDTO create(EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+        validator.validateStoreDTO(dto);
 
         User user = userRepository.findById(userId).orElseThrow();
 
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
                 new UserCanModerate(user).when(
-                        null != data.getPublished() && data.getPublished().orElse(false) || null != data.getLocalityId()
+                        null != dto.getPublished() && dto.getPublished().orElse(false) || null != dto.getLocalityId()
                 )
         );
 
         Event event = new Event();
         event.setAuthor(user);
-        fillEventFields(event, data, locale);
+        fillEventFields(event, dto, locale);
 
         entityManager.persist(event);
 
@@ -169,22 +175,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDetailDTO update(Integer eventId, EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
-        validator.validateUpdate(data);
+    public EventDetailDTO update(Integer eventId, EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+        validator.validateUpdateDTO(dto);
 
         Event event = eventRepository.findOrThrow(eventId);
         User user = userRepository.findById(userId).get();
 
         boolean userChangesPublishStatus =
-                null != data.getPublished() && data.getPublished().get() != event.isPublished();
+                null != dto.getPublished() && dto.getPublished().get() != event.isPublished();
 
         boolean userChangesConflict =
-                null != data.getConflictId() && (data.getConflictId().get() != event.getConflict().getId());
+                null != dto.getConflictId() && (dto.getConflictId().get() != event.getConflict().getId());
 
         businessValidationService.validate(
                 new UserCanModerate(user).when(
                         userChangesPublishStatus
-                                || null != data.getLocalityId()
+                                || null != dto.getLocalityId()
                                 || userChangesConflict
                 ),
                 new NotAParentEvent(event).when(userChangesConflict)
@@ -195,7 +201,7 @@ public class EventServiceImpl implements EventService {
         boolean isLocaleEnBeforeUpdateNull = null == event.getTitleEn();
         boolean isLocaleEsBeforeUpdateNull = null == event.getTitleEs();
 
-        fillEventFields(event, data, locale);
+        fillEventFields(event, dto, locale);
 
 //
 //        //Если событие опубликовано, то посылаем пуши в те топики по языкам, на которые переведено событие в этом обновлении.
@@ -297,27 +303,27 @@ public class EventServiceImpl implements EventService {
         query.where(cb.and(predicates.toArray(Predicate[]::new)));
     }
 
-    private void fillEventFields(Event event, EventRequestDTO data, Locale locale) {
-        if (null != data.getConflictId()) setConflict(event, data.getConflictId().orElseThrow());
-        if (null != data.getDate()) event.setDate(LocalDateTime.ofEpochSecond(data.getDate().orElseThrow(), 0, ZoneOffset.UTC));
-        if (null != data.getSourceLink()) event.setSourceLink(data.getSourceLink().orElse(null));
-        if (null != data.getTitleRu()) event.setTitleRu(data.getTitleRu().orElse(null));
-        if (null != data.getTitleEn()) event.setTitleEn(data.getTitleEn().orElse(null));
-        if (null != data.getTitleEs()) event.setTitleEs(data.getTitleEs().orElse(null));
-        if (null != data.getContentRu()) event.setContentRu(data.getContentRu().orElse(null));
-        if (null != data.getContentEn()) event.setContentEn(data.getContentEn().orElse(null));
-        if (null != data.getContentEs()) event.setContentEs(data.getContentEs().orElse(null));
-        if (null != data.getPublished()) event.setPublished(data.getPublished().orElseThrow());
-        if (null != data.getLatitude()) event.setLatitude(data.getLatitude().orElseThrow());
-        if (null != data.getLongitude()) event.setLongitude(data.getLongitude().orElseThrow());
-        if (null != data.getLocalityId()) setLocality(event, data.getLocalityId().orElse(null));
-        if (null != data.getEventStatusId()) setEventStatus(event, data.getEventStatusId().orElse(null));
-        if (null != data.getEventTypeId()) setEventType(event, data.getEventTypeId().orElse(null));
-        if (null != data.getTitle()) event.setTitleByLocale(locale, data.getTitle().orElse(null));
-        if (null != data.getContent()) event.setContentByLocale(locale, data.getContent().orElse(null));
-        if (null != data.getPhotoUrls()) syncPhotos(event, data.getPhotoUrls());
-        if (null != data.getVideos()) syncVideos(event, data.getVideos());
-        if (null != data.getTags()) syncTags(event, data.getTags());
+    private void fillEventFields(Event event, EventRequestDTO dto, Locale locale) {
+        if (null != dto.getConflictId()) setConflict(event, dto.getConflictId().orElseThrow());
+        if (null != dto.getDate()) event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
+        if (null != dto.getSourceLink()) event.setSourceLink(dto.getSourceLink().orElse(null));
+        if (null != dto.getTitleRu()) event.setTitleRu(dto.getTitleRu().orElse(null));
+        if (null != dto.getTitleEn()) event.setTitleEn(dto.getTitleEn().orElse(null));
+        if (null != dto.getTitleEs()) event.setTitleEs(dto.getTitleEs().orElse(null));
+        if (null != dto.getContentRu()) event.setContentRu(dto.getContentRu().orElse(null));
+        if (null != dto.getContentEn()) event.setContentEn(dto.getContentEn().orElse(null));
+        if (null != dto.getContentEs()) event.setContentEs(dto.getContentEs().orElse(null));
+        if (null != dto.getPublished()) event.setPublished(dto.getPublished().orElseThrow());
+        if (null != dto.getLatitude()) event.setLatitude(dto.getLatitude().orElseThrow());
+        if (null != dto.getLongitude()) event.setLongitude(dto.getLongitude().orElseThrow());
+        if (null != dto.getLocalityId()) setLocality(event, dto.getLocalityId().orElse(null));
+        if (null != dto.getEventStatusId()) setEventStatus(event, dto.getEventStatusId().orElse(null));
+        if (null != dto.getEventTypeId()) setEventType(event, dto.getEventTypeId().orElse(null));
+        if (null != dto.getTitle()) event.setTitleByLocale(locale, dto.getTitle().orElse(null));
+        if (null != dto.getContent()) event.setContentByLocale(locale, dto.getContent().orElse(null));
+        if (null != dto.getPhotoUrls()) syncPhotos(event, dto.getPhotoUrls());
+        if (null != dto.getVideos()) syncVideos(event, dto.getVideos());
+        if (null != dto.getTags()) syncTags(event, dto.getTags());
     }
 
     /**

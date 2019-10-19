@@ -16,7 +16,8 @@ import ru.smartel.strike.exception.DTOValidationException;
 public interface EventService {
 
     @PreAuthorize("permitAll()")
-    EventListWrapperDTO index(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user);
+    EventListWrapperDTO list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user)
+            throws DTOValidationException;
 
     @PreAuthorize("permitAll()")
     EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);
@@ -25,10 +26,12 @@ public interface EventService {
     void setFavourite(Integer eventId, Integer userId, boolean isFavourite);
 
     @PreAuthorize("isFullyAuthenticated()")
-    EventDetailDTO create(EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException;
+    EventDetailDTO create(EventRequestDTO dto, Integer userId, Locale locale)
+            throws BusinessRuleValidationException, DTOValidationException;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#eventId)")
-    EventDetailDTO update(Integer eventId, EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException;
+    EventDetailDTO update(Integer eventId, EventRequestDTO dto, Integer userId, Locale locale)
+            throws BusinessRuleValidationException, DTOValidationException;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     void delete(Integer eventId);
