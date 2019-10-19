@@ -6,13 +6,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.JsonSchemaValidationException;
-import ru.smartel.strike.exception.UnauthtenticatedException;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
 public class Handler {
@@ -24,10 +22,10 @@ public class Handler {
         return "Проблемы с аутентификацией: " + ex.getMessage();
     }
 
-    @ExceptionHandler(JsonSchemaValidationException.class)
+    @ExceptionHandler(DTOValidationException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
-    public Map<String, String> processJsonSchemaValidationException(JsonSchemaValidationException ex) {
+    public Map<String, String> processJsonSchemaValidationException(DTOValidationException ex) {
         return ex.getErrors();
     }
 

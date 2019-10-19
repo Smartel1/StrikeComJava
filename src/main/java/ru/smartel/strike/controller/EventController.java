@@ -1,25 +1,20 @@
 package ru.smartel.strike.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.smartel.strike.dto.request.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
-import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.JsonSchemaValidationException;
+import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.EventService;
 import ru.smartel.strike.service.JsonSchemaValidator;
 import ru.smartel.strike.service.Locale;
 
 import javax.validation.constraints.Min;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/{locale}")
@@ -39,16 +34,10 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO data,
+            @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) {
-        return eventService.index(
-                data.getFilters(),
-                perPage,
-                page,
-                locale,
-                user
-        );
+    ) throws DTOValidationException {
+        return eventService.list(dto, perPage, page, locale, user);
     }
 
     @PostMapping("/event-list")
@@ -56,11 +45,11 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO data,
+            @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) {
+    ) throws DTOValidationException {
         //alias of index method
-        return index(locale, perPage, page, data, user);
+        return index(locale, perPage, page, dto, user);
     }
 
     @GetMapping("/event/{id}")
@@ -84,13 +73,10 @@ public class EventController {
     @PostMapping(path = "/event/", consumes = {"application/json"})
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody JsonNode data,
+            @RequestBody EventRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) throws JsonSchemaValidationException, IOException, ProcessingException, BusinessRuleValidationException {
-
-        validator.validate(data, "event/store");
-
-        return eventService.create(data, user.getId(), locale);
+    ) throws BusinessRuleValidationException, DTOValidationException {
+        return eventService.create(dto, user.getId(), locale);
     }
 
     @PutMapping(path = "/event/{id}", consumes = {"application/json"})
@@ -98,12 +84,9 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
             @AuthenticationPrincipal User user,
-            @RequestBody JsonNode data
-    ) throws JsonSchemaValidationException, IOException, ProcessingException, BusinessRuleValidationException {
-
-        validator.validate(data, "event/update");
-
-        return eventService.update(eventId, data, user.getId(), locale);
+            @RequestBody EventRequestDTO dto
+    ) throws BusinessRuleValidationException, DTOValidationException {
+        return eventService.update(eventId, dto, user.getId(), locale);
     }
 
     @DeleteMapping(path = "/event/{id}")
