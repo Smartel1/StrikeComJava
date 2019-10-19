@@ -4,11 +4,11 @@ import javax.persistence.EntityManager;
 import java.util.Map;
 import java.util.Optional;
 
-public class AbstractDTOValidator  {
+public class BaseDTOValidator {
 
     private EntityManager entityManager;
 
-    public AbstractDTOValidator(EntityManager entityManager) {
+    public BaseDTOValidator(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

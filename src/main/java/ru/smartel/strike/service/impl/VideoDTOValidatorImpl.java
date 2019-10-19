@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.entity.reference.VideoType;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.AbstractDTOValidator;
+import ru.smartel.strike.service.BaseDTOValidator;
 import ru.smartel.strike.service.VideoDTOValidator;
 
 import javax.persistence.EntityManager;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class VideoDTOValidatorImpl extends AbstractDTOValidator implements VideoDTOValidator {
+public class VideoDTOValidatorImpl extends BaseDTOValidator implements VideoDTOValidator {
 
     public VideoDTOValidatorImpl(EntityManager entityManager) {
         super(entityManager);

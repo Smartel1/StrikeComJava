@@ -9,7 +9,7 @@ import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.AbstractDTOValidator;
+import ru.smartel.strike.service.BaseDTOValidator;
 import ru.smartel.strike.service.EventDTOValidator;
 import ru.smartel.strike.service.VideoDTOValidator;
 
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class EventDTOValidatorImpl extends AbstractDTOValidator implements EventDTOValidator {
+public class EventDTOValidatorImpl extends BaseDTOValidator implements EventDTOValidator {
 
     private VideoDTOValidator videoDTOValidator;
 
