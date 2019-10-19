@@ -2,7 +2,7 @@ package ru.smartel.strike.service.impl;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.service.EventFiltersTransformer;
 import ru.smartel.strike.specification.*;

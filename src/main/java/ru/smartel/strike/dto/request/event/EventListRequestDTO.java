@@ -1,4 +1,4 @@
-package ru.smartel.strike.dto.request;
+package ru.smartel.strike.dto.request.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

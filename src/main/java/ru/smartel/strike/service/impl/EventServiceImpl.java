@@ -1,9 +1,9 @@
 package ru.smartel.strike.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventRequestDTO;
+import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
@@ -13,15 +13,13 @@ import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.entity.reference.VideoType;
+import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.EventRepository;
 import ru.smartel.strike.repository.TagRepository;
 import ru.smartel.strike.repository.UserRepository;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
-import ru.smartel.strike.service.BusinessValidationService;
-import ru.smartel.strike.service.EventService;
-import ru.smartel.strike.service.EventFiltersTransformer;
-import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -43,18 +41,22 @@ public class EventServiceImpl implements EventService {
     private EventRepository eventRepository;
     private UserRepository userRepository;
     private EventFiltersTransformer filtersTransformer;
+    private EventDTOValidator validator;
 
     public EventServiceImpl(
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
             EventRepository eventRepository,
             UserRepository userRepository,
-            EventFiltersTransformer filtersTransformer) {
+            EventFiltersTransformer filtersTransformer,
+            EventDTOValidator validator
+    ) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.filtersTransformer = filtersTransformer;
+        this.validator = validator;
     }
 
 
@@ -134,15 +136,16 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDetailDTO create(JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException {
-        User user = userRepository.findById(userId).get();
+    public EventDetailDTO create(EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+        validator.validateStore(data);
+
+        User user = userRepository.findById(userId).orElseThrow();
 
         //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
         businessValidationService.validate(
                 new UserCanModerate(user).when(
-                        data.has("published")
-                                && data.get("published").asBoolean()
-                                || data.has("locality_id"))
+                        null != data.getPublished() && data.getPublished().orElse(false) || null != data.getLocalityId()
+                )
         );
 
         Event event = new Event();
@@ -166,20 +169,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDetailDTO update(Integer eventId, JsonNode data, Integer userId, Locale locale) throws BusinessRuleValidationException {
+    public EventDetailDTO update(Integer eventId, EventRequestDTO data, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+        validator.validateUpdate(data);
+
         Event event = eventRepository.findOrThrow(eventId);
         User user = userRepository.findById(userId).get();
 
         boolean userChangesPublishStatus =
-                data.has("published") && data.get("published").asBoolean() != event.isPublished();
+                null != data.getPublished() && data.getPublished().get() != event.isPublished();
 
         boolean userChangesConflict =
-                data.has("conflict_id") && (data.get("conflict_id").asInt() != event.getConflict().getId());
+                null != data.getConflictId() && (data.getConflictId().get() != event.getConflict().getId());
 
         businessValidationService.validate(
                 new UserCanModerate(user).when(
                         userChangesPublishStatus
-                                || data.has("locality_id")
+                                || null != data.getLocalityId()
                                 || userChangesConflict
                 ),
                 new NotAParentEvent(event).when(userChangesConflict)
@@ -292,71 +297,71 @@ public class EventServiceImpl implements EventService {
         query.where(cb.and(predicates.toArray(Predicate[]::new)));
     }
 
-    private void fillEventFields(Event event, JsonNode data, Locale locale) {
-        if (data.has("conflict_id")) attachConflict(event, data.get("conflict_id").asInt());
-        if (data.has("date")) event.setDate(LocalDateTime.ofEpochSecond(data.get("date").asInt(), 0, ZoneOffset.UTC));
-        if (data.has("source_link")) event.setSourceLink(data.get("source_link").asText());
-        if (data.has("title_ru")) event.setTitleRu(data.get("title_ru").asText());
-        if (data.has("title_en")) event.setTitleEn(data.get("title_en").asText());
-        if (data.has("title_es")) event.setTitleEs(data.get("title_es").asText());
-        if (data.has("content_ru")) event.setContentRu(data.get("content_ru").asText());
-        if (data.has("content_en")) event.setContentEn(data.get("content_en").asText());
-        if (data.has("content_es")) event.setContentEs(data.get("content_es").asText());
-        if (data.has("published")) event.setPublished(data.get("published").asBoolean());
-        if (data.has("latitude")) event.setLatitude((float) data.get("latitude").asDouble());
-        if (data.has("longitude")) event.setLongitude((float) data.get("longitude").asDouble());
-        if (data.has("locality_id")) setLocality(event, data.get("locality_id"));
-        if (data.has("event_status_id")) setEventStatus(event, data.get("event_status_id"));
-        if (data.has("event_type_id")) setEventType(event, data.get("event_type_id"));
-        if (data.has("title")) event.setTitleByLocale(locale, data.get("title").asText());
-        if (data.has("content")) event.setContentByLocale(locale, data.get("content").asText());
-        if (data.has("photo_urls")) syncPhotos(event, data.get("photo_urls"));
-        if (data.has("videos")) syncVideos(event, data.get("videos"));
-        if (data.has("tags")) syncTags(event, data.get("tags"));
+    private void fillEventFields(Event event, EventRequestDTO data, Locale locale) {
+        if (null != data.getConflictId()) setConflict(event, data.getConflictId().orElseThrow());
+        if (null != data.getDate()) event.setDate(LocalDateTime.ofEpochSecond(data.getDate().orElseThrow(), 0, ZoneOffset.UTC));
+        if (null != data.getSourceLink()) event.setSourceLink(data.getSourceLink().orElse(null));
+        if (null != data.getTitleRu()) event.setTitleRu(data.getTitleRu().orElse(null));
+        if (null != data.getTitleEn()) event.setTitleEn(data.getTitleEn().orElse(null));
+        if (null != data.getTitleEs()) event.setTitleEs(data.getTitleEs().orElse(null));
+        if (null != data.getContentRu()) event.setContentRu(data.getContentRu().orElse(null));
+        if (null != data.getContentEn()) event.setContentEn(data.getContentEn().orElse(null));
+        if (null != data.getContentEs()) event.setContentEs(data.getContentEs().orElse(null));
+        if (null != data.getPublished()) event.setPublished(data.getPublished().orElseThrow());
+        if (null != data.getLatitude()) event.setLatitude(data.getLatitude().orElseThrow());
+        if (null != data.getLongitude()) event.setLongitude(data.getLongitude().orElseThrow());
+        if (null != data.getLocalityId()) setLocality(event, data.getLocalityId().orElse(null));
+        if (null != data.getEventStatusId()) setEventStatus(event, data.getEventStatusId().orElse(null));
+        if (null != data.getEventTypeId()) setEventType(event, data.getEventTypeId().orElse(null));
+        if (null != data.getTitle()) event.setTitleByLocale(locale, data.getTitle().orElse(null));
+        if (null != data.getContent()) event.setContentByLocale(locale, data.getContent().orElse(null));
+        if (null != data.getPhotoUrls()) syncPhotos(event, data.getPhotoUrls());
+        if (null != data.getVideos()) syncVideos(event, data.getVideos());
+        if (null != data.getTags()) syncTags(event, data.getTags());
     }
 
     /**
      * Set event's conflict
      */
-    private void attachConflict(Event event, Integer conflictId) {
+    private void setConflict(Event event, Integer conflictId) {
         Conflict conflict = entityManager.getReference(Conflict.class, conflictId);
         event.setConflict(conflict);
     }
 
     /**
-     * Set locality. If received localityIdNode equals null, then set to null
+     * Set locality. If received localityId equals to null, then set to null
      */
-    private void setLocality(Event event, JsonNode localityIdNode) {
+    private void setLocality(Event event, Integer localityIdOptional) {
         Locality locality = null;
 
-        if (!(localityIdNode instanceof NullNode)) {
-            locality = entityManager.getReference(Locality.class, localityIdNode.asInt());
+        if (null != localityIdOptional) {
+            locality = entityManager.getReference(Locality.class, localityIdOptional);
         }
 
         event.setLocality(locality);
     }
 
     /**
-     * Set event's status. If received eventStatusIdNode equals null, then set to null
+     * Set event's status. If received eventStatusId equals to null, then set to null
      */
-    private void setEventStatus(Event event, JsonNode eventStatusIdNode) {
+    private void setEventStatus(Event event, Integer eventStatusIdOptional) {
         EventStatus eventStatus = null;
 
-        if (!(eventStatusIdNode instanceof NullNode)) {
-            eventStatus = entityManager.getReference(EventStatus.class, eventStatusIdNode.asInt());
+        if (null != eventStatusIdOptional) {
+            eventStatus = entityManager.getReference(EventStatus.class, eventStatusIdOptional);
         }
 
         event.setStatus(eventStatus);
     }
 
     /**
-     * Set event's type. If received eventTypeIdNode equals null, then set to null
+     * Set event's type. If received eventTypeId equals null, then set to null
      */
-    private void setEventType(Event event, JsonNode eventTypeIdNode) {
+    private void setEventType(Event event, Integer eventTypeIdOptional) {
         EventType eventType = null;
 
-        if (!(eventTypeIdNode instanceof NullNode)) {
-            eventType = entityManager.getReference(EventType.class, eventTypeIdNode.asInt());
+        if (null != eventTypeIdOptional) {
+            eventType = entityManager.getReference(EventType.class, eventTypeIdOptional);
         }
 
         event.setType(eventType);
@@ -365,16 +370,14 @@ public class EventServiceImpl implements EventService {
     /**
      * If client has sent photos, then remove old ones and save received
      */
-    private void syncPhotos(Event event, JsonNode photoURLsNode) {
-        if (null == photoURLsNode) return;
-
+    private void syncPhotos(Event event, List<String> photoURLs) {
         for (Photo oldPhoto : event.getPhotos()) {
             entityManager.remove(oldPhoto);
         }
 
-        for (JsonNode photoURLNode : photoURLsNode) {
+        for (String photoURL : photoURLs) {
             Photo photo = new Photo();
-            photo.setUrl(photoURLNode.asText());
+            photo.setUrl(photoURL);
             entityManager.persist(photo);
             event.getPhotos().add(photo);
         }
@@ -383,20 +386,18 @@ public class EventServiceImpl implements EventService {
     /**
      * If client has sent videos, then remove old ones and save received
      */
-    private void syncVideos(Event event, JsonNode videosNode) {
-        if (null == videosNode) return;
-
+    private void syncVideos(Event event, List<VideoDTO> videos) {
         for (Video oldVideo : event.getVideos()) {
             entityManager.remove(oldVideo);
         }
 
-        for (JsonNode receivedVideo : videosNode) {
+        for (VideoDTO receivedVideo : videos) {
             Video video = new Video();
-            video.setUrl(receivedVideo.get("url").asText());
-            if (receivedVideo.has("preview_url")) {
-                video.setPreviewUrl(receivedVideo.get("preview_url").asText());
+            video.setUrl(receivedVideo.getUrl());
+            if (null != receivedVideo.getPreviewUrl()) {
+                video.setPreviewUrl(receivedVideo.getPreviewUrl().orElse(null));
             }
-            video.setVideoType(entityManager.getReference(VideoType.class, receivedVideo.get("video_type_id").asInt()));
+            video.setVideoType(entityManager.getReference(VideoType.class, receivedVideo.getVideoTypeId()));
             entityManager.persist(video);
             event.getVideos().add(video);
         }
@@ -405,17 +406,16 @@ public class EventServiceImpl implements EventService {
     /**
      * If client has sent tags, then detach (not remove because tags are shared between events) old ones and save received
      */
-    private void syncTags(Event event, JsonNode receivedTags) {
-        if (null == receivedTags) return;
+    private void syncTags(Event event, List<String> receivedTags) {
         //Не удаляем старые теги из таблицы, они могут быть привязаны к другим событиям
         event.getTags().clear();
 
         //сохраняем теги
-        for (JsonNode receivedTag : receivedTags) {
-            Tag tag = tagRepository.findFirstByName(receivedTag.asText());
+        for (String receivedTag : receivedTags) {
+            Tag tag = tagRepository.findFirstByName(receivedTag);
             if (null == tag) {
                 tag = new Tag();
-                tag.setName(receivedTag.asText());
+                tag.setName(receivedTag);
                 entityManager.persist(tag);
             }
             event.getTags().add(tag);
