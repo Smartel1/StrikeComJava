@@ -70,7 +70,7 @@ public class EventServiceImpl implements EventService {
                 eventsCount/perPage + 1
         );
 
-        if (eventsCount == 0) {
+        if (eventsCount <= (page - 1) * perPage) {
             return new EventListWrapperDTO(Collections.emptyList(), responseMeta);
         }
 
