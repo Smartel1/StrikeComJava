@@ -4,11 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.smartel.strike.service.BaseDTOValidator;
 
-import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +19,7 @@ class EventDTOValidatorMaxTests {
 	@ParameterizedTest
 	@MethodSource("providedArguments")
 	void maxRule(Object provided, boolean emptyErrors) {
-		BaseDTOValidator validator = new BaseDTOValidator(Mockito.mock(EntityManager.class));
+		BaseDTOValidator validator = new BaseDTOValidator();
 
 		Map<String, String> errors = new HashMap<>();
 
