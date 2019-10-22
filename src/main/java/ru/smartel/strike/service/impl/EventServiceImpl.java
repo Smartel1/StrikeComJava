@@ -1,5 +1,6 @@
 package ru.smartel.strike.service.impl;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventRequestDTO;
@@ -7,38 +8,39 @@ import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
-import ru.smartel.strike.entity.reference.VideoType;
+import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.repository.EventRepository;
-import ru.smartel.strike.repository.TagRepository;
-import ru.smartel.strike.repository.UserRepository;
+import ru.smartel.strike.repository.*;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.*;
+import ru.smartel.strike.specification.event.ByRolesEvent;
+import ru.smartel.strike.specification.event.LocalizedEvent;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
     private TagRepository tagRepository;
     private BusinessValidationService businessValidationService;
     private EventRepository eventRepository;
+    private ConflictRepository conflictRepository;
+    private PhotoRepository photoRepository;
+    private VideoRepository videoRepository;
+    private VideoTypeRepository videoTypeRepository;
+    private LocalityRepository localityRepository;
+    private EventTypeRepository eventTypeRepository;
+    private EventStatusRepository eventStatusRepository;
     private UserRepository userRepository;
     private EventFiltersTransformer filtersTransformer;
     private EventDTOValidator validator;
@@ -47,6 +49,13 @@ public class EventServiceImpl implements EventService {
             TagRepository tagRepository,
             BusinessValidationService businessValidationService,
             EventRepository eventRepository,
+            ConflictRepository conflictRepository,
+            PhotoRepository photoRepository,
+            VideoRepository videoRepository,
+            VideoTypeRepository videoTypeRepository,
+            LocalityRepository localityRepository,
+            EventTypeRepository eventTypeRepository,
+            EventStatusRepository eventStatusRepository,
             UserRepository userRepository,
             EventFiltersTransformer filtersTransformer,
             EventDTOValidator validator
@@ -54,6 +63,13 @@ public class EventServiceImpl implements EventService {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
+        this.conflictRepository = conflictRepository;
+        this.photoRepository = photoRepository;
+        this.videoRepository = videoRepository;
+        this.videoTypeRepository = videoTypeRepository;
+        this.localityRepository = localityRepository;
+        this.eventTypeRepository = eventTypeRepository;
+        this.eventStatusRepository = eventStatusRepository;
         this.userRepository = userRepository;
         this.filtersTransformer = filtersTransformer;
         this.validator = validator;
@@ -66,48 +82,39 @@ public class EventServiceImpl implements EventService {
 
         //Body has precedence over query params.
         //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (!dto.getPerPage().equals(20)) perPage = dto.getPerPage();
-        if (!dto.getPage().equals(1)) page = dto.getPage();
+        if (20 != dto.getPerPage()) perPage = dto.getPerPage();
+        if (1 != dto.getPage()) page = dto.getPage();
 
-        int eventsCount = getEventsCount(dto.getFilters(), locale, user);
+        //Transform filters and other restrictions to Specifications
+        Specification<Event> specification = filtersTransformer
+                .toSpecification(dto.getFilters(), user)
+                .and(new ByRolesEvent(user))
+                .and(new LocalizedEvent(locale));
+
+        //Get count of events matching specification
+        long eventsCount = eventRepository.count(specification);
 
         EventListWrapperDTO.Meta responseMeta = new EventListWrapperDTO.Meta(
                 eventsCount,
                 page,
                 perPage,
-                eventsCount/perPage + 1
+                eventsCount / perPage + 1
         );
 
         if (eventsCount <= (page - 1) * perPage) {
             return new EventListWrapperDTO(Collections.emptyList(), responseMeta);
         }
 
-        //Get list of events' ids first. That's because pagination and fetching dont work together
-        List<Integer> ids = getEventIds(dto.getFilters(), perPage, page, locale, user);
+        //Get count of events matching specification. Because pagination and fetching dont work together
+        List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, page, perPage);
 
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Event> eventQuery = cb.createQuery(Event.class);
-
-        Root<Event> eventRoot = eventQuery.from(Event.class);
-        eventRoot.fetch("photos", JoinType.LEFT);
-        eventRoot.fetch("videos", JoinType.LEFT);
-        eventRoot.fetch("tags", JoinType.LEFT);
-        eventRoot.fetch("comments", JoinType.LEFT);
-        eventRoot.fetch("conflict", JoinType.LEFT);
-
-        eventQuery.select(eventRoot)
-                .distinct(true)
-                .orderBy(cb.desc(eventRoot.get("date")))
-                .where(cb.in(eventRoot.get("id")).value(ids));
-
-        List<EventListDTO> eventListDTOS = entityManager
-                .createQuery(eventQuery)
-                .getResultList()
+        List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids)
                 .stream()
                 .map(e -> new EventListDTO(e, locale))
-                .collect(Collectors.toList());
+                .sorted(Comparator.comparingLong(EventListDTO::getDate))
+                .collect(Collectors.toList());;
 
-        return new EventListWrapperDTO(eventListDTOS, responseMeta);
+        return new EventListWrapperDTO(eventListDTOs, responseMeta);
     }
 
     @Override
@@ -127,12 +134,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
         User user = userRepository.findById(userId).get();
-        Event event = entityManager.getReference(Event.class, eventId);
+        Event event = eventRepository.getOne(eventId);
 
         List<Event> currentFavourites = user.getFavouriteEvents();
 
         if (isFavourite) {
-            //Добавим в избранное, если ещё не в избранном
+            //If not in favourites - add it
             if (!currentFavourites.contains(event)) {
                 currentFavourites.add(event);
             }
@@ -158,7 +165,7 @@ public class EventServiceImpl implements EventService {
         event.setAuthor(user);
         fillEventFields(event, dto, locale);
 
-        entityManager.persist(event);
+        eventRepository.save(event);
 
         //Если обычный пользователь предлагает событие, посылаем пуш админам. Если модератор публикует - то всем
         if (!event.isPublished()) {
@@ -229,83 +236,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void delete(Integer eventId) {
-        Event event = eventRepository.findOrThrow(eventId);
-        entityManager.remove(event);
-    }
-
-    /**
-     * Get ids of events matching filters, locale, permissions and pagination
-     */
-    private List<Integer> getEventIds(EventListRequestDTO.FiltersBag filters, int perPage, int page, Locale locale, User user) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
-        Root<Event> root = idQuery.from(Event.class);
-        idQuery.select(root.get("id"))
-                .orderBy(cb.desc(root.get("date")));
-
-        applyPredicatesToQuery(idQuery, root, filters, locale, user);
-
-        return entityManager
-                .createQuery(idQuery)
-                .setMaxResults(perPage)
-                .setFirstResult((page - 1) * perPage)
-                .getResultList();
-    }
-
-    /**
-     * Get count of events matching filters, locale and permissions
-     */
-    private int getEventsCount(EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        Root<Event> root = countQuery.from(Event.class);
-        countQuery.select(cb.count(root));
-
-        applyPredicatesToQuery(countQuery, root, filters, locale, user);
-
-        return entityManager
-                .createQuery(countQuery)
-                .getSingleResult()
-                .intValue();
-    }
-
-    /**
-     * Add restrictions by filters, user permissions and locale
-     */
-    private void applyPredicatesToQuery(CriteriaQuery query, Root root, EventListRequestDTO.FiltersBag filters, Locale locale, User user) {
-        List<Predicate> predicates = new LinkedList<>();
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-
-        //Usual users can see published events only
-        if (null == user
-                || !user.getRolesAsList().contains(User.ROLE_MODERATOR)
-                && !user.getRolesAsList().contains(User.ROLE_ADMIN)) {
-            predicates.add(cb.equal(root.get("published"), true));
-        }
-
-        if (null != filters) {
-            predicates.addAll(
-                    filtersTransformer
-                            .toSpecifications(filters, user)
-                            .stream()
-                            .map(spec -> spec.toPredicate(root, query, cb))
-                            .collect(Collectors.toList()));
-        }
-
-        //Only localized events
-        if (!locale.equals(Locale.ALL)) {
-            predicates.add(cb.isNotNull(root.get("title" + locale.getPascalCase())));
-            predicates.add(cb.isNotNull(root.get("content" + locale.getPascalCase())));
-        }
-
-        //Union all predicates (filters, restrictions) with AND operator
-        query.where(cb.and(predicates.toArray(Predicate[]::new)));
+//        Event event = eventRepository.findOrThrow(eventId);
+        eventRepository.deleteById(eventId);
     }
 
     private void fillEventFields(Event event, EventRequestDTO dto, Locale locale) {
         if (null != dto.getConflictId()) setConflict(event, dto.getConflictId().orElseThrow());
-        if (null != dto.getDate()) event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
+        if (null != dto.getDate())
+            event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
         if (null != dto.getSourceLink()) event.setSourceLink(dto.getSourceLink().orElse(null));
         if (null != dto.getTitleRu()) event.setTitleRu(dto.getTitleRu().orElse(null));
         if (null != dto.getTitleEn()) event.setTitleEn(dto.getTitleEn().orElse(null));
@@ -330,7 +268,7 @@ public class EventServiceImpl implements EventService {
      * Set event's conflict
      */
     private void setConflict(Event event, Integer conflictId) {
-        Conflict conflict = entityManager.getReference(Conflict.class, conflictId);
+        Conflict conflict = conflictRepository.getOne(conflictId);
         event.setConflict(conflict);
     }
 
@@ -341,7 +279,7 @@ public class EventServiceImpl implements EventService {
         Locality locality = null;
 
         if (null != localityIdOptional) {
-            locality = entityManager.getReference(Locality.class, localityIdOptional);
+            locality = localityRepository.getOne(localityIdOptional);
         }
 
         event.setLocality(locality);
@@ -354,7 +292,7 @@ public class EventServiceImpl implements EventService {
         EventStatus eventStatus = null;
 
         if (null != eventStatusIdOptional) {
-            eventStatus = entityManager.getReference(EventStatus.class, eventStatusIdOptional);
+            eventStatus = eventStatusRepository.getOne(eventStatusIdOptional);
         }
 
         event.setStatus(eventStatus);
@@ -367,7 +305,7 @@ public class EventServiceImpl implements EventService {
         EventType eventType = null;
 
         if (null != eventTypeIdOptional) {
-            eventType = entityManager.getReference(EventType.class, eventTypeIdOptional);
+            eventType = eventTypeRepository.getOne(eventTypeIdOptional);
         }
 
         event.setType(eventType);
@@ -377,54 +315,52 @@ public class EventServiceImpl implements EventService {
      * If client has sent photos, then remove old ones and save received
      */
     private void syncPhotos(Event event, List<String> photoURLs) {
-        for (Photo oldPhoto : event.getPhotos()) {
-            entityManager.remove(oldPhoto);
-        }
-
-        for (String photoURL : photoURLs) {
-            Photo photo = new Photo();
-            photo.setUrl(photoURL);
-            entityManager.persist(photo);
-            event.getPhotos().add(photo);
-        }
+        photoRepository.deleteAll(event.getPhotos());
+        event.getPhotos().clear();
+        event.getPhotos().addAll(
+                photoURLs
+                        .stream()
+                        .map(Photo::new)
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
      * If client has sent videos, then remove old ones and save received
      */
     private void syncVideos(Event event, List<VideoDTO> videos) {
-        for (Video oldVideo : event.getVideos()) {
-            entityManager.remove(oldVideo);
-        }
-
-        for (VideoDTO receivedVideo : videos) {
-            Video video = new Video();
-            video.setUrl(receivedVideo.getUrl());
-            if (null != receivedVideo.getPreviewUrl()) {
-                video.setPreviewUrl(receivedVideo.getPreviewUrl().orElse(null));
-            }
-            video.setVideoType(entityManager.getReference(VideoType.class, receivedVideo.getVideoTypeId()));
-            entityManager.persist(video);
-            event.getVideos().add(video);
-        }
+        videoRepository.deleteAll(event.getVideos());
+        event.getVideos().clear();
+        event.getVideos().addAll(
+                videos
+                        .stream()
+                        .map(videoDTO -> {
+                            Video video = new Video();
+                            video.setUrl(videoDTO.getUrl());
+                            if (null != videoDTO.getPreviewUrl()) {
+                                video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
+                            }
+                            video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
+                            return video;
+                        })
+                        .collect(Collectors.toList())
+        );
     }
 
     /**
      * If client has sent tags, then detach (not remove because tags are shared between events) old ones and save received
      */
-    private void syncTags(Event event, List<String> receivedTags) {
-        //Не удаляем старые теги из таблицы, они могут быть привязаны к другим событиям
+    private void syncTags(Event event, List<String> tagNames) {
+        //we do not remove old tags from db. They may be shared across multiple events or news
         event.getTags().clear();
-
-        //сохраняем теги
-        for (String receivedTag : receivedTags) {
-            Tag tag = tagRepository.findFirstByName(receivedTag);
-            if (null == tag) {
-                tag = new Tag();
-                tag.setName(receivedTag);
-                entityManager.persist(tag);
-            }
-            event.getTags().add(tag);
-        }
+        event.getTags().addAll(
+                tagNames
+                        .stream()
+                        .map(tagName -> {
+                            Tag tag = tagRepository.findFirstByName(tagName);
+                            return null != tag ? tag : new Tag(tagName);
+                        })
+                        .collect(Collectors.toList())
+        );
     }
 }

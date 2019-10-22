@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "photos")
 public class Photo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -24,6 +25,13 @@ public class Photo {
 
     @Column(length = 500)
     private String url;
+
+    public Photo() {
+    }
+
+    public Photo(String url) {
+        this.url = url;
+    }
 
     public int getId() {
         return id;

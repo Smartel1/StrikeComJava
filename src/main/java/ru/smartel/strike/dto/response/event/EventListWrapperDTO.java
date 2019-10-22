@@ -28,23 +28,23 @@ public class EventListWrapperDTO {
     }
 
     public static class Meta {
-        private Integer total;
+        private Long total;
         private Integer currentPage;
         private Integer perPage;
-        private Integer lastPage;
+        private Long lastPage;
 
-        public Meta(Integer total, Integer currentPage, Integer perPage, Integer lastPage) {
+        public Meta(Long total, Integer currentPage, Integer perPage, Long lastPage) {
             this.total = total;
             this.currentPage = currentPage;
             this.perPage = perPage;
             this.lastPage = lastPage;
         }
 
-        public Integer getTotal() {
+        public Long getTotal() {
             return total;
         }
 
-        public void setTotal(Integer total) {
+        public void setTotal(Long total) {
             this.total = total;
         }
 
@@ -64,11 +64,11 @@ public class EventListWrapperDTO {
             this.perPage = perPage;
         }
 
-        public Integer getLastPage() {
+        public Long getLastPage() {
             return lastPage;
         }
 
-        public void setLastPage(Integer lastPage) {
+        public void setLastPage(Long lastPage) {
             this.lastPage = lastPage;
         }
     }

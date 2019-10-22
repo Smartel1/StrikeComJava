@@ -1,4 +1,4 @@
-package ru.smartel.strike.specification;
+package ru.smartel.strike.specification.event;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Event;
@@ -7,19 +7,21 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.List;
 
 /**
- * User's favourite events
+ * Events with ids
  */
-public class FavouriteEvent implements Specification<Event> {
-    private int userId;
+public class WithIdsEvents implements Specification<Event> {
+    private List<Integer> ids;
 
-    public FavouriteEvent(int userId) {
-        this.userId = userId;
+    public WithIdsEvents(List<Integer> ids) {
+        this.ids = ids;
     }
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.in(root.join("likedUsers").get("id")).value(userId);
+        //or parent-events of conflicts with given ids
+        return cb.in(root.get("id")).value(ids);
     }
 }

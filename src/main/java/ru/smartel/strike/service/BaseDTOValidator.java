@@ -1,16 +1,9 @@
 package ru.smartel.strike.service;
 
-import javax.persistence.EntityManager;
 import java.util.Map;
 import java.util.Optional;
 
-public class AbstractDTOValidator  {
-
-    private EntityManager entityManager;
-
-    public AbstractDTOValidator(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+public class BaseDTOValidator {
 
     public CheckedField check(Object field, String fieldName, Map<String, String> errors) {
         return new CheckedField(field, fieldName, errors);
@@ -64,37 +57,6 @@ public class AbstractDTOValidator  {
 
             if (null == fieldValue) {
                 putError("must not be null", skipRemainingIfFail);
-            }
-            return this;
-        }
-
-        /**
-         * Checks if id is present in database (null fields considered invalid)
-         */
-        public CheckedField existsAsId(Class<?> entity) {
-            return existsAsId(entity, false);
-        }
-
-        /**
-         * Checks if id is present in database (null fields considered valid)
-         */
-        public CheckedField existsAsId(Class<?> entity, boolean skipRemainingIfFail) {
-            if (skipChecks) return this;
-
-            if (null == fieldValue) return this;
-
-            if (!(fieldValue instanceof Number)) {
-                putError("must be present in database", skipRemainingIfFail);
-                return this;
-            }
-
-            Long count = (Long) entityManager
-                    .createQuery("select count(1) from " + entity.getName() + " where id = " + fieldValue)
-                    .setMaxResults(1)
-                    .getSingleResult();
-
-            if (count == 0) {
-                putError("must be present in database", skipRemainingIfFail);
             }
             return this;
         }

@@ -1,7 +1,6 @@
 package ru.smartel.strike.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventRequestDTO;
@@ -11,21 +10,17 @@ import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.EventService;
-import ru.smartel.strike.service.JsonSchemaValidator;
 import ru.smartel.strike.service.Locale;
 
 import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/{locale}")
-@Validated
 public class EventController {
 
-    private JsonSchemaValidator validator;
     private EventService eventService;
 
-    public EventController(JsonSchemaValidator validator, EventService eventService) {
-        this.validator = validator;
+    public EventController(EventService eventService) {
         this.eventService = eventService;
     }
 
@@ -70,7 +65,7 @@ public class EventController {
         eventService.setFavourite(eventId, user.getId(), isFavourite);
     }
 
-    @PostMapping(path = "/event/", consumes = {"application/json"})
+    @PostMapping(path = "/event", consumes = {"application/json"})
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody EventRequestDTO dto,

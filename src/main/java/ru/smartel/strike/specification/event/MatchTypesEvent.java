@@ -1,4 +1,4 @@
-package ru.smartel.strike.specification;
+package ru.smartel.strike.specification.event;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Event;
@@ -10,17 +10,17 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
- * Events with statuses
+ * Events with types
  */
-public class MatchStatusesEvent implements Specification<Event> {
-    private List<Integer> statusIds;
+public class MatchTypesEvent implements Specification<Event> {
+    private List<Integer> typeIds;
 
-    public MatchStatusesEvent(List<Integer> statusIds) {
-        this.statusIds = statusIds;
+    public MatchTypesEvent(List<Integer> typeIds) {
+        this.typeIds = typeIds;
     }
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.in(root.get("status").get("id")).value(statusIds);
+        return cb.in(root.get("type").get("id")).value(typeIds);
     }
 }

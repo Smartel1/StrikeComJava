@@ -1,4 +1,4 @@
-package ru.smartel.strike.specification;
+package ru.smartel.strike.specification.event;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Event;

@@ -1,9 +1,6 @@
 package ru.smartel.strike.entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 import org.springframework.data.annotation.AccessType;
 import ru.smartel.strike.entity.interfaces.*;
 import ru.smartel.strike.entity.reference.EventStatus;
@@ -11,6 +8,9 @@ import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -18,6 +18,13 @@ import java.util.*;
 
 @Entity(name = "Event")
 @Table(name = "events")
+@NamedEntityGraph(
+        name = "fetch",
+        attributeNodes = {
+                @NamedAttributeNode("videos"),
+                @NamedAttributeNode("photos")
+        }
+)
 public class Event implements Commentable, Post, TitlesContents {
 
     @Id
@@ -80,7 +87,7 @@ public class Event implements Commentable, Post, TitlesContents {
     @ManyToMany(mappedBy = "favouriteEvents")
     private Set<User> likedUsers = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "event_photo",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
@@ -88,7 +95,7 @@ public class Event implements Commentable, Post, TitlesContents {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Photo> photos = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "event_video",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
@@ -96,7 +103,7 @@ public class Event implements Commentable, Post, TitlesContents {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Video> videos = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(name = "event_tag",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}

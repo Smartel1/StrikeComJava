@@ -73,7 +73,7 @@ public class News implements Commentable, Post, TitlesContents {
     )
     private Set<Comment> comments = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "news_photo",
             joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
@@ -81,13 +81,21 @@ public class News implements Commentable, Post, TitlesContents {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Photo> photos;
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "news_video",
             joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Video> videos;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @JoinTable(name = "news_tag",
+            joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}
+    )
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<Tag> tags = new HashSet<>();
 
     public int getId() {
         return id;
@@ -211,6 +219,14 @@ public class News implements Commentable, Post, TitlesContents {
 
     public void setVideos(Set<Video> videos) {
         this.videos = videos;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     public LocalDateTime getCreatedAt() {
