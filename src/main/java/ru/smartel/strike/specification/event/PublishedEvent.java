@@ -1,4 +1,4 @@
-package ru.smartel.strike.specification;
+package ru.smartel.strike.specification.event;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Event;
@@ -7,20 +7,19 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.List;
 
 /**
- * Events with tag
+ * Only published events
  */
-public class HasTagEvent implements Specification<Event> {
-    private int tagId;
+public class PublishedEvent implements Specification<Event> {
+    private boolean published;
 
-    public HasTagEvent(int tagId) {
-        this.tagId = tagId;
+    public PublishedEvent(boolean published) {
+        this.published = published;
     }
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.join("tags").get("id"), tagId);
+        return cb.equal(root.get("published"), published);
     }
 }

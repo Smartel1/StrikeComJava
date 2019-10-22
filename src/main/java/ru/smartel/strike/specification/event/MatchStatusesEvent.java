@@ -1,4 +1,4 @@
-package ru.smartel.strike.specification;
+package ru.smartel.strike.specification.event;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Event;
@@ -10,18 +10,17 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
- * Events with ids
+ * Events with statuses
  */
-public class WithIdsEvents implements Specification<Event> {
-    private List<Integer> ids;
+public class MatchStatusesEvent implements Specification<Event> {
+    private List<Integer> statusIds;
 
-    public WithIdsEvents(List<Integer> ids) {
-        this.ids = ids;
+    public MatchStatusesEvent(List<Integer> statusIds) {
+        this.statusIds = statusIds;
     }
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        //or parent-events of conflicts with given ids
-        return cb.in(root.get("id")).value(ids);
+        return cb.in(root.get("status").get("id")).value(statusIds);
     }
 }
