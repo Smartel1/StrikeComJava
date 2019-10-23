@@ -18,13 +18,6 @@ import java.util.*;
 
 @Entity(name = "Event")
 @Table(name = "events")
-@NamedEntityGraph(
-        name = "fetch",
-        attributeNodes = {
-                @NamedAttributeNode("videos"),
-                @NamedAttributeNode("photos")
-        }
-)
 public class Event implements Commentable, Post, TitlesContents {
 
     @Id

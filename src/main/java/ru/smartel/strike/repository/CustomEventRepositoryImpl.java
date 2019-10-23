@@ -1,7 +1,6 @@
 package ru.smartel.strike.repository;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.CrudRepository;
 import ru.smartel.strike.entity.Event;
 
 import javax.persistence.EntityManager;
@@ -12,7 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-public  class CustomEventRepositoryImpl implements CustomEventRepository {
+public class CustomEventRepositoryImpl implements CustomEventRepository {
     @PersistenceContext
     EntityManager entityManager;
 

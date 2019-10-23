@@ -1,7 +1,9 @@
 package ru.smartel.strike.service.impl;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class EventServiceImpl implements EventService {
 
     private TagRepository tagRepository;
@@ -77,6 +80,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
+    @PreAuthorize("permitAll()")
     public EventListWrapperDTO list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
 
@@ -118,6 +122,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("permitAll()")
     public EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives) {
         Event event = eventRepository.findOrThrow(eventId);
 
@@ -132,6 +137,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("isFullyAuthenticated()")
     public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
         User user = userRepository.findById(userId).get();
         Event event = eventRepository.getOne(eventId);
@@ -149,6 +155,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("isFullyAuthenticated()")
     public EventDetailDTO create(EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateStoreDTO(dto);
 
@@ -182,6 +189,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#eventId)")
     public EventDetailDTO update(Integer eventId, EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateUpdateDTO(dto);
 
@@ -235,6 +243,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public void delete(Integer eventId) {
 //        Event event = eventRepository.findOrThrow(eventId);
         eventRepository.deleteById(eventId);
