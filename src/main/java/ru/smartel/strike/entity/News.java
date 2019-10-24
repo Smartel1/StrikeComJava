@@ -66,6 +66,9 @@ public class News implements Commentable, Post, TitlesContents {
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
+    @ManyToMany(mappedBy = "favouriteEvents")
+    private Set<User> likedUsers = new HashSet<>();
+
     @ManyToMany(cascade = {CascadeType.REMOVE})
     @JoinTable(name = "comment_news",
             inverseJoinColumns = {@JoinColumn(name = "comment_id")},
@@ -79,7 +82,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Photo> photos;
+    private Set<Photo> photos = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "news_video",
@@ -87,7 +90,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Video> videos;
+    private Set<Video> videos = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(name = "news_tag",
@@ -113,6 +116,14 @@ public class News implements Commentable, Post, TitlesContents {
     @Override
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public Set<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(Set<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 
     public String getTitleEn() {

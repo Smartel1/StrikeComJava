@@ -9,7 +9,7 @@ import ru.smartel.strike.dto.request.event.EventRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
-import ru.smartel.strike.dto.response.event.EventListWrapperDTO;
+import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
@@ -45,7 +45,7 @@ public class EventServiceImpl implements EventService {
     private EventTypeRepository eventTypeRepository;
     private EventStatusRepository eventStatusRepository;
     private UserRepository userRepository;
-    private EventFiltersTransformer filtersTransformer;
+    private FiltersTransformer filtersTransformer;
     private EventDTOValidator validator;
     private PushService pushService;
 
@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
             EventTypeRepository eventTypeRepository,
             EventStatusRepository eventStatusRepository,
             UserRepository userRepository,
-            EventFiltersTransformer filtersTransformer,
+            FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
             PushService pushService
     ) {
@@ -84,7 +84,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public EventListWrapperDTO list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
 
         //Body has precedence over query params.
@@ -94,14 +94,14 @@ public class EventServiceImpl implements EventService {
 
         //Transform filters and other restrictions to Specifications
         Specification<Event> specification = filtersTransformer
-                .toSpecification(dto.getFilters(), user)
+                .toSpecification(dto.getFilters(), null != user ? user.getId() : null)
                 .and(new ByRolesEvent(user))
                 .and(new LocalizedEvent(locale));
 
         //Get count of events matching specification
         long eventsCount = eventRepository.count(specification);
 
-        EventListWrapperDTO.Meta responseMeta = new EventListWrapperDTO.Meta(
+        ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 eventsCount,
                 page,
                 perPage,
@@ -109,7 +109,7 @@ public class EventServiceImpl implements EventService {
         );
 
         if (eventsCount <= (page - 1) * perPage) {
-            return new EventListWrapperDTO(Collections.emptyList(), responseMeta);
+            return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
         //Get count of events matching specification. Because pagination and fetching dont work together
@@ -121,7 +121,7 @@ public class EventServiceImpl implements EventService {
                 .sorted(Comparator.comparingLong(EventListDTO::getDate))
                 .collect(Collectors.toList());
 
-        return new EventListWrapperDTO(eventListDTOs, responseMeta);
+        return new ListWrapperDTO<>(eventListDTOs, responseMeta);
     }
 
     @Override
@@ -293,9 +293,9 @@ public class EventServiceImpl implements EventService {
         if (null != dto.getEventTypeId()) setEventType(event, dto.getEventTypeId().orElse(null));
         if (null != dto.getTitle()) event.setTitleByLocale(locale, dto.getTitle().orElse(null));
         if (null != dto.getContent()) event.setContentByLocale(locale, dto.getContent().orElse(null));
-        if (null != dto.getPhotoUrls()) syncPhotos(event, dto.getPhotoUrls());
-        if (null != dto.getVideos()) syncVideos(event, dto.getVideos());
-        if (null != dto.getTags()) syncTags(event, dto.getTags());
+        if (null != dto.getPhotoUrls()) syncPhotos(event, dto.getPhotoUrls().orElseThrow());
+        if (null != dto.getVideos()) syncVideos(event, dto.getVideos().orElseThrow());
+        if (null != dto.getTags()) syncTags(event, dto.getTags().orElseThrow());
     }
 
     /**

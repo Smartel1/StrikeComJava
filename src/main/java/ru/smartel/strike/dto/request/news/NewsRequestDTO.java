@@ -1,4 +1,4 @@
-package ru.smartel.strike.dto.request.event;
+package ru.smartel.strike.dto.request.news;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,8 +11,7 @@ import java.util.Optional;
  * dto for creating/updating requests
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EventRequestDTO {
-    private Optional<Integer> conflictId;
+public class NewsRequestDTO {
     private Optional<Boolean> published;
     private Optional<String> title;
     private Optional<String> titleRu;
@@ -23,23 +22,10 @@ public class EventRequestDTO {
     private Optional<String> contentEn;
     private Optional<String> contentEs;
     private Optional<Long> date;
-    private Optional<Float> latitude;
-    private Optional<Float> longitude;
     private Optional<String> sourceLink;
-    private Optional<Integer> localityId;
-    private Optional<Integer> eventStatusId;
-    private Optional<Integer> eventTypeId;
     private Optional<List<String>> tags;
     private Optional<List<String>> photoUrls;
     private Optional<List<VideoDTO>> videos;
-
-    public Optional<Integer> getConflictId() {
-        return conflictId;
-    }
-
-    public void setConflictId(Optional<Integer> conflictId) {
-        this.conflictId = conflictId;
-    }
 
     public Optional<Boolean> getPublished() {
         return published;
@@ -121,52 +107,12 @@ public class EventRequestDTO {
         this.date = date;
     }
 
-    public Optional<Float> getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Optional<Float> latitude) {
-        this.latitude = latitude;
-    }
-
-    public Optional<Float> getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Optional<Float> longitude) {
-        this.longitude = longitude;
-    }
-
     public Optional<String> getSourceLink() {
         return sourceLink;
     }
 
     public void setSourceLink(Optional<String> sourceLink) {
         this.sourceLink = sourceLink;
-    }
-
-    public Optional<Integer> getLocalityId() {
-        return localityId;
-    }
-
-    public void setLocalityId(Optional<Integer> localityId) {
-        this.localityId = localityId;
-    }
-
-    public Optional<Integer> getEventStatusId() {
-        return eventStatusId;
-    }
-
-    public void setEventStatusId(Optional<Integer> eventStatusId) {
-        this.eventStatusId = eventStatusId;
-    }
-
-    public Optional<Integer> getEventTypeId() {
-        return eventTypeId;
-    }
-
-    public void setEventTypeId(Optional<Integer> eventTypeId) {
-        this.eventTypeId = eventTypeId;
     }
 
     public Optional<List<String>> getTags() {

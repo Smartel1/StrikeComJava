@@ -2,93 +2,92 @@ package ru.smartel.strike.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.event.EventRequestDTO;
-import ru.smartel.strike.dto.response.event.EventDetailDTO;
+import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
-import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.news.NewsDetailDTO;
+import ru.smartel.strike.dto.response.news.NewsListDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.EventService;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.NewsService;
 
 import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/{locale}")
-public class EventController {
+public class NewsController {
 
-    private EventService eventService;
+    private NewsService newsService;
 
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
+    public NewsController(NewsService newsService) {
+        this.newsService = newsService;
     }
 
-    @GetMapping("/event")
-    public ListWrapperDTO<EventListDTO> index(
+    @GetMapping("/news")
+    public ListWrapperDTO<NewsListDTO> index(
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO dto,
+            @RequestBody NewsListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
-        return eventService.list(dto, perPage, page, locale, user);
+        return newsService.list(dto, perPage, page, locale, user);
     }
 
-    @PostMapping("/event-list")
+    @PostMapping("/news-list")
     public ListWrapperDTO postIndex(
             @PathVariable("locale") Locale locale,
             @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
             @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO dto,
+            @RequestBody NewsListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
         //alias of index method
         return index(locale, perPage, page, dto, user);
     }
 
-    @GetMapping("/event/{id}")
-    public EventDetailDTO show(
+    @GetMapping("/news/{id}")
+    public NewsDetailDTO show(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int eventId,
-            @RequestParam(value = "with_relatives", required = false) boolean withRelatives
+            @PathVariable("id") int newsId
     ) {
-        return eventService.incrementViewsAndGet(eventId, locale, withRelatives);
+        return newsService.incrementViewsAndGet(newsId, locale);
     }
 
-    @PostMapping("/event/{id}/favourite")
+    @PostMapping("/news/{id}/favourite")
     public void setFavourite(
-            @PathVariable("id") int eventId,
+            @PathVariable("id") int newsId,
             @RequestParam(value = "favourite") boolean isFavourite,
             @AuthenticationPrincipal User user
     ) {
-        eventService.setFavourite(eventId, null != user? user.getId() : null, isFavourite);
+        newsService.setFavourite(newsId, null != user? user.getId() : null, isFavourite);
     }
 
-    @PostMapping(path = "/event", consumes = {"application/json"})
-    public EventDetailDTO store(
+    @PostMapping(path = "/news", consumes = {"application/json"})
+    public NewsDetailDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody EventRequestDTO dto,
+            @RequestBody NewsRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.create(dto, null != user? user.getId() : null, locale);
+        return newsService.create(dto, null != user? user.getId() : null, locale);
     }
 
-    @PutMapping(path = "/event/{id}", consumes = {"application/json"})
-    public EventDetailDTO update(
+    @PutMapping(path = "/news/{id}", consumes = {"application/json"})
+    public NewsDetailDTO update(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int eventId,
+            @PathVariable("id") int newsId,
             @AuthenticationPrincipal User user,
-            @RequestBody EventRequestDTO dto
+            @RequestBody NewsRequestDTO dto
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.update(eventId, dto, null != user? user.getId() : null, locale);
+        return newsService.update(newsId, dto, null != user? user.getId() : null, locale);
     }
 
-    @DeleteMapping(path = "/event/{id}")
+    @DeleteMapping(path = "/news/{id}")
     public void delete(
-            @PathVariable("id") int eventId
+            @PathVariable("id") int newsId
     ) throws BusinessRuleValidationException {
-        eventService.delete(eventId);
+        newsService.delete(newsId);
     }
 }

@@ -3,27 +3,33 @@ package ru.smartel.strike.service.impl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.User;
-import ru.smartel.strike.service.EventFiltersTransformer;
+import ru.smartel.strike.entity.News;
+import ru.smartel.strike.repository.ConflictRepository;
+import ru.smartel.strike.service.FiltersTransformer;
 import ru.smartel.strike.specification.event.*;
+import ru.smartel.strike.specification.news.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Service
-public class FiltersTransformerImpl implements EventFiltersTransformer {
+public class FiltersTransformerImpl implements FiltersTransformer {
 
-    @PersistenceContext
-    EntityManager entityManager;
+    private ConflictRepository conflictRepository;
+
+    public FiltersTransformerImpl(ConflictRepository conflictRepository) {
+        this.conflictRepository = conflictRepository;
+    }
 
     @Override
-    public Specification toSpecification(EventListRequestDTO.FiltersBag filters, User user) {
+    public Specification toSpecification(EventListRequestDTO.FiltersBag filters, Integer userId) {
+        if (null == filters) return null;
+
         //Empty specification
         Specification<Event> result = null;
-
-        if (null == filters) return result;
 
         if (null != filters.getPublished()) result = and(result, new PublishedEvent(filters.getPublished()));
         if (null != filters.getDateFrom()) result = and(result, new AfterDateEvent(filters.getDateFrom()));
@@ -33,13 +39,10 @@ public class FiltersTransformerImpl implements EventFiltersTransformer {
         if (null != filters.getTagId()) result = and(result, new HasTagEvent(filters.getTagId()));
         if (null != filters.getConflictIds()) {
             //additional query to find ids of parent events of conflicts with given ids
-            List<Integer> parentEventIds = entityManager
-                    .createQuery("select parentEvent.id from Conflict where id in :ids")
-                    .setParameter("ids", filters.getConflictIds())
-                    .getResultList();
+            List<Integer> parentEventIds = conflictRepository.findAllByIdGetParentEventId(filters.getConflictIds());
             result = and(result, new BelongToConflictsEvent(filters.getConflictIds()).or(new WithIdsEvents(parentEventIds)));
         }
-        if (null != filters.getFavourites() && null != user) result = and(result, new FavouriteEvent(user.getId()));
+        if (null != filters.getFavourites() && null != userId) result = and(result, new FavouriteEvent(userId));
         if (null != filters.getContainsContent()) result = and(result, new WithContentEvent(filters.getContainsContent()));
         if (null != filters.getCountryIds()) result = and(result, new CountryEvent(filters.getCountryIds()));
         if (null != filters.getRegionIds()) result = and(result, new RegionEvent(filters.getRegionIds()));
@@ -48,9 +51,24 @@ public class FiltersTransformerImpl implements EventFiltersTransformer {
         return result;
     }
 
-    private Specification<Event> and(Specification<Event> s1, Specification<Event> s2) {
+    @Override
+    public Specification<News> toSpecification(NewsListRequestDTO.FiltersBag filters, Integer userId) {
+        if (null == filters) return null;
+
+        //Empty specification
+        Specification<News> result = null;
+
+        if (null != filters.getPublished()) result = and(result, new PublishedNews(filters.getPublished()));
+        if (null != filters.getDateFrom()) result = and(result, new AfterDateNews(filters.getDateFrom()));
+        if (null != filters.getDateTo()) result = and(result, new BeforeDateNews(filters.getDateTo()));
+        if (null != filters.getFavourites() && null != userId) result = and(result, new FavouriteNews(userId));
+        if (null != filters.getTagId()) result = and(result, new HasTagNews(filters.getTagId()));
+
+        return result;
+    }
+
+    private <T> Specification<T> and(Specification<T> s1, Specification<T> s2) {
         if (null == s1) return s2;
         return s1.and(s2);
-    };
-
+    }
 }

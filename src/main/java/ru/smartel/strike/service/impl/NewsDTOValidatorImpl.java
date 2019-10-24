@@ -1,21 +1,21 @@
 package ru.smartel.strike.service.impl;
 
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.event.EventRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.BaseDTOValidator;
-import ru.smartel.strike.service.EventDTOValidator;
+import ru.smartel.strike.service.NewsDTOValidator;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class EventDTOValidatorImpl extends BaseDTOValidator implements EventDTOValidator {
+public class NewsDTOValidatorImpl extends BaseDTOValidator implements NewsDTOValidator {
 
     @Override
-    public void validateListQueryDTO(EventListRequestDTO dto) throws DTOValidationException {
+    public void validateListQueryDTO(NewsListRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getPage(), "page", errors).min(1);
@@ -27,13 +27,10 @@ public class EventDTOValidatorImpl extends BaseDTOValidator implements EventDTOV
     }
 
     @Override
-    public void validateStoreDTO(EventRequestDTO dto) throws DTOValidationException {
+    public void validateStoreDTO(NewsRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
-        check(dto.getConflictId(), "conflict_id", errors).requiredOptional().notNull(true);
         check(dto.getDate(), "date", errors).requiredOptional().notNull();
-        check(dto.getLatitude(), "latitude", errors).requiredOptional().notNull();
-        check(dto.getLongitude(), "longitude", errors).requiredOptional().notNull();
         validateCommon(dto, errors);
 
         if (!errors.isEmpty()) {
@@ -42,13 +39,10 @@ public class EventDTOValidatorImpl extends BaseDTOValidator implements EventDTOV
     }
 
     @Override
-    public void validateUpdateDTO(EventRequestDTO dto) throws DTOValidationException {
+    public void validateUpdateDTO(NewsRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
-        check(dto.getConflictId(), "conflict_id", errors).notNull(true);
         check(dto.getDate(), "date", errors).notNull();
-        check(dto.getLatitude(), "latitude", errors).notNull();
-        check(dto.getLongitude(), "longitude", errors).notNull();
         validateCommon(dto, errors);
 
         if (!errors.isEmpty()) {
@@ -59,11 +53,8 @@ public class EventDTOValidatorImpl extends BaseDTOValidator implements EventDTOV
     /**
      * Validate fields whose checks are similar on update and create actions
      */
-    private void validateCommon(EventRequestDTO dto, Map<String, String> errors) {
+    private void validateCommon(NewsRequestDTO dto, Map<String, String> errors) {
         check(dto.getPublished(), "published", errors).notNull();
-        check(dto.getEventStatusId(), "event_status_id", errors);
-        check(dto.getEventTypeId(), "event_type_id", errors);
-        check(dto.getLocalityId(), "locality_id", errors);
         check(dto.getTitle(), "title", errors).maxLength(255);
         check(dto.getTitleRu(), "title_ru", errors).maxLength(255);
         check(dto.getTitleEn(), "title_en", errors).maxLength(255);

@@ -1,21 +1,21 @@
-package ru.smartel.strike.dto.response.event;
+package ru.smartel.strike.dto.response;
 
 import java.util.List;
 
-public class EventListWrapperDTO {
-    private List<EventListDTO> data;
+public class ListWrapperDTO <T> {
+    private List<T> data;
     private Meta meta;
 
-    public EventListWrapperDTO(List<EventListDTO> data, Meta meta) {
+    public ListWrapperDTO(List<T> data, Meta meta) {
         this.data = data;
         this.meta = meta;
     }
 
-    public List<EventListDTO> getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public void setData(List<EventListDTO> data) {
+    public void setData(List<T> data) {
         this.data = data;
     }
 

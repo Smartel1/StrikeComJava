@@ -4,18 +4,18 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.News;
 
 import java.util.List;
 
 
 @Repository
-public interface EventRepository extends
-        CustomEventRepository,
-        JpaSpecificationExecutor<Event>,
-        JpaRepository<Event, Integer>
+public interface NewsRepository extends
+        CustomNewsRepository,
+        JpaSpecificationExecutor<News>,
+        JpaRepository<News, Integer>
 {
-    @EntityGraph(attributePaths = {"videos", "photos", "tags", "comments", "conflict"})
+    @EntityGraph(attributePaths = {"videos", "photos", "tags", "comments"})
     @Override
-    List<Event> findAllById(Iterable<Integer> ids);
+    List<News> findAllById(Iterable<Integer> ids);
 }

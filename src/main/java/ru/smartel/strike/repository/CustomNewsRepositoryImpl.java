@@ -1,8 +1,7 @@
 package ru.smartel.strike.repository;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.smartel.strike.entity.Conflict;
-import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.News;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
@@ -13,35 +12,22 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 
-public class CustomEventRepositoryImpl implements CustomEventRepository {
+public class CustomNewsRepositoryImpl implements CustomNewsRepository {
     @PersistenceContext
     EntityManager entityManager;
 
     @Override
-    public boolean isNotParentForAnyConflicts(int eventId) {
-        Long count = (Long) entityManager
-                .createQuery("select count(c.id) " +
-                        "from " + Conflict.class.getName() + " c " +
-                        "where c.parentEvent = " + eventId)
-                .setMaxResults(1)
-                .getSingleResult();
-        return count.equals(0L);
-    }
-
-
-
-    @Override
-    public Event findOrThrow(int id) throws EntityNotFoundException {
-        Event entity = entityManager.find(Event.class, id);
-        if (null == entity) throw new EntityNotFoundException("Событие не найдено");
+    public News findOrThrow(int id) throws EntityNotFoundException {
+        News entity = entityManager.find(News.class, id);
+        if (null == entity) throw new EntityNotFoundException("Новость не найдена");
         return entity;
     }
 
     @Override
-    public List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, Integer page, Integer perPage) {
+    public List<Integer> findIdsOrderByDateDesc(Specification<News> specification, Integer page, Integer perPage) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
-        Root<Event> root = idQuery.from(Event.class);
+        Root<News> root = idQuery.from(News.class);
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("date")));
 
