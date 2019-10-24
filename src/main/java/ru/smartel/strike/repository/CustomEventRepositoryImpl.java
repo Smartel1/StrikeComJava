@@ -1,6 +1,7 @@
 package ru.smartel.strike.repository;
 
 import org.springframework.data.jpa.domain.Specification;
+import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 
 import javax.persistence.EntityManager;
@@ -37,5 +38,16 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
                 .setMaxResults(perPage)
                 .setFirstResult((page - 1) * perPage)
                 .getResultList();
+    }
+
+    @Override
+    public boolean isNotParentForAnyConflicts(int eventId) {
+        Long count = (Long) entityManager
+                .createQuery("select count(c.id) " +
+                        "from " + Conflict.class.getName() + " c " +
+                        "where c.parentEvent = " + eventId)
+                .setMaxResults(1)
+                .getSingleResult();
+        return count.equals(0L);
     }
 }

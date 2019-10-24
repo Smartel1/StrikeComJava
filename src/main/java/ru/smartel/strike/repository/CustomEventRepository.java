@@ -10,4 +10,5 @@ import java.util.List;
 public interface CustomEventRepository {
     Event findOrThrow(int id);
     List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, Integer page, Integer perPage);
+    boolean isNotParentForAnyConflicts(int eventId);
 }

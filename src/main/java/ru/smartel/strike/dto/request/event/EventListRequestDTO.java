@@ -6,9 +6,12 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EventListRequestDTO {
+    public static final int DEFAULT_PAGE_CAPACITY = 20;
+    public static final int DEFAULT_PAGE = 1;
+
     private FiltersBag filters;
-    private Integer perPage = 20;
-    private Integer page = 1;
+    private Integer perPage = DEFAULT_PAGE_CAPACITY;
+    private Integer page = DEFAULT_PAGE;
 
     public FiltersBag getFilters() {
         return filters;

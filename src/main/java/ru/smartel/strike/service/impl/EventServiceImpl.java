@@ -20,15 +20,15 @@ import ru.smartel.strike.repository.*;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.*;
+import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -47,6 +47,7 @@ public class EventServiceImpl implements EventService {
     private UserRepository userRepository;
     private EventFiltersTransformer filtersTransformer;
     private EventDTOValidator validator;
+    private PushService pushService;
 
     public EventServiceImpl(
             TagRepository tagRepository,
@@ -61,7 +62,8 @@ public class EventServiceImpl implements EventService {
             EventStatusRepository eventStatusRepository,
             UserRepository userRepository,
             EventFiltersTransformer filtersTransformer,
-            EventDTOValidator validator
+            EventDTOValidator validator,
+            PushService pushService
     ) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
@@ -76,6 +78,7 @@ public class EventServiceImpl implements EventService {
         this.userRepository = userRepository;
         this.filtersTransformer = filtersTransformer;
         this.validator = validator;
+        this.pushService = pushService;
     }
 
 
@@ -86,8 +89,8 @@ public class EventServiceImpl implements EventService {
 
         //Body has precedence over query params.
         //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (20 != dto.getPerPage()) perPage = dto.getPerPage();
-        if (1 != dto.getPage()) page = dto.getPage();
+        if (EventListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
+        if (EventListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
 
         //Transform filters and other restrictions to Specifications
         Specification<Event> specification = filtersTransformer
@@ -116,7 +119,7 @@ public class EventServiceImpl implements EventService {
                 .stream()
                 .map(e -> new EventListDTO(e, locale))
                 .sorted(Comparator.comparingLong(EventListDTO::getDate))
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
 
         return new EventListWrapperDTO(eventListDTOs, responseMeta);
     }
@@ -139,7 +142,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @PreAuthorize("isFullyAuthenticated()")
     public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId).orElseThrow();
         Event event = eventRepository.getOne(eventId);
 
         List<Event> currentFavourites = user.getFavouriteEvents();
@@ -161,7 +164,7 @@ public class EventServiceImpl implements EventService {
 
         User user = userRepository.findById(userId).orElseThrow();
 
-        //Если пользователь хочет сразу опубликовать событие, он должен быть модератором
+        //Only moderator can publish events
         businessValidationService.validate(
                 new UserCanModerate(user).when(
                         null != dto.getPublished() && dto.getPublished().orElse(false) || null != dto.getLocalityId()
@@ -174,15 +177,27 @@ public class EventServiceImpl implements EventService {
 
         eventRepository.save(event);
 
-        //Если обычный пользователь предлагает событие, посылаем пуш админам. Если модератор публикует - то всем
+        //Send push
         if (!event.isPublished()) {
-//            $this->pushService->eventCreatedByUser($event);
+            //if event is creating non published - notify moderators
+            pushService.eventCreatedByUser(event.getId(), event.getAuthor().getId(), event.getAuthor().getName());
         } else {
-//            $this->pushService->eventPublished($event, new LocalesDTO(
-//                    !is_null($event->getTitleRu()),
-//                    !is_null($event->getTitleEn()),
-//                    !is_null($event->getTitleEs())
-//            ));
+            //if event published - notify subscribers
+            Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
+                    .filter(loc -> !loc.equals(Locale.ALL))
+                    .filter(loc -> null != event.getTitleByLocale(loc))
+                    .map(loc -> new AbstractMap.SimpleEntry<>(event.getTitleByLocale(loc), loc))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            pushService.eventPublished(
+                    event.getId(),
+                    event.getAuthor().getId(),
+                    event.getLongitude(),
+                    event.getLatitude(),
+                    titlesByLocales,
+                    null, //do not send push to author cuz he's moderator
+                    false
+            );
         }
 
         return new EventDetailDTO(event, locale);
@@ -194,59 +209,69 @@ public class EventServiceImpl implements EventService {
         validator.validateUpdateDTO(dto);
 
         Event event = eventRepository.findOrThrow(eventId);
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId).orElseThrow();
 
-        boolean userChangesPublishStatus =
-                null != dto.getPublished() && dto.getPublished().get() != event.isPublished();
+        boolean changingPublicationStatus =
+                null != dto.getPublished() && dto.getPublished().orElseThrow() != event.isPublished();
 
-        boolean userChangesConflict =
-                null != dto.getConflictId() && (dto.getConflictId().get() != event.getConflict().getId());
+        boolean changingConflictJoint =
+                null != dto.getConflictId() && (dto.getConflictId().orElseThrow() != event.getConflict().getId());
 
         businessValidationService.validate(
-                new UserCanModerate(user).when(
-                        userChangesPublishStatus
+                new UserCanModerate(user).when(changingPublicationStatus
                                 || null != dto.getLocalityId()
-                                || userChangesConflict
+                                || changingConflictJoint
                 ),
-                new NotAParentEvent(event).when(userChangesConflict)
+                new NotAParentEvent(event.getId(), eventRepository).when(changingConflictJoint)
         );
 
-        //Перед изменением смотрим, на каких языках уже есть переводы (чтобы не послать пуш второй раз)
-        boolean isLocaleRuBeforeUpdateNull = null == event.getTitleRu();
-        boolean isLocaleEnBeforeUpdateNull = null == event.getTitleEn();
-        boolean isLocaleEsBeforeUpdateNull = null == event.getTitleEs();
+        //We need to know which titles was not translated before update (not to send push twice to locale topic)
+        Set<Locale> nonLocalizedTitlesBeforeUpdate = Stream.of(Locale.values())
+                .filter(loc -> null == event.getTitleByLocale(loc))
+                .collect(Collectors.toSet());
 
         fillEventFields(event, dto, locale);
 
-//
-//        //Если событие опубликовано, то посылаем пуши в те топики по языкам, на которые переведено событие в этом обновлении.
-//        //Если событие публикуется в этом действии, то посылаются пуши на все языки, на которые локализовано событие
-//        if ($event -> isPublished()) {
-//            $localesToPush = new LocalesDTO(
-//                    ($nullLocalesBeforeUpdate -> isRu()or $userChangesPublishStatus) and
-//            !is_null($event -> getTitleRu()),
-//                    ($nullLocalesBeforeUpdate -> isEn() or $userChangesPublishStatus)and
-//            !is_null($event -> getTitleEn()),
-//                    ($nullLocalesBeforeUpdate -> isEs() or $userChangesPublishStatus)and
-//            !is_null($event -> getTitleEs())
-//            );
-//
-//            $this -> pushService -> eventPublished($event, $localesToPush);
-//
-//            //Если событие публикуется в этом действии, то автору посылается уведомление об этом
-//            if ($userChangesPublishStatus) {
-//                $this -> pushService -> sendYourPostModerated($event);
-//            }
-//        }
-//
+        if (event.isPublished()) {
+            // titles which was not localized earlier and have been localized in this transaction
+            Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
+                    .filter(loc -> !loc.equals(Locale.ALL))
+                    .filter(nonLocalizedTitlesBeforeUpdate::contains)
+                    .filter(loc -> null != event.getTitleByLocale(loc))
+                    .map(loc -> new AbstractMap.SimpleEntry<>(event.getTitleByLocale(loc), loc))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            pushService.eventPublished(
+                    eventId,
+                    null != event.getAuthor() ? event.getAuthor().getId() : null,
+                    event.getLongitude(),
+                    event.getLatitude(),
+                    titlesLocalizedDuringThisUpdate,
+                    null != event.getAuthor()? event.getAuthor().getFcm() : null,
+                    changingPublicationStatus //whether notify event's author or not
+            );
+        }
+
         return new EventDetailDTO(event, locale);
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer eventId) {
-//        Event event = eventRepository.findOrThrow(eventId);
-        eventRepository.deleteById(eventId);
+    public void delete(Integer eventId) throws BusinessRuleValidationException {
+        businessValidationService.validate(
+                new NotAParentEvent(eventId, eventRepository)
+        );
+        Event event = eventRepository.findById(eventId).orElseThrow();
+        eventRepository.delete(event);
+
+        //If event was not published - notify its' author about rejection
+        if (!event.isPublished() && null != event.getAuthor()) {
+            pushService.eventDeclined(
+                    event.getAuthor().getFcm(),
+                    eventId,
+                    event.getAuthor().getId()
+            );
+        }
     }
 
     private void fillEventFields(Event event, EventRequestDTO dto, Locale locale) {

@@ -23,5 +23,5 @@ public interface EventService {
     EventDetailDTO update(Integer eventId, EventRequestDTO dto, Integer userId, Locale locale)
             throws BusinessRuleValidationException, DTOValidationException;
 
-    void delete(Integer eventId);
+    void delete(Integer eventId) throws BusinessRuleValidationException;
 }

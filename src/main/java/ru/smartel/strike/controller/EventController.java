@@ -87,7 +87,7 @@ public class EventController {
     @DeleteMapping(path = "/event/{id}")
     public void delete(
             @PathVariable("id") int eventId
-    ) {
+    ) throws BusinessRuleValidationException {
         eventService.delete(eventId);
     }
 }

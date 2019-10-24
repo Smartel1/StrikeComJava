@@ -1,32 +1,20 @@
 package ru.smartel.strike.rules;
 
-import ru.smartel.strike.entity.Event;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import ru.smartel.strike.repository.EventRepository;
 
 public class NotAParentEvent extends BusinessRule {
 
-    @PersistenceContext
-    EntityManager entityManager;
+    private int eventId;
+    private EventRepository repository;
 
-    private Event event;
-
-    public NotAParentEvent(Event event) {
-        this.event = event;
+    public NotAParentEvent(int eventId, EventRepository repository) {
+        this.eventId = eventId;
+        this.repository = repository;
     }
 
     @Override
     public boolean passes() {
-        int relatedConflictsCount =  entityManager
-                .createQuery("select c.id " +
-                        "from ru.smartel.strike.entity.Conflict c " +
-                        "where c.parentEvent = :event")
-                .setMaxResults(1)
-                .setParameter("event", entityManager.getReference(Event.class, 21))
-                .getResultList().size();
-
-        return relatedConflictsCount == 0;
+        return repository.isNotParentForAnyConflicts(eventId);
     }
 
     @Override
