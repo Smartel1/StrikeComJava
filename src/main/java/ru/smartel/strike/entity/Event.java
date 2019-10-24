@@ -1,24 +1,28 @@
 package ru.smartel.strike.entity;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.AccessType;
-import ru.smartel.strike.entity.interfaces.*;
+import ru.smartel.strike.entity.interfaces.HasComments;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity(name = "Event")
 @Table(name = "events")
-public class Event implements Commentable, Post, TitlesContents {
+public class Event implements HasComments, PostEntity {
+
+    @Embedded
+    private Post post;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,24 +38,6 @@ public class Event implements Commentable, Post, TitlesContents {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "title_ru")
-    private String titleRu;
-
-    @Column(name = "title_en")
-    private String titleEn;
-
-    @Column(name = "title_es")
-    private String titleEs;
-
-    @Column(name = "content_ru", columnDefinition = "TEXT")
-    private String contentRu;
-
-    @Column(name = "content_en", columnDefinition = "TEXT")
-    private String contentEn;
-
-    @Column(name = "content_es", columnDefinition = "TEXT")
-    private String contentEs;
-
     @NotNull
     @Column(name = "longitude", nullable = false)
     private Float longitude;
@@ -59,23 +45,6 @@ public class Event implements Commentable, Post, TitlesContents {
     @NotNull
     @Column(name = "latitude", nullable = false)
     private Float latitude;
-
-    @NotNull
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date;
-
-    @Column(name = "views", nullable = false)
-    private Integer views = 0;
-
-    @Column(name = "published", nullable = false)
-    private boolean published = false;
-
-    @Size(max = 500)
-    @Column(name = "source_link", length = 500)
-    private String sourceLink;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User author;
 
     @ManyToMany(mappedBy = "favouriteEvents")
     private Set<User> likedUsers = new HashSet<>();
@@ -129,6 +98,16 @@ public class Event implements Commentable, Post, TitlesContents {
     private Locality locality;
 
     @Override
+    public Post getPost() {
+        return post;
+    }
+
+    @Override
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    @Override
     public int getId() {
         return id;
     }
@@ -137,80 +116,13 @@ public class Event implements Commentable, Post, TitlesContents {
         this.id = id;
     }
 
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public String getTitleRu() {
-        return titleRu;
-    }
-
-    @Override
-    public void setTitleRu(String titleRu) {
-        this.titleRu = titleRu;
-    }
-
-    @Override
-    public String getTitleEn() {
-        return titleEn;
-    }
-
-    @Override
-    public void setTitleEn(String titleEn) {
-        this.titleEn = titleEn;
-    }
-
-    @Override
-    public String getTitleEs() {
-        return titleEs;
-    }
-
-    @Override
-    public void setTitleEs(String titleEs) {
-        this.titleEs = titleEs;
-    }
-
-    @Override
-    public String getContentRu() {
-        return contentRu;
-    }
-
-    @Override
-    public void setContentRu(String contentRu) {
-        this.contentRu = contentRu;
-    }
-
-    @Override
-    public String getContentEn() {
-        return contentEn;
-    }
-
-    @Override
-    public void setContentEn(String contentEn) {
-        this.contentEn = contentEn;
-    }
-
-    @Override
-    public String getContentEs() {
-        return contentEs;
-    }
-
-    @Override
-    public void setContentEs(String contentEs) {
-        this.contentEs = contentEs;
     }
 
     public Float getLongitude() {
@@ -227,48 +139,6 @@ public class Event implements Commentable, Post, TitlesContents {
 
     public void setLatitude(Float latitude) {
         this.latitude = latitude;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public Integer getViews() {
-        return views;
-    }
-
-    public void setViews(Integer views) {
-        this.views = views;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public String getSourceLink() {
-        return sourceLink;
-    }
-
-    public void setSourceLink(String sourceLink) {
-        this.sourceLink = sourceLink;
-    }
-
-    @Override
-    public User getAuthor() {
-        return author;
-    }
-
-    @Override
-    public void setAuthor(User author) {
-        this.author = author;
     }
 
     public Set<User> getLikedUsers() {

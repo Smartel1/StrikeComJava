@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsRequestDTO;
+import ru.smartel.strike.dto.request.post.PostListRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
@@ -16,8 +17,8 @@ import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.*;
 import ru.smartel.strike.rules.UserCanModerate;
-import ru.smartel.strike.service.*;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -27,9 +28,9 @@ import java.util.stream.Stream;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class NewsServiceImpl implements NewsService {
+public class BasePostService {
 
-    private NewsDTOValidator validator;
+    private PostDTOValidator validator;
     private FiltersTransformer filtersTransformer;
     private NewsRepository newsRepository;
     private UserRepository userRepository;
@@ -40,7 +41,7 @@ public class NewsServiceImpl implements NewsService {
     private TagRepository tagRepository;
     private VideoRepository videoRepository;
 
-    public NewsServiceImpl(NewsDTOValidator validator,
+    public BasePostService(PostDTOValidator validator,
                            FiltersTransformer filtersTransformer,
                            NewsRepository newsRepository,
                            UserRepository userRepository,
@@ -62,9 +63,7 @@ public class NewsServiceImpl implements NewsService {
         this.videoRepository = videoRepository;
     }
 
-    @Override
-    @PreAuthorize("permitAll()")
-    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<NewsListDTO> list(PostListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
 
         //Body has precedence over query params.

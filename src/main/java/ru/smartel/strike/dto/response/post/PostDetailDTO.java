@@ -1,31 +1,31 @@
-package ru.smartel.strike.dto.response.news;
+package ru.smartel.strike.dto.response.post;
 
 import ru.smartel.strike.dto.response.TitlesContentExtendableDTO;
 import ru.smartel.strike.dto.response.user.UserDTO;
 import ru.smartel.strike.dto.response.video.VideoDTO;
-import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NewsDetailDTO extends TitlesContentExtendableDTO {
+public class PostDetailDTO extends TitlesContentExtendableDTO {
 
-    public NewsDetailDTO(News news, Locale locale) {
-        super(news, locale);
-        id = news.getId();
-        published = news.isPublished();
-        date = news.getDate().toEpochSecond(ZoneOffset.UTC);
-        views = news.getViews();
-        sourceLink = news.getSourceLink();
-        photos = news.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
-        videos = news.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
-        tags = news.getTags().stream().map(Tag::getName).collect(Collectors.toList());
-        author = null != news.getAuthor() ? new UserDTO(news.getAuthor()) : null;
-        commentsCount = news.getComments().size();
+    public PostDetailDTO(PostEntity post, Locale locale) {
+        super(post, locale);
+        id = post.getId();
+        published = post.isPublished();
+        date = post.getDate().toEpochSecond(ZoneOffset.UTC);
+        views = post.getViews();
+        sourceLink = post.getSourceLink();
+        photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
+        videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
+        tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
+        author = null != post.getAuthor() ? new UserDTO(post.getAuthor()) : null;
+        commentsCount = post.getComments().size();
     }
 
     private int id;

@@ -6,15 +6,15 @@ public interface Contents {
 
     String getContentRu();
 
-    void setContentRu(String title_ru);
+    void setContentRu(String contentRu);
 
     String getContentEn();
 
-    void setContentEn(String title_en);
+    void setContentEn(String contentEn);
 
     String getContentEs();
 
-    void setContentEs(String title_es);
+    void setContentEs(String contentEs);
 
     default String getContentByLocale(Locale locale) {
         switch (locale) {

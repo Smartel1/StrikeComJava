@@ -6,15 +6,15 @@ public interface Titles {
 
     String getTitleRu();
 
-    void setTitleRu(String title_ru);
+    void setTitleRu(String titleRu);
 
     String getTitleEn();
 
-    void setTitleEn(String title_en);
+    void setTitleEn(String titleEn);
 
     String getTitleEs();
 
-    void setTitleEs(String title_es);
+    void setTitleEs(String titleEs);
 
     default String getTitleByLocale(Locale locale) {
         switch (locale) {

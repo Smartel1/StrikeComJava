@@ -1,42 +1,37 @@
-package ru.smartel.strike.dto.response.news;
+package ru.smartel.strike.dto.response.post;
 
 import ru.smartel.strike.dto.response.TitlesContentExtendableDTO;
-import ru.smartel.strike.dto.response.user.UserDTO;
 import ru.smartel.strike.dto.response.video.VideoDTO;
-import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NewsDetailDTO extends TitlesContentExtendableDTO {
+public class PostListDTO extends TitlesContentExtendableDTO {
 
-    public NewsDetailDTO(News news, Locale locale) {
-        super(news, locale);
-        id = news.getId();
-        published = news.isPublished();
-        date = news.getDate().toEpochSecond(ZoneOffset.UTC);
-        views = news.getViews();
-        sourceLink = news.getSourceLink();
-        photos = news.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
-        videos = news.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
-        tags = news.getTags().stream().map(Tag::getName).collect(Collectors.toList());
-        author = null != news.getAuthor() ? new UserDTO(news.getAuthor()) : null;
-        commentsCount = news.getComments().size();
+    public PostListDTO(PostEntity post, Locale locale) {
+        super(post, locale);
+        id = post.getId();
+        date = post.getDate().toEpochSecond(ZoneOffset.UTC);
+        views = post.getViews();
+        sourceLink = post.getSourceLink();
+        photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
+        videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
+        tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
+        commentsCount = post.getComments().size();
     }
 
     private int id;
-    private boolean published;
     private long date;
     private int views;
     private String sourceLink;
     private List<String> photos;
     private List<VideoDTO> videos;
     private List<String> tags;
-    private UserDTO author;
     private int commentsCount;
 
     public int getId() {
@@ -45,14 +40,6 @@ public class NewsDetailDTO extends TitlesContentExtendableDTO {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
     }
 
     public long getDate() {
@@ -101,14 +88,6 @@ public class NewsDetailDTO extends TitlesContentExtendableDTO {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
-    }
-
-    public UserDTO getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(UserDTO author) {
-        this.author = author;
     }
 
     public int getCommentsCount() {

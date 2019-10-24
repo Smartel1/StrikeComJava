@@ -6,7 +6,7 @@ import ru.smartel.strike.entity.Comment;
 import java.util.Set;
 
 
-public interface Commentable {
+public interface HasComments {
 
     Set<Comment> getComments();
 

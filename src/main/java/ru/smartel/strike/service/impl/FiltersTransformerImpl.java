@@ -2,8 +2,8 @@ package ru.smartel.strike.service.impl;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventFiltersDTO;
+import ru.smartel.strike.dto.request.news.NewsFiltersDTO;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.repository.ConflictRepository;
@@ -11,10 +11,9 @@ import ru.smartel.strike.service.FiltersTransformer;
 import ru.smartel.strike.specification.event.*;
 import ru.smartel.strike.specification.news.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
+//TODO refactor
 @Service
 public class FiltersTransformerImpl implements FiltersTransformer {
 
@@ -25,7 +24,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     }
 
     @Override
-    public Specification toSpecification(EventListRequestDTO.FiltersBag filters, Integer userId) {
+    public Specification<Event> toSpecification(EventFiltersDTO filters, Integer userId) {
         if (null == filters) return null;
 
         //Empty specification
@@ -52,7 +51,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     }
 
     @Override
-    public Specification<News> toSpecification(NewsListRequestDTO.FiltersBag filters, Integer userId) {
+    public Specification<News> toSpecification(NewsFiltersDTO filters, Integer userId) {
         if (null == filters) return null;
 
         //Empty specification
