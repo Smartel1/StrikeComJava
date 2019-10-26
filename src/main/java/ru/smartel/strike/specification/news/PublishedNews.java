@@ -20,6 +20,6 @@ public class PublishedNews implements Specification<News> {
 
     @Override
     public Predicate toPredicate(Root<News> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.get("published"), published);
+        return cb.equal(root.get("post").get("published"), published);
     }
 }

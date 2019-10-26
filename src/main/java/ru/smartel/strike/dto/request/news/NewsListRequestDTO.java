@@ -1,10 +1,8 @@
 package ru.smartel.strike.dto.request.news;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.smartel.strike.dto.request.post.PostListRequestDTO;
+import ru.smartel.strike.dto.request.BaseListRequestDTO;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class NewsListRequestDTO extends PostListRequestDTO {
+public class NewsListRequestDTO extends BaseListRequestDTO {
 
     private NewsFiltersDTO filters;
 

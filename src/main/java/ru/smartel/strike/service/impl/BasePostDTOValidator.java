@@ -1,19 +1,17 @@
 package ru.smartel.strike.service.impl;
 
-import ru.smartel.strike.dto.request.post.PostListRequestDTO;
+import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.BaseDTOValidator;
-import ru.smartel.strike.service.PostDTOValidator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BasePostDTOValidator extends BaseDTOValidator implements PostDTOValidator {
+public class BasePostDTOValidator extends BaseDTOValidator {
 
-    @Override
-    public void validateListQueryDTO(PostListRequestDTO dto) throws DTOValidationException {
+    void validateListQueryDTO(BaseListRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getPage(), "page", errors).min(1);
@@ -24,8 +22,7 @@ public class BasePostDTOValidator extends BaseDTOValidator implements PostDTOVal
         }
     }
 
-    @Override
-    public void validateStoreDTO(PostRequestDTO dto) throws DTOValidationException {
+    void validateStoreDTO(PostRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getDate(), "date", errors).requiredOptional().notNull();
@@ -36,8 +33,7 @@ public class BasePostDTOValidator extends BaseDTOValidator implements PostDTOVal
         }
     }
 
-    @Override
-    public void validateUpdateDTO(PostRequestDTO dto) throws DTOValidationException {
+    void validateUpdateDTO(PostRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getDate(), "date", errors).notNull();

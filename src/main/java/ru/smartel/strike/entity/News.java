@@ -9,7 +9,6 @@ import ru.smartel.strike.entity.interfaces.HasComments;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +18,7 @@ import java.util.Set;
 public class News implements HasComments, PostEntity {
 
     @Embedded
-    private Post post;
+    private Post post = new Post();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,14 +33,6 @@ public class News implements HasComments, PostEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @NotNull
-    @Column(name = "longitude", nullable = false)
-    private Float longitude;
-
-    @NotNull
-    @Column(name = "latitude", nullable = false)
-    private Float latitude;
 
     @ManyToMany(mappedBy = "favouriteNews")
     private Set<User> likedUsers = new HashSet<>();
@@ -103,22 +94,6 @@ public class News implements HasComments, PostEntity {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public Float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
-    }
-
-    public Float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
     }
 
     public Set<User> getLikedUsers() {

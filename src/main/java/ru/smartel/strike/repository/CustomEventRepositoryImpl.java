@@ -43,7 +43,7 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<Event> root = idQuery.from(Event.class);
         idQuery.select(root.get("id"))
-                .orderBy(cb.desc(root.get("date")));
+                .orderBy(cb.desc(root.get("post").get("date")));
 
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 

@@ -9,7 +9,7 @@ public class BaseDTOValidator {
         return new CheckedField(field, fieldName, errors);
     }
 
-    public class CheckedField {
+    public static class CheckedField {
         Object fieldValue;
         String fieldName;
         boolean presentOptional; //If this field was Optional

@@ -1,7 +1,6 @@
 package ru.smartel.strike.dto.request.event;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 
 import java.util.Optional;
@@ -9,7 +8,6 @@ import java.util.Optional;
 /**
  * dto for creating/updating event requests
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class EventRequestDTO extends PostRequestDTO {
     private Optional<Integer> conflictId;
     private Optional<Float> latitude;

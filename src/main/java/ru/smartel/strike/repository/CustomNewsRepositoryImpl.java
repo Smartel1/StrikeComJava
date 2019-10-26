@@ -29,7 +29,7 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<News> root = idQuery.from(News.class);
         idQuery.select(root.get("id"))
-                .orderBy(cb.desc(root.get("date")));
+                .orderBy(cb.desc(root.get("post").get("date")));
 
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 

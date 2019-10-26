@@ -1,10 +1,8 @@
 package ru.smartel.strike.dto.request.event;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.smartel.strike.dto.request.post.PostListRequestDTO;
+import ru.smartel.strike.dto.request.BaseListRequestDTO;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class EventListRequestDTO extends PostListRequestDTO {
+public class EventListRequestDTO extends BaseListRequestDTO {
 
     private EventFiltersDTO filters;
 

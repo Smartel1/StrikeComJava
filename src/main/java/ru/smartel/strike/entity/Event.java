@@ -22,7 +22,7 @@ import java.util.Set;
 public class Event implements HasComments, PostEntity {
 
     @Embedded
-    private Post post;
+    private Post post = new Post();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

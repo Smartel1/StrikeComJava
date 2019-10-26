@@ -4,7 +4,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
@@ -18,6 +17,8 @@ import ru.smartel.strike.repository.*;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.*;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.specification.news.ByRolesNews;
+import ru.smartel.strike.specification.news.LocalizedNews;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -69,16 +70,16 @@ public class NewsServiceImpl implements NewsService {
 
         //Body has precedence over query params.
         //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (EventListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
-        if (EventListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
+        if (NewsListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
+        if (NewsListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
 
         //Transform filters and other restrictions to Specifications
         Specification<News> specification = filtersTransformer
                 .toSpecification(dto.getFilters(), null != user ? user.getId() : null)
-                .and(new ByRoles(user))
-                .and(new Localized(locale));
+                .and(new ByRolesNews(user))
+                .and(new LocalizedNews(locale));
 
-        //Get count of events matching specification
+        //Get count of news matching specification
         long newsCount = newsRepository.count(specification);
 
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
@@ -92,16 +93,16 @@ public class NewsServiceImpl implements NewsService {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
-        //Get count of events matching specification. Because pagination and fetching dont work together
+        //Get count of news matching specification. Because pagination and fetching dont work together
         List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, page, perPage);
 
-        List<NewsListDTO> eventListDTOs = newsRepository.findAllById(ids)
+        List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids)
                 .stream()
                 .map(e -> new NewsListDTO(e, locale))
                 .sorted(Comparator.comparingLong(NewsListDTO::getDate))
                 .collect(Collectors.toList());
 
-        return new ListWrapperDTO<>(eventListDTOs, responseMeta);
+        return new ListWrapperDTO<>(newsListDTOs, responseMeta);
     }
 
     @Override
@@ -110,16 +111,15 @@ public class NewsServiceImpl implements NewsService {
         News news = newsRepository.findOrThrow(newsId);
 
         news.setViews(news.getViews() + 1);
-        NewsDetailDTO dto = new NewsDetailDTO(news, locale);
 
-        return dto;
+        return new NewsDetailDTO(news, locale);
     }
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
+    public void setFavourite(Integer newsId, Integer userId, boolean isFavourite) {
         User user = userRepository.findById(userId).orElseThrow();
-        News news = newsRepository.getOne(eventId);
+        News news = newsRepository.getOne(newsId);
 
         List<News> currentFavourites = user.getFavouriteNews();
 
@@ -140,7 +140,7 @@ public class NewsServiceImpl implements NewsService {
 
         User user = userRepository.findById(userId).orElseThrow();
 
-        //Only moderator can publish events
+        //Only moderator can publish news
         businessValidationService.validate(
                 new UserCanModerate(user).when(null != dto.getPublished() && dto.getPublished().orElse(false))
         );
@@ -154,7 +154,7 @@ public class NewsServiceImpl implements NewsService {
         //Send push
         if (!news.isPublished()) {
             //if news is creating non published - notify moderators
-            pushService.eventCreatedByUser(news.getId(), news.getAuthor().getId(), news.getAuthor().getName());
+            pushService.newsCreatedByUser(news.getId(), news.getAuthor().getId(), news.getAuthor().getName());
         } else {
             //if news published - notify subscribers
             Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
@@ -176,7 +176,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#newsId)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isNewsAuthor(#newsId)")
     public NewsDetailDTO update(Integer newsId, NewsRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateUpdateDTO(dto);
 
@@ -289,7 +289,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     /**
-     * If client has sent tags, then detach (not remove because tags are shared between events) old ones and save received
+     * If client has sent tags, then detach (not remove because tags are shared between news) old ones and save received
      */
     private void syncTags(News news, List<String> tagNames) {
         //we do not remove old tags from db. They may be shared across multiple events or news

@@ -22,7 +22,7 @@ public class BeforeDateNews implements Specification<News> {
 
     @Override
     public Predicate toPredicate(Root<News> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.lessThanOrEqualTo(root.get("date"),
+        return cb.lessThanOrEqualTo(root.get("post").get("date"),
                 LocalDateTime.ofEpochSecond(dateTo, 0, ZoneOffset.UTC));
     }
 }

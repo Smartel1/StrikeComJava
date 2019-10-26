@@ -23,8 +23,8 @@ public class LocalizedNews implements Specification<News> {
     public Predicate toPredicate(Root<News> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         if (!locale.equals(Locale.ALL)) {
             return cb.and(
-                    cb.isNotNull(root.get("title" + locale.getPascalCase())),
-                    cb.isNotNull(root.get("content" + locale.getPascalCase()))
+                    cb.isNotNull(root.get("post").get("title" + locale.getPascalCase())),
+                    cb.isNotNull(root.get("post").get("content" + locale.getPascalCase()))
             );
         }
         return null;

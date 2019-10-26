@@ -24,7 +24,7 @@ public class ByRolesNews implements Specification<News> {
         if (null == user
                 || !user.getRolesAsList().contains(User.ROLE_MODERATOR)
                 && !user.getRolesAsList().contains(User.ROLE_ADMIN)) {
-            return cb.equal(root.get("published"), true);
+            return cb.equal(root.get("post").get("published"), true);
         }
         return null;
     }
