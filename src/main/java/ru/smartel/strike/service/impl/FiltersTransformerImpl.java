@@ -2,19 +2,18 @@ package ru.smartel.strike.service.impl;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import ru.smartel.strike.dto.request.conflict.ConflictFiltersDTO;
 import ru.smartel.strike.dto.request.event.EventFiltersDTO;
 import ru.smartel.strike.dto.request.news.NewsFiltersDTO;
+import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.repository.ConflictRepository;
 import ru.smartel.strike.service.FiltersTransformer;
+import ru.smartel.strike.specification.conflict.*;
 import ru.smartel.strike.specification.event.*;
 import ru.smartel.strike.specification.news.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.List;
 
 @Service
@@ -28,9 +27,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
 
     @Override
     public Specification<Event> toSpecification(EventFiltersDTO filters, Integer userId) {
-        //Empty specification
         Specification<Event> result = emptySpecification();
-        if (null == filters) return result;
 
         if (null != filters.getPublished()) result = result.and(new PublishedEvent(filters.getPublished()));
         if (null != filters.getDateFrom()) result = result.and(new AfterDateEvent(filters.getDateFrom()));
@@ -47,16 +44,21 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getContainsContent()) result = result.and(new WithContentEvent(filters.getContainsContent()));
         if (null != filters.getCountryIds()) result = result.and(new CountryEvent(filters.getCountryIds()));
         if (null != filters.getRegionIds()) result = result.and(new RegionEvent(filters.getRegionIds()));
-        if (null != filters.getNear()) result = result.and(new NearCoordinateEvent(filters.getNear().getLat(), filters.getNear().getLng(), filters.getNear().getRadius()));
+        if (null != filters.getNear())
+            result = result.and(
+                    new NearCoordinateEvent(
+                            filters.getNear().getLat(),
+                            filters.getNear().getLng(),
+                            filters.getNear().getRadius()
+                    )
+            );
 
         return result;
     }
 
     @Override
     public Specification<News> toSpecification(NewsFiltersDTO filters, Integer userId) {
-        //Empty specification
         Specification<News> result = emptySpecification();
-        if (null == filters) return result;
 
         if (null != filters.getPublished()) result = result.and(new PublishedNews(filters.getPublished()));
         if (null != filters.getDateFrom()) result = result.and(new AfterDateNews(filters.getDateFrom()));
@@ -67,12 +69,45 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         return result;
     }
 
-    private <T> Specification<T> emptySpecification() {
-        return new Specification<T>() {
-            @Override
-            public Predicate toPredicate(Root root, CriteriaQuery query, CriteriaBuilder criteriaBuilder) {
-                return criteriaBuilder.and();
+    @Override
+    public Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Integer userId) {
+        Specification<Conflict> result = emptySpecification();
+
+        if (null != filters.getDateFrom()) result = result.and(new AfterDateConflict(filters.getDateFrom()));
+        if (null != filters.getDateTo()) result = result.and(new BeforeDateConflict(filters.getDateTo()));
+        if (null != filters.getConflictResultIds()) result = result.and(new MatchResultsConflict(filters.getConflictResultIds()));
+        if (null != filters.getConflictReasonIds()) result = result.and(new MatchReasonsConflict(filters.getConflictReasonIds()));
+        if (null != filters.getAncestorsOf()) {
+            Conflict descendant = conflictRepository.findById(filters.getAncestorsOf()).orElse(null);
+            if (null == descendant) {
+                result = result.and(falseSpecification());
+            } else {
+                result = result.and(new AncestorsOfConflict(descendant.getLft(), descendant.getRgt()));
             }
-        };
+        }
+        if (null != filters.getChildrenOf()) result = result.and(new ChildrenOfConflict(filters.getChildrenOf()));
+        if (null != filters.getNear())
+            result = result.and(
+                    new NearCoordinateConflict(
+                            filters.getNear().getLat(),
+                            filters.getNear().getLng(),
+                            filters.getNear().getRadius()
+                    )
+            );
+        return result;
+    }
+
+    /**
+     * Create Specification with no restrictions
+     */
+    private <T> Specification<T> emptySpecification() {
+        return (Specification<T>) (root, query, criteriaBuilder) -> criteriaBuilder.and();
+    }
+
+    /**
+     * Create Specification which leads to no results
+     */
+    private <T> Specification<T> falseSpecification() {
+        return (Specification<T>) (root, query, criteriaBuilder) -> criteriaBuilder.or();
     }
 }

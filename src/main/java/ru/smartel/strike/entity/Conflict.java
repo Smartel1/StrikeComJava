@@ -51,10 +51,10 @@ public class Conflict implements Titles {
     private String titleEs;
 
     @Column(name = "latitude", nullable = false)
-    private Double latitude;
+    private Float latitude;
 
     @Column(name = "longitude", nullable = false)
-    private Double longitude;
+    private Float longitude;
 
     @Size(max = 500)
     @Column(name = "company_name", length = 500)
@@ -75,11 +75,11 @@ public class Conflict implements Titles {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_reason_id")
-    private ConflictReason conflictReason;
+    private ConflictReason reason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_result_id")
-    private ConflictResult conflictResult;
+    private ConflictResult result;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
@@ -144,19 +144,19 @@ public class Conflict implements Titles {
         this.titleEs = titleEs;
     }
 
-    public Double getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public Double getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 
@@ -184,20 +184,20 @@ public class Conflict implements Titles {
         this.dateTo = dateTo;
     }
 
-    public ConflictReason getConflictReason() {
-        return conflictReason;
+    public ConflictReason getReason() {
+        return reason;
     }
 
-    public void setConflictReason(ConflictReason conflictReason) {
-        this.conflictReason = conflictReason;
+    public void setReason(ConflictReason reason) {
+        this.reason = reason;
     }
 
-    public ConflictResult getConflictResult() {
-        return conflictResult;
+    public ConflictResult getResult() {
+        return result;
     }
 
-    public void setConflictResult(ConflictResult conflictResult) {
-        this.conflictResult = conflictResult;
+    public void setResult(ConflictResult result) {
+        this.result = result;
     }
 
     public List<Event> getEvents() {

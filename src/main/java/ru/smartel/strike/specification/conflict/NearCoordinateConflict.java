@@ -1,7 +1,7 @@
-package ru.smartel.strike.specification.event;
+package ru.smartel.strike.specification.conflict;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.Conflict;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -9,24 +9,24 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
- * Events near the point
+ * Conflicts near the point
  * Haversine formula
  * 6371 * acos(cos(radians(:lat)) * cos(radians(e.latitude)) * cos(radians(e.longitude) - radians(:lng)) + sin(radians(:lat)) * sin(radians(e.latitude))) <= :radius
  * https://stackoverflow.com/questions/21084886/how-to-calculate-distance-using-latitude-and-longitude
  */
-public class NearCoordinateEvent implements Specification<Event> {
+public class NearCoordinateConflict implements Specification<Conflict> {
     private Double latitude;
     private Double longitude;
     private Integer radius;
 
-    public NearCoordinateEvent(Double latitude, Double longitude, Integer radius) {
+    public NearCoordinateConflict(Double latitude, Double longitude, Integer radius) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
     }
 
     @Override
-    public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return cb.lessThanOrEqualTo(
                 cb.prod(6371D,
                         cb.function(

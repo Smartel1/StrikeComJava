@@ -309,11 +309,11 @@ public class EventServiceImpl implements EventService {
     /**
      * Set locality. If received localityId equals to null, then set to null
      */
-    private void setLocality(Event event, Integer localityIdOptional) {
+    private void setLocality(Event event, Integer localityId) {
         Locality locality = null;
 
-        if (null != localityIdOptional) {
-            locality = localityRepository.getOne(localityIdOptional);
+        if (null != localityId) {
+            locality = localityRepository.getOne(localityId);
         }
 
         event.setLocality(locality);
@@ -322,11 +322,11 @@ public class EventServiceImpl implements EventService {
     /**
      * Set event's status. If received eventStatusId equals to null, then set to null
      */
-    private void setEventStatus(Event event, Integer eventStatusIdOptional) {
+    private void setEventStatus(Event event, Integer eventStatusId) {
         EventStatus eventStatus = null;
 
-        if (null != eventStatusIdOptional) {
-            eventStatus = eventStatusRepository.getOne(eventStatusIdOptional);
+        if (null != eventStatusId) {
+            eventStatus = eventStatusRepository.getOne(eventStatusId);
         }
 
         event.setStatus(eventStatus);
@@ -335,11 +335,11 @@ public class EventServiceImpl implements EventService {
     /**
      * Set event's type. If received eventTypeId equals null, then set to null
      */
-    private void setEventType(Event event, Integer eventTypeIdOptional) {
+    private void setEventType(Event event, Integer eventTypeId) {
         EventType eventType = null;
 
-        if (null != eventTypeIdOptional) {
-            eventType = eventTypeRepository.getOne(eventTypeIdOptional);
+        if (null != eventTypeId) {
+            eventType = eventTypeRepository.getOne(eventTypeId);
         }
 
         event.setType(eventType);

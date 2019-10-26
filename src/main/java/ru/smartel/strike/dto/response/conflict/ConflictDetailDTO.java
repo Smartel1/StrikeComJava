@@ -16,8 +16,8 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         companyName = conflict.getCompanyName();
         dateFrom = null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null;
         dateTo = null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null;
-        conflictReasonId = null != conflict.getConflictReason() ? conflict.getConflictReason().getId() : null;
-        conflictResultId = null != conflict.getConflictResult() ? conflict.getConflictResult().getId() : null;
+        conflictReasonId = null != conflict.getReason() ? conflict.getReason().getId() : null;
+        conflictResultId = null != conflict.getResult() ? conflict.getResult().getId() : null;
         industryId = null != conflict.getIndustry() ? conflict.getIndustry().getId() : null;
         parentEventId = null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null;
     }
