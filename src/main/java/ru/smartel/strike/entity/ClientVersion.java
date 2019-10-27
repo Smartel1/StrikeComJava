@@ -2,6 +2,7 @@ package ru.smartel.strike.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.smartel.strike.service.Locale;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,10 +24,10 @@ public class ClientVersion {
     private LocalDateTime updatedAt;
 
     @Column
-    private int version;
+    private String version;
 
     @Column(name = "client_id")
-    private int clientId;
+    private String clientId;
 
     @Column
     private boolean required;
@@ -44,19 +45,19 @@ public class ClientVersion {
         return id;
     }
 
-    public int getVersion() {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public int getClientId() {
+    public String getClientId() {
         return clientId;
     }
 
-    public void setClientId(int clientId) {
+    public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
@@ -98,5 +99,18 @@ public class ClientVersion {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getDescriptionByLocale(Locale locale) {
+        switch (locale) {
+            case RU:
+                return getDescriptionRu();
+            case EN:
+                return getDescriptionEn();
+            case ES:
+                return getDescriptionEs();
+            default:
+                return "";
+        }
     }
 }

@@ -1,0 +1,49 @@
+package ru.smartel.strike.controller;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
+import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
+import ru.smartel.strike.dto.response.ListWrapperDTO;
+import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
+import ru.smartel.strike.entity.User;
+import ru.smartel.strike.exception.BusinessRuleValidationException;
+import ru.smartel.strike.exception.DTOValidationException;
+import ru.smartel.strike.service.ClientVersionService;
+import ru.smartel.strike.service.Locale;
+
+import javax.validation.constraints.Min;
+
+@RestController
+@RequestMapping("/api/v1/{locale}")
+public class ClientVersionController {
+
+    private ClientVersionService clientVersionService;
+
+    public ClientVersionController(ClientVersionService clientVersionService) {
+        this.clientVersionService = clientVersionService;
+    }
+
+    @GetMapping("/client-version")
+    public ListWrapperDTO<ClientVersionDTO> getNewVersions(
+            @PathVariable("locale") Locale locale,
+            @RequestBody ClientVersionGetNewRequestDTO dto
+    ) throws DTOValidationException, BusinessRuleValidationException {
+        return clientVersionService.getNewVersions(dto, locale);
+    }
+
+    @PostMapping(path = "/client-version", consumes = {"application/json"})
+    public ClientVersionDTO store(
+            @PathVariable("locale") Locale locale,
+            @RequestBody ClientVersionCreateRequestDTO dto
+    ) throws BusinessRuleValidationException, DTOValidationException {
+        return clientVersionService.create(dto, locale);
+    }
+
+    @DeleteMapping(path = "/client-version/{id}")
+    public void delete(
+            @PathVariable("id") int clientVersionId
+    ) {
+        clientVersionService.delete(clientVersionId);
+    }
+}

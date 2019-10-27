@@ -20,6 +20,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.news.ByRolesNews;
 import ru.smartel.strike.specification.news.LocalizedNews;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -214,7 +215,8 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public void delete(Integer newsId) throws BusinessRuleValidationException {
-        News news = newsRepository.findById(newsId).orElseThrow();
+        News news = newsRepository.findById(newsId).orElseThrow(
+                () -> new EntityNotFoundException("Новость не найдена"));
         newsRepository.delete(news);
 
         //If news was not published - notify its' author about rejection

@@ -24,6 +24,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -254,7 +255,9 @@ public class EventServiceImpl implements EventService {
         businessValidationService.validate(
                 new NotAParentEvent(eventId, eventRepository)
         );
-        Event event = eventRepository.findById(eventId).orElseThrow();
+        Event event = eventRepository.findById(eventId).orElseThrow(
+                () -> new EntityNotFoundException("Событие не найдено")
+        );
         eventRepository.delete(event);
 
         //If event was not published - notify its' author about rejection
