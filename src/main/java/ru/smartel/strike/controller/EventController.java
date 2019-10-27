@@ -10,7 +10,7 @@ import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.EventService;
+import ru.smartel.strike.service.event.EventService;
 import ru.smartel.strike.service.Locale;
 
 import javax.validation.constraints.Min;

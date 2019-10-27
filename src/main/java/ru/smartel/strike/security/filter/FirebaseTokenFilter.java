@@ -2,7 +2,6 @@ package ru.smartel.strike.security.filter;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -10,8 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.repository.UserRepository;
-import ru.smartel.strike.security.FirebaseAuthenticationException;
+import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
 
 import javax.servlet.*;

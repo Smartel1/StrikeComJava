@@ -1,6 +1,6 @@
 package ru.smartel.strike.rules;
 
-import ru.smartel.strike.repository.EventRepository;
+import ru.smartel.strike.repository.event.EventRepository;
 
 public class NotAParentEvent extends BusinessRule {
 

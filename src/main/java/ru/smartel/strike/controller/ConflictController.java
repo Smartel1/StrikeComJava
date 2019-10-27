@@ -10,7 +10,7 @@ import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.ConflictService;
+import ru.smartel.strike.service.conflict.ConflictService;
 import ru.smartel.strike.service.Locale;
 
 import javax.validation.constraints.Min;

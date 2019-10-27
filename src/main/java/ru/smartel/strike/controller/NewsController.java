@@ -11,7 +11,7 @@ import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.Locale;
-import ru.smartel.strike.service.NewsService;
+import ru.smartel.strike.service.news.NewsService;
 
 import javax.validation.constraints.Min;
 import java.util.Optional;

@@ -8,8 +8,8 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import ru.smartel.strike.repository.EventRepository;
-import ru.smartel.strike.repository.NewsRepository;
+import ru.smartel.strike.repository.event.EventRepository;
+import ru.smartel.strike.repository.news.NewsRepository;
 
 @Component
 public class CustomMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {

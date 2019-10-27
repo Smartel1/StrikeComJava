@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import ru.smartel.strike.service.BaseDTOValidator;
+import ru.smartel.strike.service.validation.BaseDTOValidator;
 
 import java.util.HashMap;
 import java.util.Map;

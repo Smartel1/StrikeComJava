@@ -1,18 +1,14 @@
 package ru.smartel.strike.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
-import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.ClientVersionService;
+import ru.smartel.strike.service.client_version.ClientVersionService;
 import ru.smartel.strike.service.Locale;
-
-import javax.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/v1/{locale}")

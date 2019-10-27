@@ -6,8 +6,8 @@ import org.springframework.security.core.Authentication;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.repository.EventRepository;
-import ru.smartel.strike.repository.NewsRepository;
+import ru.smartel.strike.repository.event.EventRepository;
+import ru.smartel.strike.repository.news.NewsRepository;
 
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
