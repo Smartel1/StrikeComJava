@@ -7,6 +7,13 @@ import ru.smartel.strike.service.Locale;
 
 public class EventListDTO extends PostListDTO {
 
+    private double latitude;
+    private double longitude;
+    private int conflictId;
+    private Integer eventStatusId;
+    private Integer eventTypeId;
+    private ConflictDetailDTO conflict;
+
     public EventListDTO(Event event, Locale locale) {
         super(event, locale);
         latitude = event.getLatitude();
@@ -16,13 +23,6 @@ public class EventListDTO extends PostListDTO {
         eventTypeId = null != event.getType() ? event.getType().getId() : null;
         conflict = new ConflictDetailDTO(event.getConflict(), locale);
     }
-
-    private double latitude;
-    private double longitude;
-    private int conflictId;
-    private Integer eventStatusId;
-    private Integer eventTypeId;
-    private ConflictDetailDTO conflict;
 
     public double getLatitude() {
         return latitude;

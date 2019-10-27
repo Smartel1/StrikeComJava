@@ -14,9 +14,10 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.NewsService;
 
 import javax.validation.constraints.Min;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/{locale}")
+@RequestMapping("/api/v1/{locale}")
 public class NewsController {
 
     private NewsService newsService;
@@ -33,7 +34,8 @@ public class NewsController {
             @RequestBody NewsListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
-        return newsService.list(dto, perPage, page, locale, user);
+        dto.mergeWith(page, perPage);
+        return newsService.list(dto, locale, user);
     }
 
     @PostMapping("/news-list")
@@ -62,7 +64,9 @@ public class NewsController {
             @RequestParam(value = "favourite") boolean isFavourite,
             @AuthenticationPrincipal User user
     ) {
-        newsService.setFavourite(newsId, null != user? user.getId() : null, isFavourite);
+        Optional.ofNullable(user).ifPresent(
+                usr -> newsService.setFavourite(newsId, usr.getId(), isFavourite)
+        );
     }
 
     @PostMapping(path = "/news", consumes = {"application/json"})

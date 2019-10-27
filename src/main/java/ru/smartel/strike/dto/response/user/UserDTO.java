@@ -4,15 +4,15 @@ import ru.smartel.strike.entity.User;
 
 public class UserDTO {
 
+    private int id;
+    private String name;
+    private String email;
+
     public UserDTO (User user) {
         id = user.getId();
         name = user.getName();
         email = user.getEmail();
     }
-
-    private int id;
-    private String name;
-    private String email;
 
     public int getId() {
         return id;

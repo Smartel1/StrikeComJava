@@ -23,6 +23,7 @@ import ru.smartel.strike.specification.news.LocalizedNews;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,13 +66,8 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, Locale locale, User user) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
-
-        //Body has precedence over query params.
-        //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (NewsListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
-        if (NewsListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
 
         //Transform filters and other restrictions to Specifications
         Specification<News> specification = filtersTransformer
@@ -84,20 +80,19 @@ public class NewsServiceImpl implements NewsService {
 
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 newsCount,
-                page,
-                perPage,
-                newsCount / perPage + 1
+                dto.getPage(),
+                dto.getPerPage(),
+                newsCount / dto.getPerPage() + 1
         );
 
-        if (newsCount <= (page - 1) * perPage) {
+        if (newsCount <= (dto.getPage() - 1) * dto.getPerPage()) {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
         //Get count of news matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, page, perPage);
+        List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
 
-        List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids)
-                .stream()
+        List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
                 .map(e -> new NewsListDTO(e, locale))
                 .sorted(Comparator.comparingLong(NewsListDTO::getDate))
                 .collect(Collectors.toList());
@@ -117,7 +112,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public void setFavourite(Integer newsId, Integer userId, boolean isFavourite) {
+    public void setFavourite(Integer newsId, int userId, boolean isFavourite) {
         User user = userRepository.findById(userId).orElseThrow();
         News news = newsRepository.getOne(newsId);
 
@@ -160,8 +155,7 @@ public class NewsServiceImpl implements NewsService {
             Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(loc -> null != news.getTitleByLocale(loc))
-                    .map(loc -> new AbstractMap.SimpleEntry<>(news.getTitleByLocale(loc), loc))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(news::getTitleByLocale, Function.identity()));
 
             pushService.newsPublished(
                     news.getId(),
@@ -203,14 +197,13 @@ public class NewsServiceImpl implements NewsService {
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != news.getTitleByLocale(loc))
-                    .map(loc -> new AbstractMap.SimpleEntry<>(news.getTitleByLocale(loc), loc))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(news::getTitleByLocale, Function.identity()));
 
             pushService.newsPublished(
                     newsId,
                     null != news.getAuthor() ? news.getAuthor().getId() : null,
                     titlesLocalizedDuringThisUpdate,
-                    null != news.getAuthor()? news.getAuthor().getFcm() : null,
+                    null != news.getAuthor() ? news.getAuthor().getFcm() : null,
                     changingPublicationStatus //whether notify news's author or not
             );
         }
@@ -297,10 +290,8 @@ public class NewsServiceImpl implements NewsService {
         news.getTags().addAll(
                 tagNames
                         .stream()
-                        .map(tagName -> {
-                            Tag tag = tagRepository.findFirstByName(tagName);
-                            return null != tag ? tag : new Tag(tagName);
-                        })
+                        .map(tagName -> tagRepository.findFirstByName(tagName)
+                                .orElse(new Tag(tagName)))
                         .collect(Collectors.toList())
         );
     }

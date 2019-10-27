@@ -29,6 +29,8 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     public Specification<Event> toSpecification(EventFiltersDTO filters, Integer userId) {
         Specification<Event> result = emptySpecification();
 
+        if (null == filters) return result;
+
         if (null != filters.getPublished()) result = result.and(new PublishedEvent(filters.getPublished()));
         if (null != filters.getDateFrom()) result = result.and(new AfterDateEvent(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateEvent(filters.getDateTo()));
@@ -60,6 +62,8 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     public Specification<News> toSpecification(NewsFiltersDTO filters, Integer userId) {
         Specification<News> result = emptySpecification();
 
+        if (null == filters) return result;
+
         if (null != filters.getPublished()) result = result.and(new PublishedNews(filters.getPublished()));
         if (null != filters.getDateFrom()) result = result.and(new AfterDateNews(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateNews(filters.getDateTo()));
@@ -72,6 +76,8 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     @Override
     public Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Integer userId) {
         Specification<Conflict> result = emptySpecification();
+
+        if (null == filters) return result;
 
         if (null != filters.getDateFrom()) result = result.and(new AfterDateConflict(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateConflict(filters.getDateTo()));

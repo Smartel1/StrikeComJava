@@ -6,15 +6,15 @@ import ru.smartel.strike.service.Locale;
 
 public class RegionDTO {
 
+    private int id;
+    private String name;
+    private CountryDTO country;
+
     public RegionDTO(Region region, Locale locale) {
         id = region.getId();
         name = region.getName();
         country = new CountryDTO(region.getCountry(), locale);
     }
-
-    private int id;
-    private String name;
-    private CountryDTO country;
 
     public int getId() {
         return id;

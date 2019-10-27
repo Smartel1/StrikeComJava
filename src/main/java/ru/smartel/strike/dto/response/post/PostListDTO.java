@@ -13,6 +13,15 @@ import java.util.stream.Collectors;
 
 public class PostListDTO extends TitlesContentExtendableDTO {
 
+    private int id;
+    private long date;
+    private int views;
+    private String sourceLink;
+    private List<String> photos;
+    private List<VideoDTO> videos;
+    private List<String> tags;
+    private int commentsCount;
+
     public PostListDTO(PostEntity post, Locale locale) {
         super(post, locale);
         id = post.getId();
@@ -24,15 +33,6 @@ public class PostListDTO extends TitlesContentExtendableDTO {
         tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
         commentsCount = post.getComments().size();
     }
-
-    private int id;
-    private long date;
-    private int views;
-    private String sourceLink;
-    private List<String> photos;
-    private List<VideoDTO> videos;
-    private List<String> tags;
-    private int commentsCount;
 
     public int getId() {
         return id;

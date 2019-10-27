@@ -10,23 +10,10 @@ import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PostDetailDTO extends TitlesContentExtendableDTO {
-
-    public PostDetailDTO(PostEntity post, Locale locale) {
-        super(post, locale);
-        id = post.getId();
-        published = post.isPublished();
-        date = post.getDate().toEpochSecond(ZoneOffset.UTC);
-        views = post.getViews();
-        sourceLink = post.getSourceLink();
-        photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
-        videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
-        tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
-        author = null != post.getAuthor() ? new UserDTO(post.getAuthor()) : null;
-        commentsCount = post.getComments().size();
-    }
 
     private int id;
     private boolean published;
@@ -38,6 +25,20 @@ public class PostDetailDTO extends TitlesContentExtendableDTO {
     private List<String> tags;
     private UserDTO author;
     private int commentsCount;
+
+    public PostDetailDTO(PostEntity post, Locale locale) {
+        super(post, locale);
+        id = post.getId();
+        published = post.isPublished();
+        date = post.getDate().toEpochSecond(ZoneOffset.UTC);
+        views = post.getViews();
+        sourceLink = post.getSourceLink();
+        photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
+        videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
+        tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
+        author = Optional.ofNullable(post.getAuthor()).map(UserDTO::new).orElse(null);
+        commentsCount = post.getComments().size();
+    }
 
     public int getId() {
         return id;

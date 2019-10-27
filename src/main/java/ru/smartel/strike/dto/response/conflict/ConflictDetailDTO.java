@@ -8,6 +8,17 @@ import java.time.ZoneOffset;
 
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
+    private int id;
+    private double latitude;
+    private double longitude;
+    private String companyName;
+    private Long dateFrom;
+    private Long dateTo;
+    private Integer conflictReasonId;
+    private Integer conflictResultId;
+    private Integer industryId;
+    private Integer parentEventId;
+
     public ConflictDetailDTO (Conflict conflict, Locale locale) {
         super(conflict, locale);
         id = conflict.getId();
@@ -21,17 +32,6 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         industryId = null != conflict.getIndustry() ? conflict.getIndustry().getId() : null;
         parentEventId = null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null;
     }
-
-    private int id;
-    private double latitude;
-    private double longitude;
-    private String companyName;
-    private Long dateFrom;
-    private Long dateTo;
-    private Integer conflictReasonId;
-    private Integer conflictResultId;
-    private Integer industryId;
-    private Integer parentEventId;
 
     public int getId() {
         return id;

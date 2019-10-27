@@ -1,6 +1,7 @@
 package ru.smartel.strike.repository;
 
 import org.springframework.data.jpa.domain.Specification;
+import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.entity.News;
 
 import javax.persistence.EntityManager;
@@ -10,6 +11,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 
 public class CustomNewsRepositoryImpl implements CustomNewsRepository {
@@ -18,13 +20,13 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
 
     @Override
     public News findOrThrow(int id) throws EntityNotFoundException {
-        News entity = entityManager.find(News.class, id);
-        if (null == entity) throw new EntityNotFoundException("Новость не найдена");
-        return entity;
+        return Optional.ofNullable(entityManager.find(News.class, id)).orElseThrow(
+                () -> new EntityNotFoundException("Новость не найдена")
+        );
     }
 
     @Override
-    public List<Integer> findIdsOrderByDateDesc(Specification<News> specification, Integer page, Integer perPage) {
+    public List<Integer> findIdsOrderByDateDesc(Specification<News> specification, BaseListRequestDTO dto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<News> root = idQuery.from(News.class);
@@ -33,10 +35,9 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
 
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 
-        return entityManager
-                .createQuery(idQuery)
-                .setMaxResults(perPage)
-                .setFirstResult((page - 1) * perPage)
+        return entityManager.createQuery(idQuery)
+                .setMaxResults(dto.getPage())
+                .setFirstResult((dto.getPage() - 1) * dto.getPerPage())
                 .getResultList();
     }
 }

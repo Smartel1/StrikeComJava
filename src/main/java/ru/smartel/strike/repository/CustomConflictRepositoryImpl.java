@@ -27,8 +27,7 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
     @Override
     @SuppressWarnings("unchecked")
     public List<Integer> findAllByIdGetParentEventId(List<Integer> ids) {
-        return entityManager
-                .createQuery("select parentEvent.id from Conflict where id in :ids")
+        return entityManager.createQuery("select parentEvent.id from Conflict where id in :ids")
                 .setParameter("ids", ids)
                 .getResultList();
     }
@@ -42,8 +41,7 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
 
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 
-        return entityManager
-                .createQuery(idQuery)
+        return entityManager.createQuery(idQuery)
                 .setMaxResults(perPage)
                 .setFirstResult((page - 1) * perPage)
                 .getResultList();

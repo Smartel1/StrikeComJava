@@ -11,12 +11,12 @@ import ru.smartel.strike.exception.DTOValidationException;
 
 public interface EventService {
 
-    ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user)
+    ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, Locale locale, User user)
             throws DTOValidationException;
 
     EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives);
 
-    void setFavourite(Integer eventId, Integer userId, boolean isFavourite);
+    void setFavourite(Integer eventId, int userId, boolean isFavourite);
 
     EventDetailDTO create(EventRequestDTO dto, Integer userId, Locale locale)
             throws BusinessRuleValidationException, DTOValidationException;

@@ -16,7 +16,7 @@ import ru.smartel.strike.service.Locale;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/api/{locale}")
+@RequestMapping("/api/v1/{locale}")
 public class ConflictController {
 
     private ConflictService conflictService;

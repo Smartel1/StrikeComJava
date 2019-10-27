@@ -9,15 +9,15 @@ import ru.smartel.strike.service.Locale;
  */
 public class ExtendedLocalityDTO {
 
+    private int id;
+    private String name;
+    private RegionDTO region;
+
     public ExtendedLocalityDTO(Locality locality, Locale locale) {
         id = locality.getId();
         name = locality.getName();
         region = new RegionDTO(locality.getRegion(), locale);
     }
-
-    private int id;
-    private String name;
-    private RegionDTO region;
 
     public int getId() {
         return id;

@@ -14,9 +14,10 @@ import ru.smartel.strike.service.EventService;
 import ru.smartel.strike.service.Locale;
 
 import javax.validation.constraints.Min;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/{locale}")
+@RequestMapping("/api/v1/{locale}")
 public class EventController {
 
     private EventService eventService;
@@ -33,7 +34,8 @@ public class EventController {
             @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
-        return eventService.list(dto, perPage, page, locale, user);
+        dto.mergeWith(page, perPage);
+        return eventService.list(dto, locale, user);
     }
 
     @PostMapping("/event-list")
@@ -63,7 +65,9 @@ public class EventController {
             @RequestParam(value = "favourite") boolean isFavourite,
             @AuthenticationPrincipal User user
     ) {
-        eventService.setFavourite(eventId, null != user? user.getId() : null, isFavourite);
+        Optional.ofNullable(user).ifPresent(
+                usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite)
+        );
     }
 
     @PostMapping(path = "/event", consumes = {"application/json"})

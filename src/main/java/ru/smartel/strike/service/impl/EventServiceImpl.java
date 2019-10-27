@@ -27,6 +27,7 @@ import ru.smartel.strike.specification.event.LocalizedEvent;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,13 +85,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, int perPage, int page, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, Locale locale, User user) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
-
-        //Body has precedence over query params.
-        //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (EventListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
-        if (EventListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
 
         //Transform filters and other restrictions to Specifications
         Specification<Event> specification = filtersTransformer
@@ -103,20 +99,19 @@ public class EventServiceImpl implements EventService {
 
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 eventsCount,
-                page,
-                perPage,
-                eventsCount / perPage + 1
+                dto.getPage(),
+                dto.getPerPage(),
+                eventsCount / dto.getPerPage() + 1
         );
 
-        if (eventsCount <= (page - 1) * perPage) {
+        if (eventsCount <= (dto.getPage() - 1) * dto.getPerPage()) {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
         //Get count of events matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, page, perPage);
+        List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
 
-        List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids)
-                .stream()
+        List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
                 .map(e -> new EventListDTO(e, locale))
                 .sorted(Comparator.comparingLong(EventListDTO::getDate))
                 .collect(Collectors.toList());
@@ -141,7 +136,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public void setFavourite(Integer eventId, Integer userId, boolean isFavourite) {
+    public void setFavourite(Integer eventId, int userId, boolean isFavourite) {
         User user = userRepository.findById(userId).orElseThrow();
         Event event = eventRepository.getOne(eventId);
 
@@ -186,8 +181,7 @@ public class EventServiceImpl implements EventService {
             Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(loc -> null != event.getTitleByLocale(loc))
-                    .map(loc -> new AbstractMap.SimpleEntry<>(event.getTitleByLocale(loc), loc))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(event::getTitleByLocale, Function.identity()));
 
             pushService.eventPublished(
                     event.getId(),
@@ -219,8 +213,8 @@ public class EventServiceImpl implements EventService {
 
         businessValidationService.validate(
                 new UserCanModerate(user).when(changingPublicationStatus
-                                || null != dto.getLocalityId()
-                                || changingConflictJoint
+                        || null != dto.getLocalityId()
+                        || changingConflictJoint
                 ),
                 new NotAParentEvent(event.getId(), eventRepository).when(changingConflictJoint)
         );
@@ -238,8 +232,7 @@ public class EventServiceImpl implements EventService {
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != event.getTitleByLocale(loc))
-                    .map(loc -> new AbstractMap.SimpleEntry<>(event.getTitleByLocale(loc), loc))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(event::getTitleByLocale, Function.identity()));
 
             pushService.eventPublished(
                     eventId,
@@ -247,7 +240,7 @@ public class EventServiceImpl implements EventService {
                     event.getLongitude(),
                     event.getLatitude(),
                     titlesLocalizedDuringThisUpdate,
-                    null != event.getAuthor()? event.getAuthor().getFcm() : null,
+                    null != event.getAuthor() ? event.getAuthor().getFcm() : null,
                     changingPublicationStatus //whether notify event's author or not
             );
         }
@@ -390,10 +383,8 @@ public class EventServiceImpl implements EventService {
         event.getTags().addAll(
                 tagNames
                         .stream()
-                        .map(tagName -> {
-                            Tag tag = tagRepository.findFirstByName(tagName);
-                            return null != tag ? tag : new Tag(tagName);
-                        })
+                        .map(tagName -> tagRepository.findFirstByName(tagName)
+                                .orElse(new Tag(tagName)))
                         .collect(Collectors.toList())
         );
     }

@@ -3,6 +3,7 @@ package ru.smartel.strike.dto.response;
 import java.util.List;
 
 public class ListWrapperDTO <T> {
+
     private List<T> data;
     private Meta meta;
 

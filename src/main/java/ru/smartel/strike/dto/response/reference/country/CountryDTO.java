@@ -6,11 +6,6 @@ import ru.smartel.strike.service.Locale;
 
 public class CountryDTO extends NamesExtendableDTO {
 
-    public CountryDTO(Country country, Locale locale) {
-        super(country, locale);
-        id = country.getId();
-    }
-
     private int id;
 
     public int getId() {
@@ -19,5 +14,10 @@ public class CountryDTO extends NamesExtendableDTO {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public CountryDTO(Country country, Locale locale) {
+        super(country, locale);
+        id = country.getId();
     }
 }

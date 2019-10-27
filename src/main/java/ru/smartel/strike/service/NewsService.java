@@ -11,12 +11,12 @@ import ru.smartel.strike.exception.DTOValidationException;
 
 public interface NewsService {
 
-    ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, int perPage, int page, Locale locale, User user)
+    ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, Locale locale, User user)
             throws DTOValidationException;
 
     NewsDetailDTO incrementViewsAndGet(Integer newsId, Locale locale);
 
-    void setFavourite(Integer newsId, Integer userId, boolean isFavourite);
+    void setFavourite(Integer newsId, int userId, boolean isFavourite);
 
     NewsDetailDTO create(NewsRequestDTO dto, Integer userId, Locale locale)
             throws BusinessRuleValidationException, DTOValidationException;

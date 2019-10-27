@@ -4,15 +4,15 @@ import ru.smartel.strike.entity.Video;
 
 public class VideoDTO {
 
+    private String url;
+    private String previewUrl;
+    private int videoTypeId;
+
     public VideoDTO(Video video) {
         url = video.getUrl();
         previewUrl = video.getPreviewUrl();
         videoTypeId = video.getVideoType().getId();
     }
-
-    private String url;
-    private String previewUrl;
-    private int videoTypeId;
 
     public String getUrl() {
         return url;

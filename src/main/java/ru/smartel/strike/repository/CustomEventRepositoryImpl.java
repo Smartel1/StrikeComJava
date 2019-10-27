@@ -1,6 +1,7 @@
 package ru.smartel.strike.repository;
 
 import org.springframework.data.jpa.domain.Specification;
+import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 
@@ -11,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 
 public class CustomEventRepositoryImpl implements CustomEventRepository {
@@ -19,8 +21,8 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
 
     @Override
     public boolean isNotParentForAnyConflicts(int eventId) {
-        Long count = (Long) entityManager
-                .createQuery("select count(c.id) " +
+        Long count = (Long) entityManager.createQuery(
+                "select count(c.id) " +
                         "from " + Conflict.class.getName() + " c " +
                         "where c.parentEvent = " + eventId)
                 .setMaxResults(1)
@@ -29,16 +31,15 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
     }
 
 
-
     @Override
     public Event findOrThrow(int id) throws EntityNotFoundException {
-        Event entity = entityManager.find(Event.class, id);
-        if (null == entity) throw new EntityNotFoundException("Событие не найдено");
-        return entity;
+        return Optional.ofNullable(entityManager.find(Event.class, id)).orElseThrow(
+                () -> new EntityNotFoundException("Событие не найдено")
+        );
     }
 
     @Override
-    public List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, Integer page, Integer perPage) {
+    public List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, BaseListRequestDTO dto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
         Root<Event> root = idQuery.from(Event.class);
@@ -47,10 +48,9 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
 
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 
-        return entityManager
-                .createQuery(idQuery)
-                .setMaxResults(perPage)
-                .setFirstResult((page - 1) * perPage)
+        return entityManager.createQuery(idQuery)
+                .setMaxResults(dto.getPerPage())
+                .setFirstResult((dto.getPage() - 1) * dto.getPerPage())
                 .getResultList();
     }
 }
