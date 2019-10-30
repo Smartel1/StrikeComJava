@@ -1,10 +1,13 @@
 package ru.smartel.strike.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 public class ListWrapperDTO <T> {
 
     private List<T> data;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Meta meta;
 
     public ListWrapperDTO(List<T> data, Meta meta) {
