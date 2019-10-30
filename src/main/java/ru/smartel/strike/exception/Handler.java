@@ -15,7 +15,7 @@ import java.util.Map;
 @ControllerAdvice
 public class Handler {
 
-    @ExceptionHandler(value = {UnauthtenticatedException.class})
+    @ExceptionHandler(value = {UnauthenticatedException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     protected String handleConflict(Exception ex, WebRequest request) {

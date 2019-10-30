@@ -1,8 +1,10 @@
 package ru.smartel.strike.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
 import org.hibernate.annotations.*;
 import org.springframework.data.annotation.AccessType;
@@ -10,9 +12,12 @@ import org.springframework.data.annotation.AccessType;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -79,6 +84,15 @@ public class User {
             roles.add(role.asText());
         }
         return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = new ArrayNode(
+                JsonNodeFactory.instance,
+                roles.stream()
+                        .map(TextNode::valueOf)
+                        .collect(Collectors.toList())
+        );
     }
 
     public int getId() {
