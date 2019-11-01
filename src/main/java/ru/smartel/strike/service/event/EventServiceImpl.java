@@ -112,8 +112,7 @@ public class EventServiceImpl implements EventService {
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 eventsCount,
                 dto.getPage(),
-                dto.getPerPage(),
-                eventsCount / dto.getPerPage() + 1
+                dto.getPerPage()
         );
 
         if (eventsCount <= (dto.getPage() - 1) * dto.getPerPage()) {

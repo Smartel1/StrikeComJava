@@ -37,11 +37,11 @@ public class ListWrapperDTO <T> {
         private Integer perPage;
         private Long lastPage;
 
-        public Meta(Long total, Integer currentPage, Integer perPage, Long lastPage) {
+        public Meta(Long total, Integer currentPage, Integer perPage) {
             this.total = total;
             this.currentPage = currentPage;
             this.perPage = perPage;
-            this.lastPage = lastPage;
+            this.lastPage = (long) Math.ceil((double) total / (double) perPage);
         }
 
         public Long getTotal() {

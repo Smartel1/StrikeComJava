@@ -7,7 +7,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "comments")
@@ -32,13 +34,13 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @ManyToMany(cascade = {CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "comment_photo",
         joinColumns = {@JoinColumn(name = "comment_id", referencedColumnName = "id")},
         inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id", unique = true)}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Photo> photos;
+    private Set<Photo> photos = new LinkedHashSet<>();
 
     @ManyToMany(mappedBy = "comments")
     private List<Event> events;
@@ -47,7 +49,7 @@ public class Comment {
     private List<News> news;
 
     @OneToMany(mappedBy = "comment")
-    private List<Claim> claims;
+    private Set<Claim> claims = new LinkedHashSet<>();
 
     public int getId() {
         return id;
@@ -69,11 +71,11 @@ public class Comment {
         this.user = user;
     }
 
-    public List<Photo> getPhotos() {
+    public Set<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<Photo> photos) {
+    public void setPhotos(Set<Photo> photos) {
         this.photos = photos;
     }
 
@@ -93,11 +95,11 @@ public class Comment {
         this.news = news;
     }
 
-    public List<Claim> getClaims() {
+    public Set<Claim> getClaims() {
         return claims;
     }
 
-    public void setClaims(List<Claim> claims) {
+    public void setClaims(Set<Claim> claims) {
         this.claims = claims;
     }
 

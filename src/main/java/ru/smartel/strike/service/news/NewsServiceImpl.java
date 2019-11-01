@@ -89,8 +89,7 @@ public class NewsServiceImpl implements NewsService {
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 newsCount,
                 dto.getPage(),
-                dto.getPerPage(),
-                newsCount / dto.getPerPage() + 1
+                dto.getPerPage()
         );
 
         if (newsCount <= (dto.getPage() - 1) * dto.getPerPage()) {

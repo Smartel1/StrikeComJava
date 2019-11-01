@@ -78,8 +78,7 @@ public class ConflictServiceImpl implements ConflictService {
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 conflictsCount,
                 page,
-                perPage,
-                conflictsCount / perPage + 1
+                perPage
         );
 
         if (conflictsCount <= (page - 1) * perPage) {
