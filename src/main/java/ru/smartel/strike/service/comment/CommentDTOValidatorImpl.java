@@ -19,7 +19,7 @@ public class CommentDTOValidatorImpl extends BaseDTOValidator implements Comment
 
         if (null != dto.getPhotoUrls()) {
             int i = 0;
-            for (Object photoUrl : dto.getPhotoUrls()) {
+            for (String photoUrl : dto.getPhotoUrls()) {
                 check(photoUrl, "photo_urls[" + i + "]", errors).maxLength(500);
                 i++;
             }
