@@ -20,7 +20,7 @@ import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.event.EventRepository;
-import ru.smartel.strike.repository.reference.IndustryRepository;
+import ru.smartel.strike.repository.etc.IndustryRepository;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.conflict.LocalizedConflict;
@@ -105,7 +105,7 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO create(ConflictRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public ConflictDetailDTO create(ConflictRequestDTO dto, Integer userId, Locale locale) throws DTOValidationException {
         dtoValidator.validateStoreDTO(dto);
 
         Conflict conflict = new Conflict();
@@ -118,7 +118,7 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO update(Integer conflictId, ConflictRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public ConflictDetailDTO update(Integer conflictId, ConflictRequestDTO dto, Integer userId, Locale locale) throws DTOValidationException {
         dtoValidator.validateUpdateDTO(dto);
         Conflict conflict = conflictRepository.findOrThrow(conflictId);
         fillConflictFields(conflict, dto, locale);
@@ -129,7 +129,7 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer conflictId) throws BusinessRuleValidationException {
+    public void delete(Integer conflictId) {
         Conflict conflict = conflictRepository.findOrThrow(conflictId);
         conflictRepository.delete(conflict);
     }

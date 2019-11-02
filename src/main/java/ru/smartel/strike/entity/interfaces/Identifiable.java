@@ -1,5 +1,5 @@
 package ru.smartel.strike.entity.interfaces;
 
-public interface Reference extends Names {
+public interface Identifiable {
     int getId();
 }

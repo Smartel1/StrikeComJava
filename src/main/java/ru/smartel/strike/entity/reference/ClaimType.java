@@ -1,17 +1,23 @@
 package ru.smartel.strike.entity.reference;
 
-import ru.smartel.strike.entity.interfaces.Reference;
+import ru.smartel.strike.entity.interfaces.NamedReference;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "claim_types")
-public class ClaimType extends EntityWithNames implements Reference {
+public class ClaimType extends EntityWithNames implements NamedReference {
+
+    public ClaimType() {
+    }
 
     public ClaimType(String nameRu, String nameEn, String nameEs) {
         super(nameRu, nameEn, nameEs);
     }
 
-    public ClaimType() {
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nameRu, nameEn, nameEs);
     }
 }

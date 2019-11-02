@@ -18,7 +18,7 @@ import ru.smartel.strike.repository.etc.TagRepository;
 import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.repository.etc.VideoRepository;
 import ru.smartel.strike.repository.news.NewsRepository;
-import ru.smartel.strike.repository.reference.VideoTypeRepository;
+import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -226,7 +226,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer newsId) throws BusinessRuleValidationException {
+    public void delete(Integer newsId) {
         News news = newsRepository.findById(newsId).orElseThrow(
                 () -> new EntityNotFoundException("Новость не найдена"));
         newsRepository.delete(news);

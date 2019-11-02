@@ -8,10 +8,9 @@ import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.country.CountryDTO;
 import ru.smartel.strike.entity.reference.Country;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.repository.reference.CountryRepository;
+import ru.smartel.strike.repository.etc.CountryRepository;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.country.NamePatternCountry;
-import ru.smartel.strike.specification.locality.NamePatternLocality;
 
 import java.util.List;
 import java.util.stream.Collectors;

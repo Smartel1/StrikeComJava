@@ -4,7 +4,6 @@ import ru.smartel.strike.service.Locale;
 
 public interface Names {
 
-
     String getNameRu();
 
     void setNameRu(String name_ru);
