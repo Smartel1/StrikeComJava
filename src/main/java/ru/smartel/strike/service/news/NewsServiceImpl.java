@@ -26,6 +26,7 @@ import ru.smartel.strike.service.notifications.PushService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.news.ByRolesNews;
 import ru.smartel.strike.specification.news.LocalizedNews;
+import ru.smartel.strike.specification.news.PublishedNews;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -70,6 +71,11 @@ public class NewsServiceImpl implements NewsService {
         this.videoTypeRepository = videoTypeRepository;
         this.tagRepository = tagRepository;
         this.videoRepository = videoRepository;
+    }
+
+    @Override
+    public Long getNonPublishedCount() {
+        return newsRepository.count(new PublishedNews(false));
     }
 
     @Override

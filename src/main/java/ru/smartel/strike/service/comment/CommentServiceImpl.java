@@ -97,6 +97,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public Long getComplainedCount() {
+        return commentRepository.getCommentsWithClaimsCount();
+    }
+
+    @Override
     @PreAuthorize("isFullyAuthenticated()")
     public CommentDTO create(CommentRequestDTO dto, Integer userId) throws DTOValidationException {
         commentDTOValidator.validateDTO(dto);

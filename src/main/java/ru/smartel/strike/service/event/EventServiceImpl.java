@@ -34,6 +34,7 @@ import ru.smartel.strike.service.notifications.PushService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
+import ru.smartel.strike.specification.event.PublishedEvent;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -94,6 +95,10 @@ public class EventServiceImpl implements EventService {
         this.pushService = pushService;
     }
 
+    @Override
+    public Long getNonPublishedCount() {
+        return eventRepository.count(new PublishedEvent(false));
+    }
 
     @Override
     @PreAuthorize("permitAll()")

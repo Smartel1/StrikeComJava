@@ -13,6 +13,7 @@ import ru.smartel.strike.exception.DTOValidationException;
 public interface CommentService {
     ListWrapperDTO<CommentDTO> list(CommentListRequestDTO dto);
     ListWrapperDTO<CommentDTO> getComplained(BaseListRequestDTO dto);
+    Long getComplainedCount();
     CommentDTO create(CommentRequestDTO dto, Integer userId) throws DTOValidationException;
     CommentDTO update(Integer commentId, CommentRequestDTO dto, Integer userId) throws DTOValidationException;
     void delete(Integer commentId, Integer userId) throws DTOValidationException;

@@ -12,6 +12,8 @@ import ru.smartel.strike.service.Locale;
 
 public interface NewsService {
 
+    Long getNonPublishedCount();
+
     ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, Locale locale, User user)
             throws DTOValidationException;
 

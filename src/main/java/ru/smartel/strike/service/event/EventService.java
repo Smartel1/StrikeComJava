@@ -12,6 +12,8 @@ import ru.smartel.strike.service.Locale;
 
 public interface EventService {
 
+    Long getNonPublishedCount();
+
     ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, Locale locale, User user)
             throws DTOValidationException;
 
