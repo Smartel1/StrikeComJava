@@ -114,6 +114,7 @@ public class ConflictServiceImpl implements ConflictService {
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) throws DTOValidationException {
         dtoValidator.validateUpdateDTO(dto);
+
         Conflict conflict = conflictRepository.findOrThrow(dto.getConflictId());
         fillConflictFields(conflict, dto, dto.getLocale());
 

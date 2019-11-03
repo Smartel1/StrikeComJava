@@ -3,68 +3,122 @@ package ru.smartel.strike.service.validation;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
-import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.validation.BaseDTOValidator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BasePostDTOValidator extends BaseDTOValidator {
+import static ru.smartel.strike.util.ValidationUtil.*;
 
-    protected void validateListQueryDTO(BaseListRequestDTO dto) throws DTOValidationException {
+public class BasePostDTOValidator {
+
+    protected Map<String, String> validateListQueryDTO(BaseListRequestDTO dto) {
         Map<String, String> errors = new HashMap<>();
 
-        check(dto.getPage(), "page", errors).min(1);
-        check(dto.getPerPage(), "per_page", errors).min(1);
-
-        if (!errors.isEmpty()) {
-            throw new DTOValidationException("validation errors", errors);
+        if (dto.getPage() < 1) {
+            addErrorMessage("page", new Min(1), errors);
         }
+
+        if (dto.getPerPage() < 1) {
+            addErrorMessage("per_page", new Min(1), errors);
+        }
+
+        return errors;
     }
 
-    protected void validateStoreDTO(PostRequestDTO dto) throws DTOValidationException {
+    protected Map<String, String> validateStoreDTO(PostRequestDTO dto) {
         Map<String, String> errors = new HashMap<>();
 
-        check(dto.getDate(), "date", errors).requiredOptional().notNull();
+        if (null == dto.getDate()) {
+            addErrorMessage("date", new Required(), errors);
+        } else if (dto.getDate().isEmpty()) {
+            addErrorMessage("date", new NotNull(), errors);
+        }
+
         validateCommon(dto, errors);
 
-        if (!errors.isEmpty()) {
-            throw new DTOValidationException("validation errors", errors);
-        }
+        return errors;
     }
 
-    protected void validateUpdateDTO(PostRequestDTO dto) throws DTOValidationException {
+    protected Map<String, String> validateUpdateDTO(PostRequestDTO dto) {
         Map<String, String> errors = new HashMap<>();
 
-        check(dto.getDate(), "date", errors).notNull();
+        if (null != dto.getDate() && dto.getDate().isEmpty()) {
+            addErrorMessage("date", new NotNull(), errors);
+        }
+
         validateCommon(dto, errors);
 
-        if (!errors.isEmpty()) {
-            throw new DTOValidationException("validation errors", errors);
-        }
+        return errors;
     }
 
     /**
      * Validate fields whose checks are similar on update and create actions
      */
     private void validateCommon(PostRequestDTO dto, Map<String, String> errors) {
-        check(dto.getPublished(), "published", errors).notNull();
-        check(dto.getTitle(), "title", errors).maxLength(255);
-        check(dto.getTitleRu(), "title_ru", errors).maxLength(255);
-        check(dto.getTitleEn(), "title_en", errors).maxLength(255);
-        check(dto.getTitleEs(), "title_es", errors).maxLength(255);
-        check(dto.getSourceLink(), "source_link", errors).maxLength(255);
-        check(dto.getContent(), "content", errors).minLength(3);
-        check(dto.getContentRu(), "content_ru", errors).minLength(3);
-        check(dto.getContentEn(), "content_en", errors).minLength(3);
-        check(dto.getContentEs(), "content_es", errors).minLength(3);
+
+        if (null != dto.getPublished() && dto.getPublished().isEmpty()) {
+            addErrorMessage("published", new NotNull(), errors);
+        }
+
+        if (null != dto.getTitle()) {
+            dto.getTitle().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("title", new Max(255), errors);
+            });
+        }
+
+        if (null != dto.getTitleRu()) {
+            dto.getTitleRu().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("title_ru", new Max(255), errors);
+            });
+        }
+
+        if (null != dto.getTitleEn()) {
+            dto.getTitleEn().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("title_en", new Max(255), errors);
+            });
+        }
+
+        if (null != dto.getTitleEs()) {
+            dto.getTitleEs().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("title_es", new Max(255), errors);
+            });
+        }
+
+        if (null != dto.getSourceLink()) {
+            dto.getSourceLink().ifPresent(link -> {
+                if (link.length() > 255) addErrorMessage("source_link", new Max(255), errors);
+            });
+        }
+
+        if (null != dto.getContent()) {
+            dto.getContent().ifPresent(content -> {
+                if (content.length() < 3) addErrorMessage("content", new Min(3), errors);
+            });
+        }
+
+        if (null != dto.getContentRu()) {
+            dto.getContentRu().ifPresent(content -> {
+                if (content.length() < 3) addErrorMessage("content_ru", new Min(3), errors);
+            });
+        }
+
+        if (null != dto.getContentEn()) {
+            dto.getContentEn().ifPresent(content -> {
+                if (content.length() < 3) addErrorMessage("content_en", new Min(3), errors);
+            });
+        }
+
+        if (null != dto.getContentEs()) {
+            dto.getContentEs().ifPresent(content -> {
+                if (content.length() < 3) addErrorMessage("content_es", new Min(3), errors);
+            });
+        }
 
         if (null != dto.getPhotoUrls()) {
-            check(dto.getPhotoUrls(), "photo_urls", errors).notNull();
             dto.getPhotoUrls().ifPresent((photoUrls) -> {
                     int i = 0;
                     for (String photoUrl : photoUrls) {
-                        check(photoUrl, "photo_urls[" + i + "]", errors).maxLength(500);
+                        if (photoUrl.length() > 500) addErrorMessage("photo_urls[" + i + "]", new Max(500), errors);
                         i++;
                     }
                 }
@@ -72,11 +126,11 @@ public class BasePostDTOValidator extends BaseDTOValidator {
         }
 
         if (null != dto.getTags()) {
-            check(dto.getTags(), "tags", errors).notNull();
             dto.getTags().ifPresent((tags) -> {
                         int i = 0;
                         for (String tag : tags) {
-                            check(tag, "tags[" + i + "]", errors).minLength(2).maxLength(20);
+                            if (tag.length() > 20) addErrorMessage("tags[" + i + "]", new Max(20), errors);
+                            if (tag.length() < 2) addErrorMessage("tags[" + i + "]", new Min(2), errors);
                             i++;
                         }
                     }
@@ -84,13 +138,25 @@ public class BasePostDTOValidator extends BaseDTOValidator {
         }
 
         if (null != dto.getVideos()) {
-            check(dto.getVideos(), "videos", errors).notNull();
             dto.getVideos().ifPresent((videos) -> {
                         int i = 0;
                         for (VideoDTO video : videos) {
-                            check(video.getUrl(), "videos[" + i + "].url", errors).notNull().maxLength(500);
-                            check(video.getPreviewUrl(), "videos[" + i + "].preview_url", errors).maxLength(500);
-                            check(video.getVideoTypeId(), "videos[" + i + "].video_type_id", errors);
+                            if (null == video.getUrl()) {
+                                addErrorMessage("videos[" + i + "].url", new NotNull(), errors);
+                            } else if (video.getUrl().length() > 500) {
+                                addErrorMessage("videos[" + i + "].url", new Max(500), errors);
+                            }
+
+                            if (video.getPreviewUrl().isPresent()) {
+                                if (video.getPreviewUrl().get().length() > 500) {
+                                    addErrorMessage("videos[" + i + "].preview_url", new Max(500), errors);
+                                }
+                            }
+
+                            if (null == video.getVideoTypeId()) {
+                                addErrorMessage("videos[" + i + "].video_type_id", new NotNull(), errors);
+                            }
+
                             i++;
                         }
                     }

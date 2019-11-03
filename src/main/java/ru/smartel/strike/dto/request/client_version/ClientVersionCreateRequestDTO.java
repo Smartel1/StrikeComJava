@@ -10,7 +10,7 @@ public class ClientVersionCreateRequestDTO {
     private Locale locale;
     private String version;
     private String clientId;
-    private boolean required;
+    private Boolean required;
     private String descriptionRu;
     private String descriptionEn;
     private String descriptionEs;
@@ -39,11 +39,11 @@ public class ClientVersionCreateRequestDTO {
         this.clientId = clientId;
     }
 
-    public boolean isRequired() {
+    public Boolean isRequired() {
         return required;
     }
 
-    public void setRequired(boolean required) {
+    public void setRequired(Boolean required) {
         this.required = required;
     }
 

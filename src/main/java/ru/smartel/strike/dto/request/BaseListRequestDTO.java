@@ -5,11 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseListRequestDTO {
 
-    public static final int DEFAULT_PAGE_CAPACITY = 20;
-    public static final int DEFAULT_PAGE = 1;
+    private static final int DEFAULT_PAGE_CAPACITY = 20;
+    private static final int DEFAULT_PAGE = 1;
 
-    private Integer perPage = DEFAULT_PAGE_CAPACITY;
-    private Integer page = DEFAULT_PAGE;
+    private int perPage = DEFAULT_PAGE_CAPACITY;
+    private int page = DEFAULT_PAGE;
 
     /**
      * At the moment API users can send page/perPage by query params or in request body.
@@ -21,19 +21,19 @@ public class BaseListRequestDTO {
         if (DEFAULT_PAGE_CAPACITY == this.getPerPage()) setPerPage(perPage);
     }
 
-    public Integer getPerPage() {
+    public int getPerPage() {
         return perPage;
     }
 
-    public void setPerPage(Integer perPage) {
+    public void setPerPage(int perPage) {
         this.perPage = perPage;
     }
 
-    public Integer getPage() {
+    public int getPage() {
         return page;
     }
 
-    public void setPage(Integer page) {
+    public void setPage(int page) {
         this.page = page;
     }
 }
