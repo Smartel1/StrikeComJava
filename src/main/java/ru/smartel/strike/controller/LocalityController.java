@@ -36,6 +36,7 @@ public class LocalityController {
             @PathVariable("locale") Locale locale,
             @RequestBody LocalityCreateRequestDTO dto
     ) throws DTOValidationException {
-        return localityService.create(dto, locale);
+        dto.setLocale(locale);
+        return localityService.create(dto);
     }
 }

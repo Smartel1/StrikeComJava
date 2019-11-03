@@ -2,7 +2,7 @@ package ru.smartel.strike.service.news;
 
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
-import ru.smartel.strike.dto.request.news.NewsRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.validation.BasePostDTOValidator;
 
@@ -15,12 +15,12 @@ public class NewsDTOValidatorImpl extends BasePostDTOValidator implements NewsDT
     }
 
     @Override
-    public void validateStoreDTO(NewsRequestDTO dto) throws DTOValidationException {
+    public void validateStoreDTO(NewsCreateRequestDTO dto) throws DTOValidationException {
         super.validateStoreDTO(dto);
     }
 
     @Override
-    public void validateUpdateDTO(NewsRequestDTO dto) throws DTOValidationException {
+    public void validateUpdateDTO(NewsCreateRequestDTO dto) throws DTOValidationException {
         super.validateUpdateDTO(dto);
     }
 }

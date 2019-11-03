@@ -6,8 +6,17 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserUpdateRequestDTO {
+    private Integer userId;
     private String fcm;
     private List<String> roles;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public String getFcm() {
         return fcm;

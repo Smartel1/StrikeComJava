@@ -6,5 +6,5 @@ import ru.smartel.strike.exception.DTOValidationException;
 
 public interface UserService {
     UserDetailDTO get(int userId);
-    UserDetailDTO update(int userId, UserUpdateRequestDTO dto) throws DTOValidationException;
+    UserDetailDTO update(UserUpdateRequestDTO dto) throws DTOValidationException;
 }

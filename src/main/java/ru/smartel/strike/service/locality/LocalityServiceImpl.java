@@ -49,7 +49,7 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public LocalityDetailDTO create(LocalityCreateRequestDTO dto, Locale locale) throws DTOValidationException {
+    public LocalityDetailDTO create(LocalityCreateRequestDTO dto) throws DTOValidationException {
         validator.validateCreateDTO(dto);
 
         Locality locality = new Locality();
@@ -57,6 +57,6 @@ public class LocalityServiceImpl implements LocalityService {
         locality.setRegion(regionRepository.getOne(dto.getRegionId()));
         localityRepository.save(locality);
 
-        return new LocalityDetailDTO(locality, locale);
+        return new LocalityDetailDTO(locality, dto.getLocale());
     }
 }

@@ -31,11 +31,12 @@ public class RegionController {
         return regionService.list(name, countryId, locale);
     }
 
-    @PostMapping(consumes = {"application/json"})
+    @PostMapping
     public RegionDetailDTO create (
             @PathVariable("locale") Locale locale,
             @RequestBody RegionCreateRequestDTO dto
     ) throws DTOValidationException {
-        return regionService.create(dto, locale);
+        dto.setLocale(locale);
+        return regionService.create(dto);
     }
 }

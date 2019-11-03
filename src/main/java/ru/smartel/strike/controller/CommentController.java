@@ -3,10 +3,7 @@ package ru.smartel.strike.controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.smartel.strike.dto.request.comment.CommentRequestDTO;
-import ru.smartel.strike.dto.request.comment.CommentDTOWithOwner;
-import ru.smartel.strike.dto.request.comment.CommentListRequestDTO;
-import ru.smartel.strike.dto.request.comment.CommentOwnerDTO;
+import ru.smartel.strike.dto.request.comment.*;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.comment.CommentDTO;
 import ru.smartel.strike.entity.Event;
@@ -47,12 +44,12 @@ public class CommentController {
     public CommentDTO create (
             @PathVariable("entity") String entity,
             @PathVariable("entity-id") int entityId,
-            @RequestBody CommentRequestDTO dto,
+            @RequestBody CommentCreateRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
         fillDTOWithCommentOwner(dto, entityId, entity);
-
-        return commentService.create(dto, user.getId());
+        dto.setUser(user);
+        return commentService.create(dto);
     }
 
     @PutMapping("{comment-id}")
@@ -60,12 +57,13 @@ public class CommentController {
             @PathVariable("entity") String entity,
             @PathVariable("entity-id") int entityId,
             @PathVariable("comment-id") int commentId,
-            @RequestBody CommentRequestDTO dto,
+            @RequestBody CommentUpdateRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
         fillDTOWithCommentOwner(dto, entityId, entity);
-
-        return commentService.update(commentId, dto, user.getId());
+        dto.setCommentId(commentId);
+        dto.setUser(user);
+        return commentService.update(dto);
     }
 
     @DeleteMapping("{comment-id}")

@@ -49,7 +49,7 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public RegionDetailDTO create(RegionCreateRequestDTO dto, Locale locale) throws DTOValidationException {
+    public RegionDetailDTO create(RegionCreateRequestDTO dto) throws DTOValidationException {
         validator.validateCreateDTO(dto);
 
         Region region = new Region();
@@ -57,6 +57,6 @@ public class RegionServiceImpl implements RegionService {
         region.setCountry(countryRepository.getOne(dto.getCountryId()));
         regionRepository.save(region);
 
-        return new RegionDetailDTO(region, locale);
+        return new RegionDetailDTO(region, dto.getLocale());
     }
 }

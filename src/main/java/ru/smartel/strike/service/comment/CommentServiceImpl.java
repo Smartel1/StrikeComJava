@@ -1,11 +1,13 @@
 package ru.smartel.strike.service.comment;
 
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
-import ru.smartel.strike.dto.request.comment.CommentRequestDTO;
+import ru.smartel.strike.dto.request.comment.CommentCreateRequestDTO;
 import ru.smartel.strike.dto.request.comment.CommentListRequestDTO;
+import ru.smartel.strike.dto.request.comment.CommentUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.comment.CommentDTO;
 import ru.smartel.strike.entity.Comment;
@@ -28,6 +30,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
+//todo validate owner existence?
 public class CommentServiceImpl implements CommentService {
 
     private CommentRepository commentRepository;
@@ -103,12 +106,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public CommentDTO create(CommentRequestDTO dto, Integer userId) throws DTOValidationException {
+    public CommentDTO create(CommentCreateRequestDTO dto) throws DTOValidationException {
         commentDTOValidator.validateDTO(dto);
 
         Comment comment = new Comment();
         comment.setContent(dto.getContent());
-        comment.setUser(userRepository.getOne(userId));
+        comment.setUser(userRepository.getOne(dto.getUser().getId()));
 
         dto.getPhotoUrls().forEach(photoUrl -> {
             Photo photo = new Photo();
@@ -135,11 +138,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @PreAuthorize("isFullyAuthenticated()") //todo user can update his own comments only
-    public CommentDTO update(Integer commentId, CommentRequestDTO dto, Integer userId) throws DTOValidationException {
+    @PreAuthorize("isFullyAuthenticated()")
+    @PostAuthorize("returnObject.user.id == #dto.user.id")
+    public CommentDTO update(CommentUpdateRequestDTO dto) throws DTOValidationException {
         commentDTOValidator.validateDTO(dto);
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
+        Comment comment = commentRepository.findById(dto.getCommentId()).orElseThrow(
                 () -> new EntityNotFoundException("Комментарий не найден")
         );
 

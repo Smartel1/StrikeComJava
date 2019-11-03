@@ -10,7 +10,6 @@ import ru.smartel.strike.entity.ClientVersion;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.client_version.ClientVersionRepository;
-import ru.smartel.strike.service.Locale;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -29,7 +28,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
     }
 
     @Override
-    public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
         ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
@@ -39,7 +38,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
                         currentVersion.getId(), dto.getClientId()
                 )
                 .stream()
-                .map(cv -> new ClientVersionDTO(cv, locale))
+                .map(cv -> new ClientVersionDTO(cv, dto.getLocale()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(
@@ -50,7 +49,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ClientVersionDTO create(ClientVersionCreateRequestDTO dto, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public ClientVersionDTO create(ClientVersionCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         clientVersionDTOValidator.validateStoreDTO(dto);
 
         Optional<ClientVersion> sameVersion = clientVersionRepository.getByVersionAndClientId(dto.getVersion(), dto.getClientId());
@@ -69,7 +68,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
 
         clientVersionRepository.save(version);
 
-        return new ClientVersionDTO(version, locale);
+        return new ClientVersionDTO(version, dto.getLocale());
     }
 
     @Override

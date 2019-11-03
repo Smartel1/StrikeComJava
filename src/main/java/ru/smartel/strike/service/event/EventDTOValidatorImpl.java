@@ -2,7 +2,7 @@ package ru.smartel.strike.service.event;
 
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.event.EventRequestDTO;
+import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.validation.BasePostDTOValidator;
 
@@ -18,7 +18,7 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
     }
 
     @Override
-    public void validateStoreDTO(EventRequestDTO dto) throws DTOValidationException {
+    public void validateStoreDTO(EventCreateRequestDTO dto) throws DTOValidationException {
         super.validateStoreDTO(dto); //todo refactor to merge errors
 
         Map<String, String> errors = new HashMap<>();
@@ -34,7 +34,7 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
     }
 
     @Override
-    public void validateUpdateDTO(EventRequestDTO dto) throws DTOValidationException {
+    public void validateUpdateDTO(EventCreateRequestDTO dto) throws DTOValidationException {
         super.validateUpdateDTO(dto); //todo refactor to merge errors
 
         Map<String, String> errors = new HashMap<>();

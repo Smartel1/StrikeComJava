@@ -22,19 +22,18 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public UserDetailDTO get (
-            @PathVariable("locale") Locale locale,
+    public UserDetailDTO get(
             @AuthenticationPrincipal User user
     ) {
         return userService.get(user.getId());
     }
 
-    @PutMapping(path = "/{id}", consumes = {"application/json"})
-    public UserDetailDTO update (
-            @PathVariable("locale") Locale locale,
+    @PutMapping(path = "/{id}")
+    public UserDetailDTO update(
             @PathVariable("id") int id,
             @RequestBody UserUpdateRequestDTO dto
     ) throws DTOValidationException {
-        return userService.update(id, dto);
+        dto.setUserId(id);
+        return userService.update(dto);
     }
 }

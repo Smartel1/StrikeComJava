@@ -34,11 +34,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId and null == #dto.roles")
-    public UserDetailDTO update(int userId, UserUpdateRequestDTO dto) throws DTOValidationException {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #dto.userId and null == #dto.roles")
+    public UserDetailDTO update(UserUpdateRequestDTO dto) throws DTOValidationException {
         validator.validateUpdateDTO(dto);
 
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findById(dto.getUserId()).orElseThrow(
                 () -> new EntityNotFoundException("Пользователь не найден")
         );
 

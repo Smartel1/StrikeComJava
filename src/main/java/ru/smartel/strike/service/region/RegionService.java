@@ -8,5 +8,5 @@ import ru.smartel.strike.service.Locale;
 
 public interface RegionService {
     ListWrapperDTO<RegionDetailDTO> list(String name, Integer countryId, Locale locale);
-    RegionDetailDTO create(RegionCreateRequestDTO dto, Locale locale) throws DTOValidationException;
+    RegionDetailDTO create(RegionCreateRequestDTO dto) throws DTOValidationException;
 }

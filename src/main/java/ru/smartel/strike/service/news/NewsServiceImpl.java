@@ -5,7 +5,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
-import ru.smartel.strike.dto.request.news.NewsRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
@@ -80,14 +82,14 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
 
         //Transform filters and other restrictions to Specifications
         Specification<News> specification = filtersTransformer
-                .toSpecification(dto.getFilters(), null != user ? user.getId() : null)
-                .and(new ByRolesNews(user))
-                .and(new LocalizedNews(locale));
+                .toSpecification(dto.getFilters(), null != dto.getUser() ? dto.getUser().getId() : null)
+                .and(new ByRolesNews(dto.getUser()))
+                .and(new LocalizedNews(dto.getLocale()));
 
         //Get count of news matching specification
         long newsCount = newsRepository.count(specification);
@@ -106,7 +108,7 @@ public class NewsServiceImpl implements NewsService {
         List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
-                .map(e -> new NewsListDTO(e, locale))
+                .map(e -> new NewsListDTO(e, dto.getLocale()))
                 .sorted(Comparator.comparingLong(NewsListDTO::getDate))
                 .collect(Collectors.toList());
 
@@ -115,12 +117,12 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public NewsDetailDTO incrementViewsAndGet(Integer newsId, Locale locale) {
-        News news = newsRepository.findOrThrow(newsId);
+    public NewsDetailDTO incrementViewsAndGet(NewsShowDetailRequestDTO dto) {
+        News news = newsRepository.findOrThrow(dto.getNewsId());
 
         news.setViews(news.getViews() + 1);
 
-        return new NewsDetailDTO(news, locale);
+        return new NewsDetailDTO(news, dto.getLocale());
     }
 
     @Override
@@ -143,10 +145,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public NewsDetailDTO create(NewsRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public NewsDetailDTO create(NewsCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateStoreDTO(dto);
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
 
         //Only moderator can publish news
         businessValidationService.validate(
@@ -155,7 +157,7 @@ public class NewsServiceImpl implements NewsService {
 
         News news = new News();
         news.setAuthor(user);
-        fillNewsFields(news, dto, locale);
+        fillNewsFields(news, dto, dto.getLocale());
 
         newsRepository.save(news);
 
@@ -179,16 +181,16 @@ public class NewsServiceImpl implements NewsService {
             );
         }
 
-        return new NewsDetailDTO(news, locale);
+        return new NewsDetailDTO(news, dto.getLocale());
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isNewsAuthor(#newsId)")
-    public NewsDetailDTO update(Integer newsId, NewsRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isNewsAuthor(#dto.newsId)")
+    public NewsDetailDTO update(NewsUpdateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateUpdateDTO(dto);
 
-        News news = newsRepository.findOrThrow(newsId);
-        User user = userRepository.findById(userId).orElseThrow();
+        News news = newsRepository.findOrThrow(dto.getNewsId());
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
 
         boolean changingPublicationStatus =
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != news.isPublished();
@@ -202,7 +204,7 @@ public class NewsServiceImpl implements NewsService {
                 .filter(loc -> null == news.getTitleByLocale(loc))
                 .collect(Collectors.toSet());
 
-        fillNewsFields(news, dto, locale);
+        fillNewsFields(news, dto, dto.getLocale());
 
         if (news.isPublished()) {
             // titles which was not localized earlier and have been localized in this transaction
@@ -213,7 +215,7 @@ public class NewsServiceImpl implements NewsService {
                     .collect(Collectors.toMap(news::getTitleByLocale, Function.identity()));
 
             pushService.newsPublished(
-                    newsId,
+                    dto.getNewsId(),
                     null != news.getAuthor() ? news.getAuthor().getId() : null,
                     titlesLocalizedDuringThisUpdate,
                     null != news.getAuthor() ? news.getAuthor().getFcm() : null,
@@ -221,7 +223,7 @@ public class NewsServiceImpl implements NewsService {
             );
         }
 
-        return new NewsDetailDTO(news, locale);
+        return new NewsDetailDTO(news, dto.getLocale());
     }
 
     @Override
@@ -241,7 +243,7 @@ public class NewsServiceImpl implements NewsService {
         }
     }
 
-    private void fillNewsFields(News news, NewsRequestDTO dto, Locale locale) {
+    private void fillNewsFields(News news, NewsCreateRequestDTO dto, Locale locale) {
         if (null != dto.getDate())
             news.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
         if (null != dto.getSourceLink()) news.setSourceLink(dto.getSourceLink().orElse(null));

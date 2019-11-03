@@ -1,15 +1,22 @@
 package ru.smartel.strike.dto.request.conflict;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import ru.smartel.strike.entity.User;
+import ru.smartel.strike.service.Locale;
 
 import java.util.Optional;
 
 /**
- * dto for creating/updating event requests
+ * dto for creating conflict
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ConflictRequestDTO {
+public class ConflictCreateRequestDTO {
+    @JsonIgnore
+    private Locale locale;
+    @JsonIgnore
+    private User user;
     private Optional<String> title;
     private Optional<String> titleRu;
     private Optional<String> titleEn;
@@ -23,6 +30,22 @@ public class ConflictRequestDTO {
     private Optional<Integer> conflictResultId;
     private Optional<Integer> industryId;
     private Optional<Integer> parentEventId;
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Optional<String> getTitle() {
         return title;

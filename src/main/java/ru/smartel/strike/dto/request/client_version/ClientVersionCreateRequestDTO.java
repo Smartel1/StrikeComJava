@@ -1,15 +1,27 @@
 package ru.smartel.strike.dto.request.client_version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import ru.smartel.strike.service.Locale;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientVersionCreateRequestDTO {
+    @JsonIgnore
+    private Locale locale;
     private String version;
     private String clientId;
     private boolean required;
     private String descriptionRu;
     private String descriptionEn;
     private String descriptionEs;
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
 
     public String getVersion() {
         return version;

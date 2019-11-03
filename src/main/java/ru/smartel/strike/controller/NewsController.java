@@ -3,7 +3,9 @@ package ru.smartel.strike.controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
-import ru.smartel.strike.dto.request.news.NewsRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
@@ -13,7 +15,6 @@ import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.news.NewsService;
 
-import javax.validation.constraints.Min;
 import java.util.Optional;
 
 @RestController
@@ -28,34 +29,32 @@ public class NewsController {
 
     @GetMapping("/news")
     public ListWrapperDTO<NewsListDTO> index(
-            @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody NewsListRequestDTO dto,
+            NewsListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
-        dto.mergeWith(page, perPage);
-        return newsService.list(dto, locale, user);
+        dto.setUser(user);
+        return newsService.list(dto);
     }
 
-    @PostMapping("/news-list")
+    @PostMapping(value = "/news-list")
     public ListWrapperDTO postIndex(
             @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "20") Integer perPage,
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestBody NewsListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
         //alias of index method
-        return index(locale, perPage, page, dto, user);
+        dto.setLocale(locale);
+        dto.mergeWith(page, perPage);
+        return index(dto, user);
     }
 
     @GetMapping("/news/{id}")
     public NewsDetailDTO show(
-            @PathVariable("locale") Locale locale,
-            @PathVariable("id") int newsId
+            NewsShowDetailRequestDTO dto
     ) {
-        return newsService.incrementViewsAndGet(newsId, locale);
+        return newsService.incrementViewsAndGet(dto);
     }
 
     @PostMapping("/news/{id}/favourite")
@@ -69,23 +68,28 @@ public class NewsController {
         );
     }
 
-    @PostMapping(path = "/news", consumes = {"application/json"})
+    @PostMapping(path = "/news")
     public NewsDetailDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody NewsRequestDTO dto,
+            @RequestBody NewsCreateRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return newsService.create(dto, null != user? user.getId() : null, locale);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        return newsService.create(dto);
     }
 
-    @PutMapping(path = "/news/{id}", consumes = {"application/json"})
+    @PutMapping(path = "/news/{id}")
     public NewsDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int newsId,
             @AuthenticationPrincipal User user,
-            @RequestBody NewsRequestDTO dto
+            @RequestBody NewsUpdateRequestDTO dto
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return newsService.update(newsId, dto, null != user? user.getId() : null, locale);
+        dto.setNewsId(newsId);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        return newsService.update(dto);
     }
 
     @DeleteMapping(path = "/news/{id}")

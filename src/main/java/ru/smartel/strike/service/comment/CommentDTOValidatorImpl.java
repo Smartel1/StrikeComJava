@@ -1,7 +1,7 @@
 package ru.smartel.strike.service.comment;
 
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.comment.CommentRequestDTO;
+import ru.smartel.strike.dto.request.comment.CommentCreateRequestDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.validation.BaseDTOValidator;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 public class CommentDTOValidatorImpl extends BaseDTOValidator implements CommentDTOValidator {
 
     @Override
-    public void validateDTO(CommentRequestDTO dto) throws DTOValidationException {
+    public void validateDTO(CommentCreateRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getContent(), "content", errors).notNull().minLength(1);

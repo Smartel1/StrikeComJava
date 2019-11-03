@@ -30,11 +30,12 @@ public class CountryController {
         return countryService.list(name, locale);
     }
 
-    @PostMapping(consumes = {"application/json"})
+    @PostMapping
     public CountryDTO create (
             @PathVariable("locale") Locale locale,
             @RequestBody CountryCreateRequestDTO dto
     ) throws DTOValidationException {
-        return countryService.create(dto, locale);
+        dto.setLocale(locale);
+        return countryService.create(dto);
     }
 }

@@ -6,11 +6,10 @@ import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
 import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.Locale;
 
 
 public interface ClientVersionService {
-    ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto, Locale locale) throws BusinessRuleValidationException, DTOValidationException;
-    ClientVersionDTO create(ClientVersionCreateRequestDTO dto, Locale locale) throws BusinessRuleValidationException, DTOValidationException;
+    ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException;
+    ClientVersionDTO create(ClientVersionCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException;
     void delete(int clientVersionId);
 }

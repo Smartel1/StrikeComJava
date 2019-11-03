@@ -5,7 +5,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.event.EventRequestDTO;
+import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
@@ -102,14 +103,14 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto, Locale locale, User user) throws DTOValidationException {
+    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto) throws DTOValidationException {
         validator.validateListQueryDTO(dto);
 
         //Transform filters and other restrictions to Specifications
         Specification<Event> specification = filtersTransformer
-                .toSpecification(dto.getFilters(), null != user ? user.getId() : null)
-                .and(new ByRolesEvent(user))
-                .and(new LocalizedEvent(locale));
+                .toSpecification(dto.getFilters(), null != dto.getUser() ? dto.getUser().getId() : null)
+                .and(new ByRolesEvent(dto.getUser()))
+                .and(new LocalizedEvent(dto.getLocale()));
 
         //Get count of events matching specification
         long eventsCount = eventRepository.count(specification);
@@ -128,7 +129,7 @@ public class EventServiceImpl implements EventService {
         List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
-                .map(e -> new EventListDTO(e, locale))
+                .map(e -> new EventListDTO(e, dto.getLocale()))
                 .sorted(Comparator.comparingLong(EventListDTO::getDate))
                 .collect(Collectors.toList());
 
@@ -170,10 +171,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public EventDetailDTO create(EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    public EventDetailDTO create(EventCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateStoreDTO(dto);
 
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
 
         //Only moderator can publish events
         businessValidationService.validate(
@@ -184,7 +185,7 @@ public class EventServiceImpl implements EventService {
 
         Event event = new Event();
         event.setAuthor(user);
-        fillEventFields(event, dto, locale);
+        fillEventFields(event, dto, dto.getLocale());
 
         eventRepository.save(event);
 
@@ -210,16 +211,16 @@ public class EventServiceImpl implements EventService {
             );
         }
 
-        return new EventDetailDTO(event, locale);
+        return new EventDetailDTO(event, dto.getLocale());
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#eventId)")
-    public EventDetailDTO update(Integer eventId, EventRequestDTO dto, Integer userId, Locale locale) throws BusinessRuleValidationException, DTOValidationException {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#dto.eventId)")
+    public EventDetailDTO update(EventUpdateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
         validator.validateUpdateDTO(dto);
 
-        Event event = eventRepository.findOrThrow(eventId);
-        User user = userRepository.findById(userId).orElseThrow();
+        Event event = eventRepository.findOrThrow(dto.getEventId());
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
 
         boolean changingPublicationStatus =
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != event.isPublished();
@@ -240,7 +241,7 @@ public class EventServiceImpl implements EventService {
                 .filter(loc -> null == event.getTitleByLocale(loc))
                 .collect(Collectors.toSet());
 
-        fillEventFields(event, dto, locale);
+        fillEventFields(event, dto, dto.getLocale());
 
         if (event.isPublished()) {
             // titles which was not localized earlier and have been localized in this transaction
@@ -251,7 +252,7 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toMap(event::getTitleByLocale, Function.identity()));
 
             pushService.eventPublished(
-                    eventId,
+                    dto.getEventId(),
                     null != event.getAuthor() ? event.getAuthor().getId() : null,
                     event.getLongitude(),
                     event.getLatitude(),
@@ -261,7 +262,7 @@ public class EventServiceImpl implements EventService {
             );
         }
 
-        return new EventDetailDTO(event, locale);
+        return new EventDetailDTO(event, dto.getLocale());
     }
 
     @Override
@@ -285,7 +286,7 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void fillEventFields(Event event, EventRequestDTO dto, Locale locale) {
+    private void fillEventFields(Event event, EventCreateRequestDTO dto, Locale locale) {
         if (null != dto.getConflictId()) setConflict(event, dto.getConflictId().orElseThrow());
         if (null != dto.getDate())
             event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));

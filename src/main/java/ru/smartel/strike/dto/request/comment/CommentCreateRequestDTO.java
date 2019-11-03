@@ -2,15 +2,18 @@ package ru.smartel.strike.dto.request.comment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.entity.interfaces.HasComments;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CommentRequestDTO implements CommentDTOWithOwner {
+public class CommentCreateRequestDTO implements CommentDTOWithOwner {
 
     @JsonIgnore
     private CommentOwnerDTO<? extends HasComments> owner;
+    @JsonIgnore
+    private User user;
     private String content;
     private List<String> photoUrls;
 
@@ -20,6 +23,14 @@ public class CommentRequestDTO implements CommentDTOWithOwner {
 
     public void setOwner(CommentOwnerDTO<? extends HasComments> owner) {
         this.owner = owner;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getContent() {

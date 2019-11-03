@@ -3,7 +3,8 @@ package ru.smartel.strike.controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
-import ru.smartel.strike.dto.request.event.EventRequestDTO;
+import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
@@ -13,7 +14,6 @@ import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.event.EventService;
 import ru.smartel.strike.service.Locale;
 
-import javax.validation.constraints.Min;
 import java.util.Optional;
 
 @RestController
@@ -28,26 +28,25 @@ public class EventController {
 
     @GetMapping("/event")
     public ListWrapperDTO<EventListDTO> index(
-            @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody EventListRequestDTO dto,
+            EventListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
-        dto.mergeWith(page, perPage);
-        return eventService.list(dto, locale, user);
+        dto.setUser(user);
+        return eventService.list(dto);
     }
 
     @PostMapping("/event-list")
     public ListWrapperDTO postIndex(
             @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(name = "per_page", required = false, defaultValue = "20") Integer perPage,
+            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
             @RequestBody EventListRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
         //alias of index method
-        return index(locale, perPage, page, dto, user);
+        dto.setLocale(locale);
+        dto.mergeWith(page, perPage);
+        return index(dto, user);
     }
 
     @GetMapping("/event/{id}")
@@ -70,23 +69,28 @@ public class EventController {
         );
     }
 
-    @PostMapping(path = "/event", consumes = {"application/json"})
+    @PostMapping(path = "/event")
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody EventRequestDTO dto,
+            @RequestBody EventCreateRequestDTO dto,
             @AuthenticationPrincipal User user
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.create(dto, null != user? user.getId() : null, locale);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        return eventService.create(dto);
     }
 
-    @PutMapping(path = "/event/{id}", consumes = {"application/json"})
+    @PutMapping(path = "/event/{id}")
     public EventDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
             @AuthenticationPrincipal User user,
-            @RequestBody EventRequestDTO dto
+            @RequestBody EventUpdateRequestDTO dto
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return eventService.update(eventId, dto, null != user? user.getId() : null, locale);
+        dto.setEventId(eventId);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        return eventService.update(dto);
     }
 
     @DeleteMapping(path = "/event/{id}")

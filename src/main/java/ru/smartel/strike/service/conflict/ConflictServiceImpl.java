@@ -4,17 +4,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
-import ru.smartel.strike.dto.request.conflict.ConflictRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.User;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
 import ru.smartel.strike.entity.reference.Industry;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
@@ -60,37 +59,32 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<ConflictListDTO> list(ConflictListRequestDTO dto, int perPage, int page, Locale locale, User user, boolean brief) throws DTOValidationException {
+    public ListWrapperDTO<ConflictListDTO> list(ConflictListRequestDTO dto) throws DTOValidationException {
         dtoValidator.validateListQueryDTO(dto);
-
-        //Body has precedence over query params.
-        //If perPage and Page of body (dto) aren't equal to default values then use values of dto
-        if (ConflictListRequestDTO.DEFAULT_PAGE_CAPACITY != dto.getPerPage()) perPage = dto.getPerPage();
-        if (ConflictListRequestDTO.DEFAULT_PAGE != dto.getPage()) page = dto.getPage();
 
         //Transform filters and other restrictions to Specifications
         Specification<Conflict> specification = filtersTransformer
-                .toSpecification(dto.getFilters(), null != user ? user.getId() : null)
-                .and(new LocalizedConflict(locale));
+                .toSpecification(dto.getFilters(), null != dto.getUser() ? dto.getUser().getId() : null)
+                .and(new LocalizedConflict(dto.getLocale()));
 
         //Get count of conflicts matching specification
         long conflictsCount = conflictRepository.count(specification);
         ListWrapperDTO.Meta responseMeta = new ListWrapperDTO.Meta(
                 conflictsCount,
-                page,
-                perPage
+                dto.getPage(),
+                dto.getPerPage()
         );
 
-        if (conflictsCount <= (page - 1) * perPage) {
+        if (conflictsCount <= (dto.getPage() - 1) * dto.getPerPage()) {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
         //Get count of conflicts matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = conflictRepository.findIds(specification, page, perPage);
+        List<Integer> ids = conflictRepository.findIds(specification, dto.getPage(), dto.getPerPage());
 
         List<ConflictListDTO> conflictListDTOS = conflictRepository.findAllById(ids)
                 .stream()
-                .map(e -> new ConflictListDTO(e, locale, brief))
+                .map(e -> new ConflictListDTO(e, dto.getLocale(), dto.isBrief()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(conflictListDTOS, responseMeta);
@@ -105,26 +99,26 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO create(ConflictRequestDTO dto, Integer userId, Locale locale) throws DTOValidationException {
+    public ConflictDetailDTO create(ConflictCreateRequestDTO dto) throws DTOValidationException {
         dtoValidator.validateStoreDTO(dto);
 
         Conflict conflict = new Conflict();
-        fillConflictFields(conflict, dto, locale);
+        fillConflictFields(conflict, dto, dto.getLocale());
 
         conflictRepository.save(conflict);
 
-        return new ConflictDetailDTO(conflict, locale);
+        return new ConflictDetailDTO(conflict, dto.getLocale());
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO update(Integer conflictId, ConflictRequestDTO dto, Integer userId, Locale locale) throws DTOValidationException {
+    public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) throws DTOValidationException {
         dtoValidator.validateUpdateDTO(dto);
-        Conflict conflict = conflictRepository.findOrThrow(conflictId);
-        fillConflictFields(conflict, dto, locale);
+        Conflict conflict = conflictRepository.findOrThrow(dto.getConflictId());
+        fillConflictFields(conflict, dto, dto.getLocale());
 
         conflictRepository.save(conflict);
-        return new ConflictDetailDTO(conflict, locale);
+        return new ConflictDetailDTO(conflict, dto.getLocale());
     }
 
     @Override
@@ -134,7 +128,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflictRepository.delete(conflict);
     }
 
-    private void fillConflictFields(Conflict conflict, ConflictRequestDTO dto, Locale locale){
+    private void fillConflictFields(Conflict conflict, ConflictCreateRequestDTO dto, Locale locale){
         if (null != dto.getTitle()) conflict.setTitleByLocale(locale, dto.getTitle().orElse(null));
         if (null != dto.getTitleRu()) conflict.setTitleRu(dto.getTitleRu().orElse(null));
         if (null != dto.getTitleEn()) conflict.setTitleEn(dto.getTitleEn().orElse(null));

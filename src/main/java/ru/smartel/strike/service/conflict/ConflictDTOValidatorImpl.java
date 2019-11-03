@@ -2,7 +2,7 @@ package ru.smartel.strike.service.conflict;
 
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
-import ru.smartel.strike.dto.request.conflict.ConflictRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.validation.BaseDTOValidator;
 
@@ -25,7 +25,7 @@ public class ConflictDTOValidatorImpl extends BaseDTOValidator implements Confli
     }
 
     @Override
-    public void validateStoreDTO(ConflictRequestDTO dto) throws DTOValidationException {
+    public void validateStoreDTO(ConflictCreateRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getTitle(), "title", errors).maxLength(255);
@@ -43,7 +43,7 @@ public class ConflictDTOValidatorImpl extends BaseDTOValidator implements Confli
     }
 
     @Override
-    public void validateUpdateDTO(ConflictRequestDTO dto) throws DTOValidationException {
+    public void validateUpdateDTO(ConflictCreateRequestDTO dto) throws DTOValidationException {
         Map<String, String> errors = new HashMap<>();
 
         check(dto.getTitle(), "title", errors).maxLength(255);

@@ -22,10 +22,9 @@ public class ClientVersionController {
 
     @GetMapping("/client-version")
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(
-            @PathVariable("locale") Locale locale,
-            @RequestBody ClientVersionGetNewRequestDTO dto
+            ClientVersionGetNewRequestDTO dto
     ) throws DTOValidationException, BusinessRuleValidationException {
-        return clientVersionService.getNewVersions(dto, locale);
+        return clientVersionService.getNewVersions(dto);
     }
 
     @PostMapping(path = "/client-version", consumes = {"application/json"})
@@ -33,7 +32,8 @@ public class ClientVersionController {
             @PathVariable("locale") Locale locale,
             @RequestBody ClientVersionCreateRequestDTO dto
     ) throws BusinessRuleValidationException, DTOValidationException {
-        return clientVersionService.create(dto, locale);
+        dto.setLocale(locale);
+        return clientVersionService.create(dto);
     }
 
     @DeleteMapping(path = "/client-version/{id}")

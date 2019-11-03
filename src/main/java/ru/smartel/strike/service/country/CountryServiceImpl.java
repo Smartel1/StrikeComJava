@@ -44,7 +44,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public CountryDTO create(CountryCreateRequestDTO dto, Locale locale) throws DTOValidationException {
+    public CountryDTO create(CountryCreateRequestDTO dto) throws DTOValidationException {
         validator.validateCreateDTO(dto);
 
         Country country = new Country();
@@ -53,6 +53,6 @@ public class CountryServiceImpl implements CountryService {
         country.setNameEs(dto.getNameEs());
         countryRepository.save(country);
 
-        return new CountryDTO(country, locale);
+        return new CountryDTO(country, dto.getLocale());
     }
 }
