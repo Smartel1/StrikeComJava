@@ -42,7 +42,9 @@ public class FiltersTransformerImpl implements FiltersTransformer {
             List<Integer> parentEventIds = conflictRepository.findAllByIdGetParentEventId(filters.getConflictIds());
             result = result.and(new BelongToConflictsEvent(filters.getConflictIds()).or(new WithIdsEvents(parentEventIds)));
         }
-        if (null != filters.getFavourites() && null != userId) result = result.and(new FavouriteEvent(userId));
+        if (null != filters.getFavourites() && filters.getFavourites() && null != userId) {
+            result = result.and(new FavouriteEvent(userId));
+        }
         if (null != filters.getContainsContent()) result = result.and(new WithContentEvent(filters.getContainsContent()));
         if (null != filters.getCountryIds()) result = result.and(new CountryEvent(filters.getCountryIds()));
         if (null != filters.getRegionIds()) result = result.and(new RegionEvent(filters.getRegionIds()));
