@@ -23,10 +23,6 @@ public class NewsDTOValidatorImpl extends BasePostDTOValidator implements NewsDT
             addErrorMessage("locale", new NotNull(), errors);
         }
 
-        if (null == dto.getUser()) {
-            addErrorMessage("user", new ValidationUtil.NotNull(), errors);
-        }
-
         throwIfErrorsExist(errors);
     }
 
