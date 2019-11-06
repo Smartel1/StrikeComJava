@@ -26,7 +26,7 @@ public class LocalityController {
     public ListWrapperDTO<LocalityDetailDTO> list(
             @PathVariable("locale") Locale locale,
             @RequestParam(value = "name") @Size(min = 2) String name,
-            @RequestParam(value = "region_id", required = false) Integer regionId
+            @RequestParam(value = "regionId", required = false) Integer regionId
     ) {
         return localityService.list(name, regionId, locale);
     }

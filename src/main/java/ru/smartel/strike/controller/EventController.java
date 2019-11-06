@@ -39,7 +39,7 @@ public class EventController {
     public EventDetailDTO show(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") int eventId,
-            @RequestParam(value = "with_relatives", required = false) boolean withRelatives
+            @RequestParam(value = "withRelatives", required = false) boolean withRelatives
     ) {
         return eventService.incrementViewsAndGet(eventId, locale, withRelatives);
     }
