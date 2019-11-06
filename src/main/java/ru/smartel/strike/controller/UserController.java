@@ -7,11 +7,10 @@ import ru.smartel.strike.dto.request.user.UserUpdateRequestDTO;
 import ru.smartel.strike.dto.response.user.UserDetailDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.user.UserService;
 
 @RestController
-@RequestMapping("/api/v1/{locale}/user")
+@RequestMapping("/api/v2/{locale}/user")
 public class UserController {
 
     private UserService userService;

@@ -11,7 +11,7 @@ import ru.smartel.strike.service.client_version.ClientVersionService;
 import ru.smartel.strike.service.Locale;
 
 @RestController
-@RequestMapping("/api/v1/{locale}")
+@RequestMapping("/api/v2/{locale}")
 public class ClientVersionController {
 
     private ClientVersionService clientVersionService;

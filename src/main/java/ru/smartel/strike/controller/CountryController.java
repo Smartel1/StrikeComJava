@@ -12,7 +12,7 @@ import ru.smartel.strike.service.country.CountryService;
 import javax.validation.constraints.Size;
 
 @RestController
-@RequestMapping("/api/v1/{locale}/country")
+@RequestMapping("/api/v2/{locale}/country")
 @Validated
 public class CountryController {
 

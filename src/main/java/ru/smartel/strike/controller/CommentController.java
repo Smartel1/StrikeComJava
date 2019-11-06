@@ -15,7 +15,7 @@ import ru.smartel.strike.service.comment.CommentService;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/api/v1/{locale}/{entity}/{entity-id}/comment")
+@RequestMapping("/api/v2/{locale}/{entity}/{entity-id}/comment")
 @Validated
 public class CommentController {
 
@@ -26,22 +26,17 @@ public class CommentController {
     }
 
     @GetMapping
-    public ListWrapperDTO<CommentDTO> list (
+    public ListWrapperDTO<CommentDTO> list(
             @PathVariable("entity") String entity,
             @PathVariable("entity-id") int entityId,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody CommentListRequestDTO dto
+            CommentListRequestDTO dto
     ) {
         fillDTOWithCommentOwner(dto, entityId, entity);
-
-        dto.mergeWith(page, perPage);
-
         return commentService.list(dto);
     }
 
     @PostMapping
-    public CommentDTO create (
+    public CommentDTO create(
             @PathVariable("entity") String entity,
             @PathVariable("entity-id") int entityId,
             @RequestBody CommentCreateRequestDTO dto,
@@ -53,7 +48,7 @@ public class CommentController {
     }
 
     @PutMapping("{comment-id}")
-    public CommentDTO update (
+    public CommentDTO update(
             @PathVariable("entity") String entity,
             @PathVariable("entity-id") int entityId,
             @PathVariable("comment-id") int commentId,
@@ -67,9 +62,7 @@ public class CommentController {
     }
 
     @DeleteMapping("{comment-id}")
-    public void delete (
-            @PathVariable("entity") String entity,
-            @PathVariable("entity-id") int entityId,
+    public void delete(
             @PathVariable("comment-id") int commentId,
             @AuthenticationPrincipal User user
     ) throws DTOValidationException {
@@ -78,15 +71,21 @@ public class CommentController {
 
     /**
      * Fill DTO with owner (event/news)
-     * @param dto dto to fill
+     *
+     * @param dto     dto to fill
      * @param ownerId news/event id
-     * @param entity name of owner entity from request path
+     * @param entity  name of owner entity from request path
      */
     private void fillDTOWithCommentOwner(CommentDTOWithOwner dto, int ownerId, String entity) {
         switch (entity) {
-            case "event": dto.setOwner(new CommentOwnerDTO<>(ownerId, Event.class)); break;
-            case "news": dto.setOwner(new CommentOwnerDTO<>(ownerId, News.class)); break;
-            default: throw new IllegalArgumentException("cannot read comments for entity " + entity);
+            case "event":
+                dto.setOwner(new CommentOwnerDTO<>(ownerId, Event.class));
+                break;
+            case "news":
+                dto.setOwner(new CommentOwnerDTO<>(ownerId, News.class));
+                break;
+            default:
+                throw new IllegalArgumentException("cannot read comments for entity " + entity);
         }
     }
 }

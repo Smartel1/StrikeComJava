@@ -14,7 +14,7 @@ import ru.smartel.strike.service.news.NewsService;
 import javax.validation.constraints.Min;
 
 @RestController
-@RequestMapping("/api/v1/{locale}/moderation")
+@RequestMapping("/api/v2/{locale}/moderation")
 @Validated
 @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
 public class ModerationController {
@@ -32,7 +32,7 @@ public class ModerationController {
     }
 
     @GetMapping("dashboard")
-    public DashboardDTO dashboard (
+    public DashboardDTO dashboard(
     ) {
         return new DashboardDTO(
                 commentService.getComplainedCount(),
@@ -42,13 +42,9 @@ public class ModerationController {
     }
 
     @GetMapping("claim-comment")
-    public ListWrapperDTO<CommentDTO> complainedCommentsList (
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") @Min(1) Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") @Min(1) Integer page,
-            @RequestBody CommentListRequestDTO dto
+    public ListWrapperDTO<CommentDTO> complainedCommentsList(
+            CommentListRequestDTO dto
     ) {
-        dto.mergeWith(page, perPage);
-
         return commentService.getComplained(dto);
     }
 }

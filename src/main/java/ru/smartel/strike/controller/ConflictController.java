@@ -15,7 +15,7 @@ import ru.smartel.strike.service.conflict.ConflictService;
 import ru.smartel.strike.service.Locale;
 
 @RestController
-@RequestMapping("/api/v1/{locale}")
+@RequestMapping("/api/v2/{locale}")
 public class ConflictController {
 
     private ConflictService conflictService;
@@ -31,22 +31,6 @@ public class ConflictController {
     ) throws DTOValidationException {
         dto.setUser(user);
         return conflictService.list(dto);
-    }
-
-    @PostMapping("/conflict-list")
-    public ListWrapperDTO<ConflictListDTO> postIndex(
-            @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-            @RequestParam(name = "brief", required = false) Boolean brief,
-            @RequestBody ConflictListRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws DTOValidationException {
-        //alias of index method
-        dto.mergeWith(page, perPage);
-        dto.setLocale(locale);
-        if (null != brief) dto.setBrief(brief);
-        return index(dto, user);
     }
 
     @GetMapping("/conflict/{id}")

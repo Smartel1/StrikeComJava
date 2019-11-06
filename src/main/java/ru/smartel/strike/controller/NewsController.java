@@ -18,7 +18,7 @@ import ru.smartel.strike.service.news.NewsService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/{locale}")
+@RequestMapping("/api/v2/{locale}")
 public class NewsController {
 
     private NewsService newsService;
@@ -34,20 +34,6 @@ public class NewsController {
     ) throws DTOValidationException {
         dto.setUser(user);
         return newsService.list(dto);
-    }
-
-    @PostMapping(value = "/news-list")
-    public ListWrapperDTO postIndex(
-            @PathVariable("locale") Locale locale,
-            @RequestParam(name = "per_page", required = false, defaultValue = "20") Integer perPage,
-            @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
-            @RequestBody NewsListRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws DTOValidationException {
-        //alias of index method
-        dto.setLocale(locale);
-        dto.mergeWith(page, perPage);
-        return index(dto, user);
     }
 
     @GetMapping("/news/{id}")

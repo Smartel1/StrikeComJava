@@ -1,15 +1,12 @@
 package ru.smartel.strike.dto.request.event;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.service.Locale;
 
 public class EventListRequestDTO extends BaseListRequestDTO {
 
-    @JsonIgnore
     private Locale locale;
-    @JsonIgnore
     private User user;
     private EventFiltersDTO filters = new EventFiltersDTO();
 

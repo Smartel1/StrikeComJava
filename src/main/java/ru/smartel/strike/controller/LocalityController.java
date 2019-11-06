@@ -12,7 +12,7 @@ import ru.smartel.strike.service.locality.LocalityService;
 import javax.validation.constraints.Size;
 
 @RestController
-@RequestMapping("/api/v1/{locale}/locality")
+@RequestMapping("/api/v2/{locale}/locality")
 @Validated
 public class LocalityController {
 
@@ -23,7 +23,7 @@ public class LocalityController {
     }
 
     @GetMapping
-    public ListWrapperDTO<LocalityDetailDTO> list (
+    public ListWrapperDTO<LocalityDetailDTO> list(
             @PathVariable("locale") Locale locale,
             @RequestParam(value = "name") @Size(min = 2) String name,
             @RequestParam(value = "region_id", required = false) Integer regionId
@@ -32,7 +32,7 @@ public class LocalityController {
     }
 
     @PostMapping(consumes = {"application/json"})
-    public LocalityDetailDTO create (
+    public LocalityDetailDTO create(
             @PathVariable("locale") Locale locale,
             @RequestBody LocalityCreateRequestDTO dto
     ) throws DTOValidationException {
