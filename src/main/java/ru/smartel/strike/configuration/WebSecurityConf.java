@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import ru.smartel.strike.security.filter.FirebaseTokenFilter;
 import ru.smartel.strike.repository.etc.UserRepository;
@@ -26,7 +27,6 @@ public class WebSecurityConf extends WebSecurityConfigurerAdapter {
                 .requestCache().disable()
                 .httpBasic().disable()
                 .csrf().disable()
-                .sessionManagement().disable();
-
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 }
