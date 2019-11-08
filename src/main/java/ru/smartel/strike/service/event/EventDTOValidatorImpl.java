@@ -10,7 +10,9 @@ import ru.smartel.strike.util.ValidationUtil;
 
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.*;
+import static ru.smartel.strike.util.ValidationUtil.NotNull;
+import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
+import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
 @Service
 public class EventDTOValidatorImpl extends BasePostDTOValidator implements EventDTOValidator {

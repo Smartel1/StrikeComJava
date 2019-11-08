@@ -4,7 +4,11 @@ import org.springframework.data.annotation.AccessType;
 import ru.smartel.strike.entity.interfaces.Names;
 import ru.smartel.strike.service.Locale;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 abstract public class EntityWithNames implements Names {

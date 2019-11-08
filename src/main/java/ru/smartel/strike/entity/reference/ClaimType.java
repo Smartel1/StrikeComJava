@@ -2,7 +2,8 @@ package ru.smartel.strike.entity.reference;
 
 import ru.smartel.strike.entity.interfaces.NamedReference;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
