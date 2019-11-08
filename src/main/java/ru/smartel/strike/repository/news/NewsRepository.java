@@ -15,7 +15,7 @@ public interface NewsRepository extends
         JpaSpecificationExecutor<News>,
         JpaRepository<News, Integer>
 {
-    @EntityGraph(attributePaths = {"videos", "photos", "tags", "comments"})
+    @EntityGraph(attributePaths = {"videos", "photos", "tags"})
     @Override
     List<News> findAllById(Iterable<Integer> ids);
 }

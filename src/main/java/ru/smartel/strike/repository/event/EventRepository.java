@@ -15,7 +15,7 @@ public interface EventRepository extends
         JpaSpecificationExecutor<Event>,
         JpaRepository<Event, Integer>
 {
-    @EntityGraph(attributePaths = {"videos", "photos", "tags", "comments", "conflict"})
+    @EntityGraph(attributePaths = {"videos", "photos", "tags", "conflict"})
     @Override
     List<Event> findAllById(Iterable<Integer> ids);
 }
