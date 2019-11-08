@@ -36,7 +36,7 @@ public class CountryServiceImpl implements CountryService {
 
         return new ListWrapperDTO<>(
                 countries.stream()
-                        .map(country -> new CountryDTO(country, locale))
+                        .map(country -> CountryDTO.of(country, locale))
                         .collect(Collectors.toList()),
                 null
         );
@@ -53,6 +53,6 @@ public class CountryServiceImpl implements CountryService {
         country.setNameEs(dto.getNameEs());
         countryRepository.save(country);
 
-        return new CountryDTO(country, dto.getLocale());
+        return CountryDTO.of(country, dto.getLocale());
     }
 }

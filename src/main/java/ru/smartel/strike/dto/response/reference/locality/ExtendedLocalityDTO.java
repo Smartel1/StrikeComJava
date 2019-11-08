@@ -13,10 +13,12 @@ public class ExtendedLocalityDTO {
     private String name;
     private RegionDTO region;
 
-    public ExtendedLocalityDTO(Locality locality, Locale locale) {
-        id = locality.getId();
-        name = locality.getName();
-        region = new RegionDTO(locality.getRegion(), locale);
+    public static ExtendedLocalityDTO of(Locality locality, Locale locale) {
+        ExtendedLocalityDTO instance = new ExtendedLocalityDTO();
+        instance.setId(locality.getId());
+        instance.setName(locality.getName());
+        instance.setRegion(RegionDTO.of(locality.getRegion(), locale));
+        return instance;
     }
 
     public int getId() {

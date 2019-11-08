@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
                 () -> new EntityNotFoundException("Пользователь не найден")
         );
 
-        return new UserDetailDTO(user);
+        return UserDetailDTO.from(user);
     }
 
     @Override
@@ -46,6 +46,6 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(dto.getRoles()).ifPresent(user::setRoles);
 
 
-        return new UserDetailDTO(user);
+        return UserDetailDTO.from(user);
     }
 }

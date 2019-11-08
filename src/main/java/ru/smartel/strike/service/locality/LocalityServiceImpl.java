@@ -41,7 +41,7 @@ public class LocalityServiceImpl implements LocalityService {
 
         return new ListWrapperDTO<>(
                 localities.stream()
-                        .map(locality -> new LocalityDetailDTO(locality, locale))
+                        .map(locality -> LocalityDetailDTO.of(locality, locale))
                         .collect(Collectors.toList()),
                 null
         );
@@ -57,6 +57,6 @@ public class LocalityServiceImpl implements LocalityService {
         locality.setRegion(regionRepository.getOne(dto.getRegionId()));
         localityRepository.save(locality);
 
-        return new LocalityDetailDTO(locality, dto.getLocale());
+        return LocalityDetailDTO.of(locality, dto.getLocale());
     }
 }

@@ -90,13 +90,13 @@ public class ReferenceServiceImpl implements ReferenceService {
 
     private List<ReferenceNamesDTO> mapReferencesWithNamesToDTOs(List<? extends NamedReference> references, Locale locale) {
         return references.stream()
-                .map(ref -> new ReferenceNamesDTO(ref, locale))
+                .map(ref -> ReferenceNamesDTO.of(ref, locale))
                 .collect(toList());
     }
 
     private List<ReferenceCodeDTO> mapReferencesWithCodeToDTOs(List<? extends ReferenceWithCode> references) {
         return references.stream()
-                .map(ReferenceCodeDTO::new)
+                .map(ReferenceCodeDTO::from)
                 .collect(toList());
     }
 }

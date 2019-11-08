@@ -129,7 +129,7 @@ public class EventServiceImpl implements EventService {
         List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
-                .map(e -> new EventListDTO(e, dto.getLocale()))
+                .map(e -> EventListDTO.of(e, dto.getLocale()))
                 .sorted(Comparator.comparingLong(EventListDTO::getDate))
                 .collect(Collectors.toList());
 
@@ -142,7 +142,7 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findOrThrow(eventId);
 
         event.setViews(event.getViews() + 1);
-        EventDetailDTO dto = new EventDetailDTO(event, locale);
+        EventDetailDTO dto = EventDetailDTO.of(event, locale);
 
         if (withRelatives) {
             dto.add("relatives", null);
@@ -211,7 +211,7 @@ public class EventServiceImpl implements EventService {
             );
         }
 
-        return new EventDetailDTO(event, dto.getLocale());
+        return EventDetailDTO.of(event, dto.getLocale());
     }
 
     @Override
@@ -262,7 +262,7 @@ public class EventServiceImpl implements EventService {
             );
         }
 
-        return new EventDetailDTO(event, dto.getLocale());
+        return EventDetailDTO.of(event, dto.getLocale());
     }
 
     @Override

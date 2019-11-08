@@ -41,7 +41,7 @@ public class RegionServiceImpl implements RegionService {
 
         return new ListWrapperDTO<>(
                 regions.stream()
-                        .map(region -> new RegionDetailDTO(region, locale))
+                        .map(region -> RegionDetailDTO.of(region, locale))
                         .collect(Collectors.toList()),
                 null
         );
@@ -57,6 +57,6 @@ public class RegionServiceImpl implements RegionService {
         region.setCountry(countryRepository.getOne(dto.getCountryId()));
         regionRepository.save(region);
 
-        return new RegionDetailDTO(region, dto.getLocale());
+        return RegionDetailDTO.of(region, dto.getLocale());
     }
 }

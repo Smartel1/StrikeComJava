@@ -11,24 +11,24 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PostListDTO extends TitlesContentExtendableDTO {
+public abstract class PostListDTO extends TitlesContentExtendableDTO {
 
-    private int id;
-    private long date;
-    private int views;
-    private String sourceLink;
-    private List<String> photos;
-    private List<VideoDTO> videos;
-    private List<String> tags;
+    protected int id;
+    protected long date;
+    protected int views;
+    protected String sourceLink;
+    protected List<String> photos;
+    protected List<VideoDTO> videos;
+    protected List<String> tags;
 
-    public PostListDTO(PostEntity post, Locale locale) {
-        super(post, locale);
+    protected void setCommonFieldsOf(PostEntity post, Locale locale) {
+        setContentsOf(post, locale);
         id = post.getId();
         date = post.getDate().toEpochSecond(ZoneOffset.UTC);
         views = post.getViews();
         sourceLink = post.getSourceLink();
         photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
-        videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
+        videos = post.getVideos().stream().map(VideoDTO::from).collect(Collectors.toList());
         tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
     }
 

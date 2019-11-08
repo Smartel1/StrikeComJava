@@ -9,12 +9,13 @@ public class UserDTO {
     private String email;
     private String imageUrl;
 
-    public UserDTO (User user) {
-        id = user.getId();
-        name = user.getName();
-        email = user.getEmail();
-        email = user.getEmail();
-        imageUrl = user.getImageUrl();
+    public static UserDTO from(User user) {
+        UserDTO instance = new UserDTO();
+        instance.setId(user.getId());
+        instance.setName(user.getName());
+        instance.setEmail(user.getEmail());
+        instance.setImageUrl(user.getImageUrl());
+        return instance;
     }
 
     public int getId() {

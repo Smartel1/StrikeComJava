@@ -10,10 +10,12 @@ public class RegionDTO {
     private String name;
     private CountryDTO country;
 
-    public RegionDTO(Region region, Locale locale) {
-        id = region.getId();
-        name = region.getName();
-        country = new CountryDTO(region.getCountry(), locale);
+    public static RegionDTO of(Region region, Locale locale) {
+        RegionDTO instance = new RegionDTO();
+        instance.setId(region.getId());
+        instance.setName(region.getName());
+        instance.setCountry(CountryDTO.of(region.getCountry(), locale));
+        return instance;
     }
 
     public int getId() {

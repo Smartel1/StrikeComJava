@@ -8,8 +8,8 @@ import ru.smartel.strike.service.Locale;
  */
 public abstract class TitlesContentExtendableDTO extends TitlesExtendableDTO {
 
-    public TitlesContentExtendableDTO(TitlesContents entity, Locale locale) {
-        super(entity, locale);
+    public void setContentsOf(TitlesContents entity, Locale locale) {
+        setTitlesOf(entity, locale);
         if (locale == Locale.ALL) {
             add("content_ru", entity.getContentRu());
             add("content_en", entity.getContentEn());

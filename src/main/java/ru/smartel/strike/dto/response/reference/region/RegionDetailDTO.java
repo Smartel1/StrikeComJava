@@ -8,16 +8,18 @@ public class RegionDetailDTO extends ExtendableDTO {
     private int id;
     private String name;
 
-    public RegionDetailDTO(Region region, Locale locale) {
-        id = region.getId();
-        name = region.getName();
+    public static RegionDetailDTO of(Region region, Locale locale) {
+        RegionDetailDTO instance = new RegionDetailDTO();
+        instance.setId(region.getId());
+        instance.setName(region.getName());
         if (locale.equals(Locale.ALL)) {
-            add("country_ru", region.getCountry().getNameRu());
-            add("country_en", region.getCountry().getNameEn());
-            add("country_es", region.getCountry().getNameEs());
+            instance.add("country_ru", region.getCountry().getNameRu());
+            instance.add("country_en", region.getCountry().getNameEn());
+            instance.add("country_es", region.getCountry().getNameEs());
         } else {
-            add("country", region.getCountry().getNameByLocale(locale));
+            instance.add("country", region.getCountry().getNameByLocale(locale));
         }
+        return instance;
     }
 
     public int getId() {

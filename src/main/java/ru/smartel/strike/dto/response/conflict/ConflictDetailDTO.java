@@ -19,18 +19,20 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
     private Integer industryId;
     private Integer parentEventId;
 
-    public ConflictDetailDTO (Conflict conflict, Locale locale) {
-        super(conflict, locale);
-        id = conflict.getId();
-        latitude = conflict.getLatitude();
-        longitude = conflict.getLongitude();
-        companyName = conflict.getCompanyName();
-        dateFrom = null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null;
-        dateTo = null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null;
-        conflictReasonId = null != conflict.getReason() ? conflict.getReason().getId() : null;
-        conflictResultId = null != conflict.getResult() ? conflict.getResult().getId() : null;
-        industryId = null != conflict.getIndustry() ? conflict.getIndustry().getId() : null;
-        parentEventId = null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null;
+    public static ConflictDetailDTO of(Conflict conflict, Locale locale) {
+        ConflictDetailDTO instance = new ConflictDetailDTO();
+        instance.setTitlesOf(conflict, locale);
+        instance.setId(conflict.getId());
+        instance.setLatitude(conflict.getLatitude());
+        instance.setLongitude(conflict.getLongitude());
+        instance.setCompanyName(conflict.getCompanyName());
+        instance.setDateFrom(null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
+        instance.setDateTo(null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
+        instance.setConflictReasonId(null != conflict.getReason() ? conflict.getReason().getId() : null);
+        instance.setConflictResultId(null != conflict.getResult() ? conflict.getResult().getId() : null);
+        instance.setIndustryId(null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
+        instance.setParentEventId(null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
+        return instance;
     }
 
     public int getId() {

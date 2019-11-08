@@ -19,20 +19,22 @@ public class UserDetailDTO {
     private List<Integer> favouriteEvents;
     private List<Integer> favouriteNews;
 
-    public UserDetailDTO(User user) {
-        id = user.getId();
-        name = user.getName();
-        email = user.getEmail();
-        uuid = user.getUuid();
-        fcm = user.getFcm();
-        roles = user.getRolesAsList();
-        imageUrl = user.getImageUrl();
-        favouriteEvents = user.getFavouriteEvents().stream()
+    public static UserDetailDTO from(User user) {
+        UserDetailDTO instance = new UserDetailDTO();
+        instance.setId(user.getId());
+        instance.setName(user.getName());
+        instance.setEmail(user.getEmail());
+        instance.setUuid(user.getUuid());
+        instance.setFcm(user.getFcm());
+        instance.setRoles(user.getRolesAsList());
+        instance.setImageUrl(user.getImageUrl());
+        instance.setFavouriteEvents(user.getFavouriteEvents().stream()
                 .map(Event::getId)
-                .collect(Collectors.toList());
-        favouriteNews = user.getFavouriteNews().stream()
+                .collect(Collectors.toList()));
+        instance.setFavouriteNews(user.getFavouriteNews().stream()
                 .map(News::getId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+        return instance;
     }
 
     public int getId() {

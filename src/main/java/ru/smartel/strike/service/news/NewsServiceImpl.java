@@ -108,7 +108,7 @@ public class NewsServiceImpl implements NewsService {
         List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
-                .map(e -> new NewsListDTO(e, dto.getLocale()))
+                .map(e -> NewsListDTO.of(e, dto.getLocale()))
                 .sorted(Comparator.comparingLong(NewsListDTO::getDate))
                 .collect(Collectors.toList());
 
@@ -122,7 +122,7 @@ public class NewsServiceImpl implements NewsService {
 
         news.setViews(news.getViews() + 1);
 
-        return new NewsDetailDTO(news, dto.getLocale());
+        return NewsDetailDTO.of(news, dto.getLocale());
     }
 
     @Override
@@ -181,7 +181,7 @@ public class NewsServiceImpl implements NewsService {
             );
         }
 
-        return new NewsDetailDTO(news, dto.getLocale());
+        return NewsDetailDTO.of(news, dto.getLocale());
     }
 
     @Override
@@ -223,7 +223,7 @@ public class NewsServiceImpl implements NewsService {
             );
         }
 
-        return new NewsDetailDTO(news, dto.getLocale());
+        return NewsDetailDTO.of(news, dto.getLocale());
     }
 
     @Override

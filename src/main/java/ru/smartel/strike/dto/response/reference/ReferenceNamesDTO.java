@@ -8,9 +8,11 @@ public class ReferenceNamesDTO extends NamesExtendableDTO {
 
     private int id;
 
-    public ReferenceNamesDTO(NamedReference entity, Locale locale) {
-        super(entity, locale);
-        id = entity.getId();
+    public static ReferenceNamesDTO of(NamedReference entity, Locale locale) {
+        ReferenceNamesDTO instance = new ReferenceNamesDTO();
+        instance.setNamesOf(entity, locale);
+        instance.setId(entity.getId());
+        return instance;
     }
 
     public int getId() {

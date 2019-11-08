@@ -38,7 +38,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
                         currentVersion.getId(), dto.getClientId()
                 )
                 .stream()
-                .map(cv -> new ClientVersionDTO(cv, dto.getLocale()))
+                .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(
@@ -68,7 +68,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
 
         clientVersionRepository.save(version);
 
-        return new ClientVersionDTO(version, dto.getLocale());
+        return ClientVersionDTO.of(version, dto.getLocale());
     }
 
     @Override

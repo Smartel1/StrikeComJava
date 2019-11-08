@@ -4,9 +4,11 @@ public class DashboardDTO {
     private Long nonpublishedEventsCount;
     private Long nonpublishedNewsCount;
 
-    public DashboardDTO(Long nonpublishedEventsCount, Long nonpublishedNewsCount) {
-        this.nonpublishedEventsCount = nonpublishedEventsCount;
-        this.nonpublishedNewsCount = nonpublishedNewsCount;
+    public static DashboardDTO of(Long nonpublishedEventsCount, Long nonpublishedNewsCount) {
+        DashboardDTO instance = new DashboardDTO();
+        instance.setNonpublishedEventsCount(nonpublishedEventsCount);
+        instance.setNonpublishedNewsCount(nonpublishedNewsCount);
+        return instance;
     }
 
     public Long getNonpublishedEventsCount() {

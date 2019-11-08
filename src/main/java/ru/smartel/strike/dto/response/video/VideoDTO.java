@@ -8,10 +8,12 @@ public class VideoDTO {
     private String previewUrl;
     private int videoTypeId;
 
-    public VideoDTO(Video video) {
-        url = video.getUrl();
-        previewUrl = video.getPreviewUrl();
-        videoTypeId = video.getVideoType().getId();
+    public static VideoDTO from(Video video) {
+        VideoDTO instance = new VideoDTO();
+        instance.setUrl(video.getUrl());
+        instance.setPreviewUrl(video.getPreviewUrl());
+        instance.setVideoTypeId(video.getVideoType().getId());
+        return instance;
     }
 
     public String getUrl() {

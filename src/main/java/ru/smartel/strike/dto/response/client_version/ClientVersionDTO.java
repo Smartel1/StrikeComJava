@@ -9,17 +9,19 @@ public class ClientVersionDTO extends ExtendableDTO {
     private String version;
     private boolean isRequired;
 
-    public ClientVersionDTO(ClientVersion clientVersion, Locale locale) {
-        this.id = clientVersion.getId();
-        this.version = clientVersion.getVersion();
-        this.isRequired = clientVersion.isRequired();
+    public static ClientVersionDTO of(ClientVersion clientVersion, Locale locale) {
+        ClientVersionDTO instance = new ClientVersionDTO();
+        instance.setId(clientVersion.getId());
+        instance.setVersion(clientVersion.getVersion());
+        instance.setRequired(clientVersion.isRequired());
         if (locale == Locale.ALL) {
-            add("description_ru", clientVersion.getDescriptionRu());
-            add("description_en", clientVersion.getDescriptionEn());
-            add("description_es", clientVersion.getDescriptionEs());
+            instance.add("description_ru", clientVersion.getDescriptionRu());
+            instance.add("description_en", clientVersion.getDescriptionEn());
+            instance.add("description_es", clientVersion.getDescriptionEs());
         } else {
-            add("description", clientVersion.getDescriptionByLocale(locale));
+            instance.add("description", clientVersion.getDescriptionByLocale(locale));
         }
+        return instance;
     }
 
     public int getId() {

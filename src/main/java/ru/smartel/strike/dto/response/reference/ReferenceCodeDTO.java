@@ -7,9 +7,11 @@ public class ReferenceCodeDTO {
     private int id;
     private String code;
 
-    public ReferenceCodeDTO(ReferenceWithCode entity) {
-        this.id = entity.getId();
-        this.code = entity.getCode();
+    public static ReferenceCodeDTO from(ReferenceWithCode entity) {
+        ReferenceCodeDTO instance = new ReferenceCodeDTO();
+        instance.setId(entity.getId());
+        instance.setCode(entity.getCode());
+        return instance;
     }
 
     public int getId() {

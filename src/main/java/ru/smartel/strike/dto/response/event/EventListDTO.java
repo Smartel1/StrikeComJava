@@ -14,14 +14,16 @@ public class EventListDTO extends PostListDTO {
     private Integer eventTypeId;
     private ConflictDetailDTO conflict;
 
-    public EventListDTO(Event event, Locale locale) {
-        super(event, locale);
-        latitude = event.getLatitude();
-        longitude = event.getLongitude();
-        conflictId = event.getConflict().getId();
-        eventStatusId = null != event.getStatus() ? event.getStatus().getId() : null;
-        eventTypeId = null != event.getType() ? event.getType().getId() : null;
-        conflict = new ConflictDetailDTO(event.getConflict(), locale);
+    public static EventListDTO of(Event event, Locale locale) {
+        EventListDTO instance = new EventListDTO();
+        instance.setCommonFieldsOf(event, locale);
+        instance.setLatitude(event.getLatitude());
+        instance.setLongitude(event.getLongitude());
+        instance.setConflictId(event.getConflict().getId());
+        instance.setEventStatusId(null != event.getStatus() ? event.getStatus().getId() : null);
+        instance.setEventTypeId(null != event.getType() ? event.getType().getId() : null);
+        instance.setConflict(ConflictDetailDTO.of(event.getConflict(), locale));
+        return instance;
     }
 
     public double getLatitude() {

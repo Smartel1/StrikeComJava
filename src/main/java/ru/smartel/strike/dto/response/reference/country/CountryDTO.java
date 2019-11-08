@@ -16,8 +16,10 @@ public class CountryDTO extends NamesExtendableDTO {
         this.id = id;
     }
 
-    public CountryDTO(Country country, Locale locale) {
-        super(country, locale);
-        id = country.getId();
+    public static CountryDTO of(Country country, Locale locale) {
+        CountryDTO instance = new CountryDTO();
+        instance.setNamesOf(country, locale);
+        instance.setId(country.getId());
+        return instance;
     }
 }

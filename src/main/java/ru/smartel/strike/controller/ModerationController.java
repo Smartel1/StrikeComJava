@@ -27,7 +27,7 @@ public class ModerationController {
     @GetMapping("dashboard")
     public DashboardDTO dashboard(
     ) {
-        return new DashboardDTO(
+        return DashboardDTO.of(
                 eventService.getNonPublishedCount(),
                 newsService.getNonPublishedCount()
         );

@@ -8,7 +8,7 @@ import ru.smartel.strike.service.Locale;
  */
 public abstract class TitlesExtendableDTO extends ExtendableDTO {
 
-    public TitlesExtendableDTO(Titles entity, Locale locale) {
+    public void setTitlesOf(Titles entity, Locale locale) {
         if (locale == Locale.ALL) {
             add("title_ru", entity.getTitleRu());
             add("title_en", entity.getTitleEn());

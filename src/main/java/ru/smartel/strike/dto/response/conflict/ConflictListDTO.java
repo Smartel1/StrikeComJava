@@ -8,20 +8,22 @@ import java.time.ZoneOffset;
 
 public class ConflictListDTO extends TitlesExtendableDTO {
 
-    public ConflictListDTO(Conflict conflict, Locale locale, boolean brief) {
-        super(conflict, locale);
-        id = conflict.getId();
+    public static ConflictListDTO of(Conflict conflict, Locale locale, boolean brief) {
+        ConflictListDTO instance = new ConflictListDTO();
+        instance.setTitlesOf(conflict, locale);
+        instance.setId(conflict.getId());
         if (!brief) {
-            add("latitude", conflict.getLatitude());
-            add("longitude", conflict.getLongitude());
-            add("companyName", conflict.getCompanyName());
-            add("dateFrom", null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
-            add("dateTo", null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
-            add("conflictReasonId", null != conflict.getReason() ? conflict.getReason().getId() : null);
-            add("conflictResultId", null != conflict.getResult() ? conflict.getResult().getId() : null);
-            add("industryId", null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
-            add("parentEventId", null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
+            instance.add("latitude", conflict.getLatitude());
+            instance.add("longitude", conflict.getLongitude());
+            instance.add("companyName", conflict.getCompanyName());
+            instance.add("dateFrom", null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
+            instance.add("dateTo", null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
+            instance.add("conflictReasonId", null != conflict.getReason() ? conflict.getReason().getId() : null);
+            instance.add("conflictResultId", null != conflict.getResult() ? conflict.getResult().getId() : null);
+            instance.add("industryId", null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
+            instance.add("parentEventId", null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
         }
+        return instance;
     }
 
     private int id;

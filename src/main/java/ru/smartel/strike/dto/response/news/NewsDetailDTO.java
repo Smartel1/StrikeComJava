@@ -6,7 +6,9 @@ import ru.smartel.strike.service.Locale;
 
 public class NewsDetailDTO extends PostDetailDTO {
 
-    public NewsDetailDTO(News news, Locale locale) {
-        super(news, locale);
+    public static NewsDetailDTO of(News news, Locale locale) {
+        NewsDetailDTO instance = new NewsDetailDTO();
+        instance.setCommonFieldsOf(news, locale);
+        return instance;
     }
 }

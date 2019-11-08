@@ -9,17 +9,19 @@ public class LocalityDetailDTO extends ExtendableDTO {
     private String name;
     private String region;
 
-    public LocalityDetailDTO(Locality locality, Locale locale) {
-        id = locality.getId();
-        name = locality.getName();
-        region = locality.getRegion().getName();
+    public static LocalityDetailDTO of(Locality locality, Locale locale) {
+        LocalityDetailDTO instance = new LocalityDetailDTO();
+        instance.setId(locality.getId());
+        instance.setName(locality.getName());
+        instance.setRegion(locality.getRegion().getName());
         if (locale.equals(Locale.ALL)) {
-            add("country_ru", locality.getRegion().getCountry().getNameRu());
-            add("country_en", locality.getRegion().getCountry().getNameEn());
-            add("country_es", locality.getRegion().getCountry().getNameEs());
+            instance.add("country_ru", locality.getRegion().getCountry().getNameRu());
+            instance.add("country_en", locality.getRegion().getCountry().getNameEn());
+            instance.add("country_es", locality.getRegion().getCountry().getNameEs());
         } else {
-            add("country", locality.getRegion().getCountry().getNameByLocale(locale));
+            instance.add("country", locality.getRegion().getCountry().getNameByLocale(locale));
         }
+        return instance;
     }
 
     public int getId() {

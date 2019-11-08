@@ -84,7 +84,7 @@ public class ConflictServiceImpl implements ConflictService {
 
         List<ConflictListDTO> conflictListDTOS = conflictRepository.findAllById(ids)
                 .stream()
-                .map(e -> new ConflictListDTO(e, dto.getLocale(), dto.isBrief()))
+                .map(conflict -> ConflictListDTO.of(conflict, dto.getLocale(), dto.isBrief()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(conflictListDTOS, responseMeta);
@@ -94,7 +94,7 @@ public class ConflictServiceImpl implements ConflictService {
     @PreAuthorize("permitAll()")
     public ConflictDetailDTO get(Integer conflictId, Locale locale) {
         Conflict conflict = conflictRepository.findOrThrow(conflictId);
-        return new ConflictDetailDTO(conflict, locale);
+        return ConflictDetailDTO.of(conflict, locale);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ConflictServiceImpl implements ConflictService {
 
         conflictRepository.save(conflict);
 
-        return new ConflictDetailDTO(conflict, dto.getLocale());
+        return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
 
     @Override
@@ -119,7 +119,7 @@ public class ConflictServiceImpl implements ConflictService {
         fillConflictFields(conflict, dto, dto.getLocale());
 
         conflictRepository.save(conflict);
-        return new ConflictDetailDTO(conflict, dto.getLocale());
+        return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
 
     @Override
