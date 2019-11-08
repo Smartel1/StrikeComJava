@@ -24,7 +24,6 @@ public class PostDetailDTO extends TitlesContentExtendableDTO {
     private List<VideoDTO> videos;
     private List<String> tags;
     private UserDTO author;
-    private int commentsCount;
 
     public PostDetailDTO(PostEntity post, Locale locale) {
         super(post, locale);
@@ -37,7 +36,6 @@ public class PostDetailDTO extends TitlesContentExtendableDTO {
         videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
         tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
         author = Optional.ofNullable(post.getAuthor()).map(UserDTO::new).orElse(null);
-        commentsCount = post.getComments().size();
     }
 
     public int getId() {
@@ -110,13 +108,5 @@ public class PostDetailDTO extends TitlesContentExtendableDTO {
 
     public void setAuthor(UserDTO author) {
         this.author = author;
-    }
-
-    public int getCommentsCount() {
-        return commentsCount;
-    }
-
-    public void setCommentsCount(int commentsCount) {
-        this.commentsCount = commentsCount;
     }
 }

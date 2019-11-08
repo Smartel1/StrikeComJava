@@ -5,7 +5,7 @@ import ru.smartel.strike.entity.User;
 
 import java.time.LocalDateTime;
 
-public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, HasTags, HasComments {
+public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, HasTags {
 
     Post getPost();
 

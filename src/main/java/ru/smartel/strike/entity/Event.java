@@ -5,7 +5,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.AccessType;
-import ru.smartel.strike.entity.interfaces.HasComments;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
@@ -19,7 +18,7 @@ import java.util.Set;
 
 @Entity(name = "Event")
 @Table(name = "events")
-public class Event implements HasComments, PostEntity {
+public class Event implements PostEntity {
 
     @Embedded
     private Post post = new Post();
@@ -85,13 +84,6 @@ public class Event implements HasComments, PostEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_type_id")
     private EventType type;
-
-    @ManyToMany(cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "comment_event",
-            inverseJoinColumns = {@JoinColumn(name = "comment_id")},
-            joinColumns = {@JoinColumn(name = "event_id")}
-    )
-    private Set<Comment> comments = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locality_id")
@@ -195,16 +187,6 @@ public class Event implements HasComments, PostEntity {
 
     public void setType(EventType type) {
         this.type = type;
-    }
-
-    @Override
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 
     public Locality getLocality() {

@@ -5,7 +5,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.AccessType;
-import ru.smartel.strike.entity.interfaces.HasComments;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 
 import javax.persistence.CascadeType;
@@ -25,7 +24,7 @@ import java.util.Set;
 
 @Entity(name = "News")
 @Table(name = "news")
-public class News implements HasComments, PostEntity {
+public class News implements PostEntity {
 
     @Embedded
     private Post post = new Post();
@@ -70,13 +69,6 @@ public class News implements HasComments, PostEntity {
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Tag> tags = new HashSet<>();
-
-    @ManyToMany(cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "comment_news",
-            inverseJoinColumns = {@JoinColumn(name = "comment_id")},
-            joinColumns = {@JoinColumn(name = "news_id")}
-    )
-    private Set<Comment> comments = new HashSet<>();
 
     @Override
     public Post getPost() {
@@ -136,15 +128,5 @@ public class News implements HasComments, PostEntity {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
-    }
-
-    @Override
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
     }
 }

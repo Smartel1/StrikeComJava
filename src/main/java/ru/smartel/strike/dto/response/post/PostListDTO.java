@@ -20,7 +20,6 @@ public class PostListDTO extends TitlesContentExtendableDTO {
     private List<String> photos;
     private List<VideoDTO> videos;
     private List<String> tags;
-    private int commentsCount;
 
     public PostListDTO(PostEntity post, Locale locale) {
         super(post, locale);
@@ -31,7 +30,6 @@ public class PostListDTO extends TitlesContentExtendableDTO {
         photos = post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
         videos = post.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
         tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
-        commentsCount = post.getComments().size();
     }
 
     public int getId() {
@@ -88,13 +86,5 @@ public class PostListDTO extends TitlesContentExtendableDTO {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
-    }
-
-    public int getCommentsCount() {
-        return commentsCount;
-    }
-
-    public void setCommentsCount(int commentsCount) {
-        this.commentsCount = commentsCount;
     }
 }

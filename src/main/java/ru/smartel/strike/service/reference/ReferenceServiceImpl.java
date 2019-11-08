@@ -12,7 +12,6 @@ import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
 import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
-import ru.smartel.strike.repository.comment.ClaimTypeRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
 import ru.smartel.strike.service.Locale;
 
@@ -30,7 +29,6 @@ public class ReferenceServiceImpl implements ReferenceService {
     private ConflictReasonRepository conflictReasonRepository;
     private ConflictResultRepository conflictResultRepository;
     private EventStatusRepository eventStatusRepository;
-    private ClaimTypeRepository claimTypeRepository;
     private EventTypeRepository eventTypeRepository;
     private IndustryRepository industryRepository;
     private VideoTypeRepository videoTypeRepository;
@@ -38,14 +36,12 @@ public class ReferenceServiceImpl implements ReferenceService {
     public ReferenceServiceImpl(ConflictReasonRepository conflictReasonRepository,
                                 ConflictResultRepository conflictResultRepository,
                                 EventStatusRepository eventStatusRepository,
-                                ClaimTypeRepository claimTypeRepository,
                                 EventTypeRepository eventTypeRepository,
                                 IndustryRepository industryRepository,
                                 VideoTypeRepository videoTypeRepository) {
         this.conflictReasonRepository = conflictReasonRepository;
         this.conflictResultRepository = conflictResultRepository;
         this.eventStatusRepository = eventStatusRepository;
-        this.claimTypeRepository = claimTypeRepository;
         this.eventTypeRepository = eventTypeRepository;
         this.industryRepository = industryRepository;
         this.videoTypeRepository = videoTypeRepository;
@@ -59,7 +55,6 @@ public class ReferenceServiceImpl implements ReferenceService {
         result.put("conflictReasons", mapReferencesWithNamesToDTOs(conflictReasonRepository.findAll(), locale));
         result.put("conflictResults", mapReferencesWithNamesToDTOs(conflictResultRepository.findAll(), locale));
         result.put("eventStatuses", mapReferencesWithNamesToDTOs(eventStatusRepository.findAll(), locale));
-        result.put("claimTypes", mapReferencesWithNamesToDTOs(claimTypeRepository.findAll(), locale));
         result.put("eventTypes", mapReferencesWithNamesToDTOs(eventTypeRepository.findAll(), locale));
         result.put("industries", mapReferencesWithNamesToDTOs(industryRepository.findAll(), locale));
 
@@ -76,7 +71,6 @@ public class ReferenceServiceImpl implements ReferenceService {
                 conflictReasonRepository,
                 conflictResultRepository,
                 eventStatusRepository,
-                claimTypeRepository,
                 eventTypeRepository,
                 industryRepository,
                 videoTypeRepository
