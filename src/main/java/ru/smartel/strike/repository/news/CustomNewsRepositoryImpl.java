@@ -36,7 +36,7 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 
         return entityManager.createQuery(idQuery)
-                .setMaxResults(dto.getPage())
+                .setMaxResults(dto.getPerPage())
                 .setFirstResult((dto.getPage() - 1) * dto.getPerPage())
                 .getResultList();
     }
