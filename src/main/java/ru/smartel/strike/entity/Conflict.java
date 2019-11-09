@@ -28,7 +28,7 @@ public class Conflict implements Titles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private int id;
+    private long id;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -94,7 +94,7 @@ public class Conflict implements Titles {
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

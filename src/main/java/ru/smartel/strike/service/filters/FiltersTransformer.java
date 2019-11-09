@@ -9,7 +9,7 @@ import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 
 public interface FiltersTransformer {
-    Specification<Event> toSpecification(EventFiltersDTO filters, Integer userId);
-    Specification<News> toSpecification(NewsFiltersDTO filters, Integer userId);
-    Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Integer userId);
+    Specification<Event> toSpecification(EventFiltersDTO filters, Long userId);
+    Specification<News> toSpecification(NewsFiltersDTO filters, Long userId);
+    Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Long userId);
 }

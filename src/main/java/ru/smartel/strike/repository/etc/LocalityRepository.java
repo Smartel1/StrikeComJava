@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.Locality;
 
 @Repository
-public interface LocalityRepository extends JpaRepository<Locality, Integer>, JpaSpecificationExecutor<Locality> {
+public interface LocalityRepository extends JpaRepository<Locality, Long>, JpaSpecificationExecutor<Locality> {
 }

@@ -19,16 +19,9 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
     EntityManager entityManager;
 
     @Override
-    public News findOrThrow(int id) throws EntityNotFoundException {
-        return Optional.ofNullable(entityManager.find(News.class, id)).orElseThrow(
-                () -> new EntityNotFoundException("Новость не найдена")
-        );
-    }
-
-    @Override
-    public List<Integer> findIdsOrderByDateDesc(Specification<News> specification, BaseListRequestDTO dto) {
+    public List<Long> findIdsOrderByDateDesc(Specification<News> specification, BaseListRequestDTO dto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
+        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<News> root = idQuery.from(News.class);
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("post").get("date")));

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.Country;
 
 @Repository
-public interface CountryRepository extends JpaRepository<Country, Integer>, JpaSpecificationExecutor<Country> {
+public interface CountryRepository extends JpaRepository<Country, Long>, JpaSpecificationExecutor<Country> {
 }

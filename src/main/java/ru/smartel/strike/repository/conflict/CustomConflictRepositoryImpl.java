@@ -18,24 +18,17 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
     EntityManager entityManager;
 
     @Override
-    public Conflict findOrThrow(int id) throws EntityNotFoundException {
-        Conflict conflict = entityManager.find(Conflict.class, id);
-        if (null == conflict) throw new EntityNotFoundException("Конфликт не найден");
-        return conflict;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
-    public List<Integer> findAllByIdGetParentEventId(List<Integer> ids) {
+    public List<Long> findAllByIdGetParentEventId(List<Long> ids) {
         return entityManager.createQuery("select parentEvent.id from Conflict where id in :ids")
                 .setParameter("ids", ids)
                 .getResultList();
     }
 
     @Override
-    public List<Integer> findIds(Specification<Conflict> specification, Integer page, Integer perPage) {
+    public List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
+        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<Conflict> root = idQuery.from(Conflict.class);
         idQuery.select(root.get("id"));
 

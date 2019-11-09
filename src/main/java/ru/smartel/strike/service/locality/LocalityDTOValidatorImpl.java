@@ -1,19 +1,22 @@
 package ru.smartel.strike.service.locality;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.locality.LocalityCreateRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.*;
+import static ru.smartel.strike.util.ValidationUtil.Min;
+import static ru.smartel.strike.util.ValidationUtil.NotNull;
+import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
+import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
-@Service
+@Component
 public class LocalityDTOValidatorImpl implements LocalityDTOValidator {
     @Override
-    public void validateCreateDTO(LocalityCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateCreateDTO(LocalityCreateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getName()) {
             addErrorMessage("name", new NotNull(), errors);
@@ -22,15 +25,13 @@ public class LocalityDTOValidatorImpl implements LocalityDTOValidator {
         }
 
         if (null == dto.getRegionId()) {
-            addErrorMessage("region_id", new NotNull(), errors);
+            addErrorMessage("regionId", new NotNull(), errors);
         }
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
         }
 
-        if (!errors.isEmpty()) {
-            throw new DTOValidationException("validation errors", errors);
-        }
+        throwIfErrorsExist(errors);
     }
 }

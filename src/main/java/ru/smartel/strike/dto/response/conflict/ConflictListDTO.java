@@ -8,6 +8,16 @@ import java.time.ZoneOffset;
 
 public class ConflictListDTO extends TitlesExtendableDTO {
 
+    private long id;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public static ConflictListDTO of(Conflict conflict, Locale locale, boolean brief) {
         ConflictListDTO instance = new ConflictListDTO();
         instance.setTitlesOf(conflict, locale);
@@ -24,15 +34,5 @@ public class ConflictListDTO extends TitlesExtendableDTO {
             instance.add("parentEventId", null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
         }
         return instance;
-    }
-
-    private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

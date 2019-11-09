@@ -1,19 +1,27 @@
 package ru.smartel.strike.util;
 
-import ru.smartel.strike.exception.DTOValidationException;
+import ru.smartel.strike.exception.ValidationException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class ValidationUtil {
 
-    public static void addErrorMessage(String field, ErrorMessage errorType, Map<String, String> errorsCollection) {
-        errorsCollection.computeIfPresent(field, (key, oldValue) -> oldValue + ", " + errorType.toString());
-        errorsCollection.putIfAbsent(field, errorType.toString());
+    //no need to instantiate this util class
+    private ValidationUtil() {}
+
+    public static void addErrorMessage(String field, ErrorMessage errorType, Map<String, List<String>> errorsCollection) {
+        if (errorsCollection.containsKey(field)) {
+            errorsCollection.get(field).add(errorType.toString());
+        } else {
+            errorsCollection.put(field, Arrays.asList(errorType.toString()));
+        }
     }
 
-    public static void throwIfErrorsExist(Map<String, String> errorsCollection) throws DTOValidationException {
+    public static void throwIfErrorsExist(Map<String, List<String>> errorsCollection) throws ValidationException {
         if (!errorsCollection.isEmpty()) {
-            throw new DTOValidationException("validation errors", errorsCollection);
+            throw new ValidationException(errorsCollection);
         }
     }
 

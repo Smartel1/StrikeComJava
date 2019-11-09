@@ -5,28 +5,29 @@ import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static ru.smartel.strike.util.ValidationUtil.*;
 
 public class BasePostDTOValidator {
 
-    protected Map<String, String> validateListQueryDTO(BaseListRequestDTO dto) {
-        Map<String, String> errors = new HashMap<>();
+    protected Map<String, List<String>> validateListQueryDTO(BaseListRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (dto.getPage() < 1) {
             addErrorMessage("page", new Min(1), errors);
         }
 
         if (dto.getPerPage() < 1) {
-            addErrorMessage("per_page", new Min(1), errors);
+            addErrorMessage("perPage", new Min(1), errors);
         }
 
         return errors;
     }
 
-    protected Map<String, String> validateStoreDTO(PostRequestDTO dto) {
-        Map<String, String> errors = new HashMap<>();
+    protected Map<String, List<String>> validateStoreDTO(PostRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getDate()) {
             addErrorMessage("date", new Required(), errors);
@@ -39,8 +40,8 @@ public class BasePostDTOValidator {
         return errors;
     }
 
-    protected Map<String, String> validateUpdateDTO(PostRequestDTO dto) {
-        Map<String, String> errors = new HashMap<>();
+    protected Map<String, List<String>> validateUpdateDTO(PostRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null != dto.getDate() && dto.getDate().isEmpty()) {
             addErrorMessage("date", new NotNull(), errors);
@@ -54,7 +55,7 @@ public class BasePostDTOValidator {
     /**
      * Validate fields whose checks are similar on update and create actions
      */
-    private void validateCommon(PostRequestDTO dto, Map<String, String> errors) {
+    private void validateCommon(PostRequestDTO dto, Map<String, List<String>> errors) {
 
         if (null != dto.getPublished() && dto.getPublished().isEmpty()) {
             addErrorMessage("published", new NotNull(), errors);
@@ -68,25 +69,25 @@ public class BasePostDTOValidator {
 
         if (null != dto.getTitleRu()) {
             dto.getTitleRu().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_ru", new Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleRu", new Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEn()) {
             dto.getTitleEn().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_en", new Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEn", new Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEs()) {
             dto.getTitleEs().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_es", new Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEs", new Max(255), errors);
             });
         }
 
         if (null != dto.getSourceLink()) {
             dto.getSourceLink().ifPresent(link -> {
-                if (link.length() > 255) addErrorMessage("source_link", new Max(255), errors);
+                if (link.length() > 255) addErrorMessage("sourceLink", new Max(255), errors);
             });
         }
 
@@ -98,19 +99,19 @@ public class BasePostDTOValidator {
 
         if (null != dto.getContentRu()) {
             dto.getContentRu().ifPresent(content -> {
-                if (content.length() < 3) addErrorMessage("content_ru", new Min(3), errors);
+                if (content.length() < 3) addErrorMessage("contentRu", new Min(3), errors);
             });
         }
 
         if (null != dto.getContentEn()) {
             dto.getContentEn().ifPresent(content -> {
-                if (content.length() < 3) addErrorMessage("content_en", new Min(3), errors);
+                if (content.length() < 3) addErrorMessage("contentEn", new Min(3), errors);
             });
         }
 
         if (null != dto.getContentEs()) {
             dto.getContentEs().ifPresent(content -> {
-                if (content.length() < 3) addErrorMessage("content_es", new Min(3), errors);
+                if (content.length() < 3) addErrorMessage("contentEs", new Min(3), errors);
             });
         }
 
@@ -118,7 +119,7 @@ public class BasePostDTOValidator {
             dto.getPhotoUrls().ifPresent((photoUrls) -> {
                     int i = 0;
                     for (String photoUrl : photoUrls) {
-                        if (photoUrl.length() > 500) addErrorMessage("photo_urls[" + i + "]", new Max(500), errors);
+                        if (photoUrl.length() > 500) addErrorMessage("photoUrls[" + i + "]", new Max(500), errors);
                         i++;
                     }
                 }
@@ -149,12 +150,12 @@ public class BasePostDTOValidator {
 
                             if (video.getPreviewUrl().isPresent()) {
                                 if (video.getPreviewUrl().get().length() > 500) {
-                                    addErrorMessage("videos[" + i + "].preview_url", new Max(500), errors);
+                                    addErrorMessage("videos[" + i + "].previewUrl", new Max(500), errors);
                                 }
                             }
 
                             if (null == video.getVideoTypeId()) {
-                                addErrorMessage("videos[" + i + "].video_type_id", new NotNull(), errors);
+                                addErrorMessage("videos[" + i + "].videoTypeId", new NotNull(), errors);
                             }
 
                             i++;

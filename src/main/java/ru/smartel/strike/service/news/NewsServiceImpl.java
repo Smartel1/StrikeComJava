@@ -4,23 +4,25 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
-import ru.smartel.strike.entity.*;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
+import ru.smartel.strike.entity.News;
+import ru.smartel.strike.entity.Photo;
+import ru.smartel.strike.entity.Tag;
+import ru.smartel.strike.entity.User;
+import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.repository.etc.PhotoRepository;
 import ru.smartel.strike.repository.etc.TagRepository;
 import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.repository.etc.VideoRepository;
-import ru.smartel.strike.repository.news.NewsRepository;
 import ru.smartel.strike.repository.etc.VideoTypeRepository;
+import ru.smartel.strike.repository.news.NewsRepository;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -33,7 +35,11 @@ import ru.smartel.strike.specification.news.PublishedNews;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -82,7 +88,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto) throws DTOValidationException {
+    public ListWrapperDTO<NewsListDTO> list(NewsListRequestDTO dto) {
         validator.validateListQueryDTO(dto);
 
         //Transform filters and other restrictions to Specifications
@@ -105,7 +111,7 @@ public class NewsServiceImpl implements NewsService {
         }
 
         //Get count of news matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
+        List<Long> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
                 .map(e -> NewsListDTO.of(e, dto.getLocale()))
@@ -118,7 +124,8 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @PreAuthorize("permitAll()")
     public NewsDetailDTO incrementViewsAndGet(NewsShowDetailRequestDTO dto) {
-        News news = newsRepository.findOrThrow(dto.getNewsId());
+        News news = newsRepository.findById(dto.getNewsId())
+                .orElseThrow(() -> new EntityNotFoundException("Новость не найдена"));
 
         news.setViews(news.getViews() + 1);
 
@@ -127,8 +134,10 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public void setFavourite(Integer newsId, int userId, boolean isFavourite) {
-        User user = userRepository.findById(userId).orElseThrow();
+    public void setFavourite(Long newsId, long userId, boolean isFavourite) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
+
         News news = newsRepository.getOne(newsId);
 
         List<News> currentFavourites = user.getFavouriteNews();
@@ -145,10 +154,12 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public NewsDetailDTO create(NewsCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public NewsDetailDTO create(NewsCreateRequestDTO dto) {
         validator.validateStoreDTO(dto);
 
-        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
+
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
 
         //Only moderator can publish news
         businessValidationService.validate(
@@ -186,11 +197,13 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isNewsAuthor(#dto.newsId)")
-    public NewsDetailDTO update(NewsUpdateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public NewsDetailDTO update(NewsUpdateRequestDTO dto) {
         validator.validateUpdateDTO(dto);
 
-        News news = newsRepository.findOrThrow(dto.getNewsId());
-        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
+        News news = newsRepository.findById(dto.getNewsId())
+                .orElseThrow(() -> new EntityNotFoundException("Новость не найдена"));
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
 
         boolean changingPublicationStatus =
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != news.isPublished();
@@ -228,7 +241,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer newsId) {
+    public void delete(Long newsId) {
         News news = newsRepository.findById(newsId).orElseThrow(
                 () -> new EntityNotFoundException("Новость не найдена"));
         newsRepository.delete(news);
@@ -244,21 +257,49 @@ public class NewsServiceImpl implements NewsService {
     }
 
     private void fillNewsFields(News news, NewsCreateRequestDTO dto, Locale locale) {
-        if (null != dto.getDate())
+        //for the sake of PATCH ;)
+        if (null != dto.getDate()) {
             news.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
-        if (null != dto.getSourceLink()) news.setSourceLink(dto.getSourceLink().orElse(null));
-        if (null != dto.getTitleRu()) news.setTitleRu(dto.getTitleRu().orElse(null));
-        if (null != dto.getTitleEn()) news.setTitleEn(dto.getTitleEn().orElse(null));
-        if (null != dto.getTitleEs()) news.setTitleEs(dto.getTitleEs().orElse(null));
-        if (null != dto.getContentRu()) news.setContentRu(dto.getContentRu().orElse(null));
-        if (null != dto.getContentEn()) news.setContentEn(dto.getContentEn().orElse(null));
-        if (null != dto.getContentEs()) news.setContentEs(dto.getContentEs().orElse(null));
-        if (null != dto.getPublished()) news.setPublished(dto.getPublished().orElseThrow());
-        if (null != dto.getTitle()) news.setTitleByLocale(locale, dto.getTitle().orElse(null));
-        if (null != dto.getContent()) news.setContentByLocale(locale, dto.getContent().orElse(null));
-        if (null != dto.getPhotoUrls()) syncPhotos(news, dto.getPhotoUrls().orElseThrow());
-        if (null != dto.getVideos()) syncVideos(news, dto.getVideos().orElseThrow());
-        if (null != dto.getTags()) syncTags(news, dto.getTags().orElseThrow());
+        }
+        if (null != dto.getSourceLink()) {
+            news.setSourceLink(dto.getSourceLink().orElse(null));
+        }
+        if (null != dto.getTitleRu()) {
+            news.setTitleRu(dto.getTitleRu().orElse(null));
+        }
+        if (null != dto.getTitleEn()) {
+            news.setTitleEn(dto.getTitleEn().orElse(null));
+        }
+        if (null != dto.getTitleEs()) {
+            news.setTitleEs(dto.getTitleEs().orElse(null));
+        }
+        if (null != dto.getContentRu()) {
+            news.setContentRu(dto.getContentRu().orElse(null));
+        }
+        if (null != dto.getContentEn()) {
+            news.setContentEn(dto.getContentEn().orElse(null));
+        }
+        if (null != dto.getContentEs()) {
+            news.setContentEs(dto.getContentEs().orElse(null));
+        }
+        if (null != dto.getPublished()) {
+            news.setPublished(dto.getPublished().orElseThrow());
+        }
+        if (null != dto.getTitle()) {
+            news.setTitleByLocale(locale, dto.getTitle().orElse(null));
+        }
+        if (null != dto.getContent()) {
+            news.setContentByLocale(locale, dto.getContent().orElse(null));
+        }
+        if (null != dto.getPhotoUrls()) {
+            syncPhotos(news, dto.getPhotoUrls().orElseThrow());
+        }
+        if (null != dto.getVideos()) {
+            syncVideos(news, dto.getVideos().orElseThrow());
+        }
+        if (null != dto.getTags()) {
+            syncTags(news, dto.getTags().orElseThrow());
+        }
     }
 
     /**

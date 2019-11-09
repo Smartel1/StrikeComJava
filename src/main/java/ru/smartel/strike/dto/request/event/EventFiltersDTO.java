@@ -5,51 +5,51 @@ import ru.smartel.strike.dto.request.post.PostFiltersDTO;
 import java.util.List;
 
 public class EventFiltersDTO extends PostFiltersDTO {
-    private List<Integer> conflictIds;
-    private List<Integer> eventStatusIds;
-    private List<Integer> eventTypeIds;
-    private List<Integer> countryIds;
-    private List<Integer> regionIds;
+    private List<Long> conflictIds;
+    private List<Long> eventStatusIds;
+    private List<Long> eventTypeIds;
+    private List<Long> countryIds;
+    private List<Long> regionIds;
     private String containsContent;
     private SearchArea near;
 
-    public List<Integer> getConflictIds() {
+    public List<Long> getConflictIds() {
         return conflictIds;
     }
 
-    public void setConflictIds(List<Integer> conflictIds) {
+    public void setConflictIds(List<Long> conflictIds) {
         this.conflictIds = conflictIds;
     }
 
-    public List<Integer> getEventStatusIds() {
+    public List<Long> getEventStatusIds() {
         return eventStatusIds;
     }
 
-    public void setEventStatusIds(List<Integer> eventStatusIds) {
+    public void setEventStatusIds(List<Long> eventStatusIds) {
         this.eventStatusIds = eventStatusIds;
     }
 
-    public List<Integer> getEventTypeIds() {
+    public List<Long> getEventTypeIds() {
         return eventTypeIds;
     }
 
-    public void setEventTypeIds(List<Integer> eventTypeIds) {
+    public void setEventTypeIds(List<Long> eventTypeIds) {
         this.eventTypeIds = eventTypeIds;
     }
 
-    public List<Integer> getCountryIds() {
+    public List<Long> getCountryIds() {
         return countryIds;
     }
 
-    public void setCountryIds(List<Integer> countryIds) {
+    public void setCountryIds(List<Long> countryIds) {
         this.countryIds = countryIds;
     }
 
-    public List<Integer> getRegionIds() {
+    public List<Long> getRegionIds() {
         return regionIds;
     }
 
-    public void setRegionIds(List<Integer> regionIds) {
+    public void setRegionIds(List<Long> regionIds) {
         this.regionIds = regionIds;
     }
 

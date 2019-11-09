@@ -13,9 +13,9 @@ import java.util.List;
  * Events from region
  */
 public class RegionEvent implements Specification<Event> {
-    private List<Integer> regionIds;
+    private List<Long> regionIds;
 
-    public RegionEvent(List<Integer> regionIds) {
+    public RegionEvent(List<Long> regionIds) {
         this.regionIds = regionIds;
     }
 

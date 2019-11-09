@@ -10,12 +10,8 @@ import java.util.List;
 
 
 @Repository
-public interface NewsRepository extends
-        CustomNewsRepository,
-        JpaSpecificationExecutor<News>,
-        JpaRepository<News, Integer>
-{
+public interface NewsRepository extends CustomNewsRepository, JpaSpecificationExecutor<News>, JpaRepository<News, Long> {
     @EntityGraph(attributePaths = {"videos", "photos", "tags"})
     @Override
-    List<News> findAllById(Iterable<Integer> ids);
+    List<News> findAllById(Iterable<Long> ids);
 }

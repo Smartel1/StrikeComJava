@@ -1,22 +1,28 @@
 package ru.smartel.strike.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.vladmihalcea.hibernate.type.json.JsonNodeBinaryType;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.AccessType;
 
-import javax.persistence.*;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -33,7 +39,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
-    private int id;
+    private long id;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -50,7 +56,7 @@ public class User {
     private String name;
 
     @Column
-    private String fcm;
+    private String fcm; //FCM registration token (firebase cloud messaging)
 
     @Column(name = "image_url", length = 500)
     private String imageUrl;
@@ -95,11 +101,11 @@ public class User {
         );
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

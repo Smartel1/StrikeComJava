@@ -1,6 +1,7 @@
 package ru.smartel.strike.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.smartel.strike.util.PaginationUtil;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class ListWrapperDTO <T> {
             this.total = total;
             this.currentPage = currentPage;
             this.perPage = perPage;
-            this.lastPage = (long) Math.ceil((double) total / (double) perPage);
+            this.lastPage = PaginationUtil.calculateLastPage(total, perPage);
         }
 
         public Long getTotal() {

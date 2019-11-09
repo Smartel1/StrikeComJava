@@ -7,11 +7,11 @@ import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDT
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
 import ru.smartel.strike.entity.ClientVersion;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
+import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.repository.client_version.ClientVersionRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,11 +28,12 @@ public class ClientVersionServiceImpl implements ClientVersionService {
     }
 
     @Override
-    public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
         ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
-                .orElseThrow(() -> new BusinessRuleValidationException("Нет такой версии"));
+                .orElseThrow(() -> new ValidationException(
+                        Collections.singletonMap("error", Collections.singletonList("Нет такой версии"))));
 
         List<ClientVersionDTO> newVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
                         currentVersion.getId(), dto.getClientId()
@@ -49,13 +50,14 @@ public class ClientVersionServiceImpl implements ClientVersionService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ClientVersionDTO create(ClientVersionCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public ClientVersionDTO create(ClientVersionCreateRequestDTO dto) {
         clientVersionDTOValidator.validateStoreDTO(dto);
 
         Optional<ClientVersion> sameVersion = clientVersionRepository.getByVersionAndClientId(dto.getVersion(), dto.getClientId());
 
         if (sameVersion.isPresent()) {
-            throw new BusinessRuleValidationException("Такая версия уже существует");
+            throw new ValidationException(
+                    Collections.singletonMap("error", Collections.singletonList("Такая версия уже существует")));
         }
 
         ClientVersion version = new ClientVersion();
@@ -73,7 +75,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(int clientVersionId) {
+    public void delete(long clientVersionId) {
         ClientVersion clientVersion = clientVersionRepository.findById(clientVersionId).orElseThrow(
                 () -> new EntityNotFoundException("Версия клиента не найдена"));
 

@@ -10,12 +10,9 @@ import java.util.List;
 
 
 @Repository
-public interface EventRepository extends
-        CustomEventRepository,
-        JpaSpecificationExecutor<Event>,
-        JpaRepository<Event, Integer>
-{
+public interface EventRepository extends CustomEventRepository, JpaSpecificationExecutor<Event>,
+        JpaRepository<Event, Long> {
     @EntityGraph(attributePaths = {"videos", "photos", "tags", "conflict"})
     @Override
-    List<Event> findAllById(Iterable<Integer> ids);
+    List<Event> findAllById(Iterable<Long> ids);
 }

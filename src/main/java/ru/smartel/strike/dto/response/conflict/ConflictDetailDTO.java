@@ -8,16 +8,16 @@ import java.time.ZoneOffset;
 
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
-    private int id;
+    private long id;
     private double latitude;
     private double longitude;
     private String companyName;
     private Long dateFrom;
     private Long dateTo;
-    private Integer conflictReasonId;
-    private Integer conflictResultId;
-    private Integer industryId;
-    private Integer parentEventId;
+    private Long conflictReasonId;
+    private Long conflictResultId;
+    private Long industryId;
+    private Long parentEventId;
 
     public static ConflictDetailDTO of(Conflict conflict, Locale locale) {
         ConflictDetailDTO instance = new ConflictDetailDTO();
@@ -35,11 +35,11 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -83,35 +83,35 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         this.dateTo = dateTo;
     }
 
-    public Integer getConflictReasonId() {
+    public Long getConflictReasonId() {
         return conflictReasonId;
     }
 
-    public void setConflictReasonId(Integer conflictReasonId) {
+    public void setConflictReasonId(Long conflictReasonId) {
         this.conflictReasonId = conflictReasonId;
     }
 
-    public Integer getConflictResultId() {
+    public Long getConflictResultId() {
         return conflictResultId;
     }
 
-    public void setConflictResultId(Integer conflictResultId) {
+    public void setConflictResultId(Long conflictResultId) {
         this.conflictResultId = conflictResultId;
     }
 
-    public Integer getIndustryId() {
+    public Long getIndustryId() {
         return industryId;
     }
 
-    public void setIndustryId(Integer industryId) {
+    public void setIndustryId(Long industryId) {
         this.industryId = industryId;
     }
 
-    public Integer getParentEventId() {
+    public Long getParentEventId() {
         return parentEventId;
     }
 
-    public void setParentEventId(Integer parentEventId) {
+    public void setParentEventId(Long parentEventId) {
         this.parentEventId = parentEventId;
     }
 }

@@ -5,13 +5,13 @@ package ru.smartel.strike.dto.request.news;
  * dto for updating news
  */
 public class NewsUpdateRequestDTO extends NewsCreateRequestDTO {
-    private Integer newsId;
+    private Long newsId;
 
-    public Integer getNewsId() {
+    public Long getNewsId() {
         return newsId;
     }
 
-    public void setNewsId(Integer newsId) {
+    public void setNewsId(Long newsId) {
         this.newsId = newsId;
     }
 }

@@ -7,7 +7,6 @@ import ru.smartel.strike.dto.request.locality.LocalityCreateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.locality.LocalityDetailDTO;
 import ru.smartel.strike.entity.reference.Locality;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.etc.LocalityRepository;
 import ru.smartel.strike.repository.etc.RegionRepository;
 import ru.smartel.strike.service.Locale;
@@ -49,7 +48,7 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public LocalityDetailDTO create(LocalityCreateRequestDTO dto) throws DTOValidationException {
+    public LocalityDetailDTO create(LocalityCreateRequestDTO dto) {
         validator.validateCreateDTO(dto);
 
         Locality locality = new Locality();

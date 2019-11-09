@@ -16,12 +16,12 @@ public class EventCreateRequestDTO extends PostRequestDTO {
     private Locale locale;
     @JsonIgnore
     private User user;
-    private Optional<Integer> conflictId;
+    private Optional<Long> conflictId;
     private Optional<Float> latitude;
     private Optional<Float> longitude;
-    private Optional<Integer> localityId;
-    private Optional<Integer> eventStatusId;
-    private Optional<Integer> eventTypeId;
+    private Optional<Long> localityId;
+    private Optional<Long> eventStatusId;
+    private Optional<Long> eventTypeId;
 
     public Locale getLocale() {
         return locale;
@@ -39,11 +39,11 @@ public class EventCreateRequestDTO extends PostRequestDTO {
         this.user = user;
     }
 
-    public Optional<Integer> getConflictId() {
+    public Optional<Long> getConflictId() {
         return conflictId;
     }
 
-    public void setConflictId(Optional<Integer> conflictId) {
+    public void setConflictId(Optional<Long> conflictId) {
         this.conflictId = conflictId;
     }
 
@@ -63,27 +63,27 @@ public class EventCreateRequestDTO extends PostRequestDTO {
         this.longitude = longitude;
     }
 
-    public Optional<Integer> getLocalityId() {
+    public Optional<Long> getLocalityId() {
         return localityId;
     }
 
-    public void setLocalityId(Optional<Integer> localityId) {
+    public void setLocalityId(Optional<Long> localityId) {
         this.localityId = localityId;
     }
 
-    public Optional<Integer> getEventStatusId() {
+    public Optional<Long> getEventStatusId() {
         return eventStatusId;
     }
 
-    public void setEventStatusId(Optional<Integer> eventStatusId) {
+    public void setEventStatusId(Optional<Long> eventStatusId) {
         this.eventStatusId = eventStatusId;
     }
 
-    public Optional<Integer> getEventTypeId() {
+    public Optional<Long> getEventTypeId() {
         return eventTypeId;
     }
 
-    public void setEventTypeId(Optional<Integer> eventTypeId) {
+    public void setEventTypeId(Optional<Long> eventTypeId) {
         this.eventTypeId = eventTypeId;
     }
 }

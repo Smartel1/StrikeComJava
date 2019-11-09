@@ -4,7 +4,7 @@ import ru.smartel.strike.entity.interfaces.ReferenceWithCode;
 
 public class ReferenceCodeDTO {
 
-    private int id;
+    private long id;
     private String code;
 
     public static ReferenceCodeDTO from(ReferenceWithCode entity) {
@@ -14,11 +14,11 @@ public class ReferenceCodeDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

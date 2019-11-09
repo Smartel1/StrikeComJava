@@ -19,32 +19,32 @@ public class PushServiceImpl implements PushService {
     private FirebaseMessaging firebaseMessaging;
 
     @Override
-    public void newsCreatedByUser(Integer newsId, Integer authorId, String authorName) {
+    public void newsCreatedByUser(Long newsId, Long authorId, String authorName) {
 
     }
 
     @Override
-    public void eventCreatedByUser(Integer eventId, Integer authorId, String authorName) {
+    public void eventCreatedByUser(Long eventId, Long authorId, String authorName) {
 
     }
 
     @Override
-    public void newsPublished(Integer newsId, Integer authorId, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void newsPublished(Long newsId, Long authorId, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
 
     }
 
     @Override
-    public void eventPublished(Integer eventId, Integer authorId, Float lng, Float lat, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
 
     }
 
     @Override
-    public void newsDeclined(String authorFCM, Integer newsId, Integer authorId) {
+    public void newsDeclined(String authorFCM, Long newsId, Long authorId) {
 
     }
 
     @Override
-    public void eventDeclined(String authorFCM, Integer eventId, Integer authorId) {
+    public void eventDeclined(String authorFCM, Long eventId, Long authorId) {
 
     }
 }

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.Photo;
 
 @Repository
-public interface PhotoRepository extends JpaRepository<Photo, Integer> {
+public interface PhotoRepository extends JpaRepository<Photo, Long> {
 }

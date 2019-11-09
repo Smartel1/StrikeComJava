@@ -6,15 +6,15 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserUpdateRequestDTO {
-    private Integer userId;
-    private String fcm;
+    private Long userId;
+    private String fcm; //FCM registration token (firebase cloud messaging)
     private List<String> roles;
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

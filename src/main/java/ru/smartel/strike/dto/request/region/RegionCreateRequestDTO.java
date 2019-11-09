@@ -9,7 +9,7 @@ public class RegionCreateRequestDTO {
     @JsonIgnore
     private Locale locale;
     private String name;
-    private Integer countryId;
+    private Long countryId;
 
     public Locale getLocale() {
         return locale;
@@ -27,11 +27,11 @@ public class RegionCreateRequestDTO {
         this.name = name;
     }
 
-    public Integer getCountryId() {
+    public Long getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(Integer countryId) {
+    public void setCountryId(Long countryId) {
         this.countryId = countryId;
     }
 }

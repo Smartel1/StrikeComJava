@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.user.UserUpdateRequestDTO;
 import ru.smartel.strike.dto.response.user.UserDetailDTO;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.etc.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -25,7 +24,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailDTO get(int userId) {
+    public UserDetailDTO get(long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Пользователь не найден")
         );
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #dto.userId and null == #dto.roles")
-    public UserDetailDTO update(UserUpdateRequestDTO dto) throws DTOValidationException {
+    public UserDetailDTO update(UserUpdateRequestDTO dto) {
         validator.validateUpdateDTO(dto);
 
         User user = userRepository.findById(dto.getUserId()).orElseThrow(

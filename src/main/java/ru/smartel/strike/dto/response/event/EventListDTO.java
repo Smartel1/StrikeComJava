@@ -9,9 +9,9 @@ public class EventListDTO extends PostListDTO {
 
     private double latitude;
     private double longitude;
-    private int conflictId;
-    private Integer eventStatusId;
-    private Integer eventTypeId;
+    private long conflictId;
+    private Long eventStatusId;
+    private Long eventTypeId;
     private ConflictDetailDTO conflict;
 
     public static EventListDTO of(Event event, Locale locale) {
@@ -42,27 +42,27 @@ public class EventListDTO extends PostListDTO {
         this.longitude = longitude;
     }
 
-    public int getConflictId() {
+    public long getConflictId() {
         return conflictId;
     }
 
-    public void setConflictId(int conflictId) {
+    public void setConflictId(long conflictId) {
         this.conflictId = conflictId;
     }
 
-    public Integer getEventStatusId() {
+    public Long getEventStatusId() {
         return eventStatusId;
     }
 
-    public void setEventStatusId(Integer eventStatusId) {
+    public void setEventStatusId(Long eventStatusId) {
         this.eventStatusId = eventStatusId;
     }
 
-    public Integer getEventTypeId() {
+    public Long getEventTypeId() {
         return eventTypeId;
     }
 
-    public void setEventTypeId(Integer eventTypeId) {
+    public void setEventTypeId(Long eventTypeId) {
         this.eventTypeId = eventTypeId;
     }
 

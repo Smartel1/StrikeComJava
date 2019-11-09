@@ -4,7 +4,7 @@ import ru.smartel.strike.entity.Tag;
 
 import java.util.Set;
 
-public interface HasTags {
+public interface Taggable {
 
     Set<Tag> getTags();
 

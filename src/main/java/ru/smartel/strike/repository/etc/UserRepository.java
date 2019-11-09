@@ -4,7 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.User;
 
+import java.util.Optional;
+
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
-    User findFirstByUuid(String uuid);
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findFirstByUuid(String uuid);
 }

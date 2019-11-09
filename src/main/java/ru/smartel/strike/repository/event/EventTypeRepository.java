@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.EventType;
 
 @Repository
-public interface EventTypeRepository extends JpaRepository<EventType, Integer> {
+public interface EventTypeRepository extends JpaRepository<EventType, Long> {
 }

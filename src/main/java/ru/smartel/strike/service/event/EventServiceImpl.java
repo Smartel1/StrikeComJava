@@ -4,29 +4,32 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
+import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
-import ru.smartel.strike.dto.response.ListWrapperDTO;
-import ru.smartel.strike.entity.*;
+import ru.smartel.strike.entity.Conflict;
+import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.Photo;
+import ru.smartel.strike.entity.Tag;
+import ru.smartel.strike.entity.User;
+import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
+import ru.smartel.strike.repository.etc.LocalityRepository;
 import ru.smartel.strike.repository.etc.PhotoRepository;
 import ru.smartel.strike.repository.etc.TagRepository;
 import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.repository.etc.VideoRepository;
+import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
-import ru.smartel.strike.repository.etc.LocalityRepository;
-import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
@@ -40,7 +43,11 @@ import ru.smartel.strike.specification.event.PublishedEvent;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -103,7 +110,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto) throws DTOValidationException {
+    public ListWrapperDTO<EventListDTO> list(EventListRequestDTO dto) {
         validator.validateListQueryDTO(dto);
 
         //Transform filters and other restrictions to Specifications
@@ -126,7 +133,7 @@ public class EventServiceImpl implements EventService {
         }
 
         //Get count of events matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
+        List<Long> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
 
         List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
                 .map(e -> EventListDTO.of(e, dto.getLocale()))
@@ -138,8 +145,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public EventDetailDTO incrementViewsAndGet(Integer eventId, Locale locale, boolean withRelatives) {
-        Event event = eventRepository.findOrThrow(eventId);
+    public EventDetailDTO incrementViewsAndGet(Long eventId, Locale locale, boolean withRelatives) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
 
         event.setViews(event.getViews() + 1);
         EventDetailDTO dto = EventDetailDTO.of(event, locale);
@@ -153,8 +161,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public void setFavourite(Integer eventId, int userId, boolean isFavourite) {
-        User user = userRepository.findById(userId).orElseThrow();
+    public void setFavourite(Long eventId, long userId, boolean isFavourite) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
         Event event = eventRepository.getOne(eventId);
 
         List<Event> currentFavourites = user.getFavouriteEvents();
@@ -171,10 +180,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("isFullyAuthenticated()")
-    public EventDetailDTO create(EventCreateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public EventDetailDTO create(EventCreateRequestDTO dto) {
         validator.validateStoreDTO(dto);
 
-        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
 
         //Only moderator can publish events
         businessValidationService.validate(
@@ -216,11 +226,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#dto.eventId)")
-    public EventDetailDTO update(EventUpdateRequestDTO dto) throws BusinessRuleValidationException, DTOValidationException {
+    public EventDetailDTO update(EventUpdateRequestDTO dto) {
         validator.validateUpdateDTO(dto);
 
-        Event event = eventRepository.findOrThrow(dto.getEventId());
-        User user = userRepository.findById(dto.getUser().getId()).orElseThrow();
+        Event event = eventRepository.findById(dto.getEventId())
+                .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
+        User user = userRepository.findById(dto.getUser().getId()).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
 
         boolean changingPublicationStatus =
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != event.isPublished();
@@ -267,7 +279,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer eventId) throws BusinessRuleValidationException {
+    public void delete(Long eventId) {
         businessValidationService.validate(
                 new NotAParentEvent(eventId, eventRepository)
         );
@@ -287,33 +299,73 @@ public class EventServiceImpl implements EventService {
     }
 
     private void fillEventFields(Event event, EventCreateRequestDTO dto, Locale locale) {
-        if (null != dto.getConflictId()) setConflict(event, dto.getConflictId().orElseThrow());
-        if (null != dto.getDate())
+        //for the sake of PATCH ;)
+        if (null != dto.getConflictId()) {
+            setConflict(event, dto.getConflictId().orElseThrow());
+        }
+        if (null != dto.getDate()) {
             event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
-        if (null != dto.getSourceLink()) event.setSourceLink(dto.getSourceLink().orElse(null));
-        if (null != dto.getTitleRu()) event.setTitleRu(dto.getTitleRu().orElse(null));
-        if (null != dto.getTitleEn()) event.setTitleEn(dto.getTitleEn().orElse(null));
-        if (null != dto.getTitleEs()) event.setTitleEs(dto.getTitleEs().orElse(null));
-        if (null != dto.getContentRu()) event.setContentRu(dto.getContentRu().orElse(null));
-        if (null != dto.getContentEn()) event.setContentEn(dto.getContentEn().orElse(null));
-        if (null != dto.getContentEs()) event.setContentEs(dto.getContentEs().orElse(null));
-        if (null != dto.getPublished()) event.setPublished(dto.getPublished().orElseThrow());
-        if (null != dto.getLatitude()) event.setLatitude(dto.getLatitude().orElseThrow());
-        if (null != dto.getLongitude()) event.setLongitude(dto.getLongitude().orElseThrow());
-        if (null != dto.getLocalityId()) setLocality(event, dto.getLocalityId().orElse(null));
-        if (null != dto.getEventStatusId()) setEventStatus(event, dto.getEventStatusId().orElse(null));
-        if (null != dto.getEventTypeId()) setEventType(event, dto.getEventTypeId().orElse(null));
-        if (null != dto.getTitle()) event.setTitleByLocale(locale, dto.getTitle().orElse(null));
-        if (null != dto.getContent()) event.setContentByLocale(locale, dto.getContent().orElse(null));
-        if (null != dto.getPhotoUrls()) syncPhotos(event, dto.getPhotoUrls().orElseThrow());
-        if (null != dto.getVideos()) syncVideos(event, dto.getVideos().orElseThrow());
-        if (null != dto.getTags()) syncTags(event, dto.getTags().orElseThrow());
+        }
+        if (null != dto.getSourceLink()) {
+            event.setSourceLink(dto.getSourceLink().orElse(null));
+        }
+        if (null != dto.getTitleRu()) {
+            event.setTitleRu(dto.getTitleRu().orElse(null));
+        }
+        if (null != dto.getTitleEn()) {
+            event.setTitleEn(dto.getTitleEn().orElse(null));
+        }
+        if (null != dto.getTitleEs()) {
+            event.setTitleEs(dto.getTitleEs().orElse(null));
+        }
+        if (null != dto.getContentRu()) {
+            event.setContentRu(dto.getContentRu().orElse(null));
+        }
+        if (null != dto.getContentEn()) {
+            event.setContentEn(dto.getContentEn().orElse(null));
+        }
+        if (null != dto.getContentEs()) {
+            event.setContentEs(dto.getContentEs().orElse(null));
+        }
+        if (null != dto.getPublished()) {
+            event.setPublished(dto.getPublished().orElseThrow());
+        }
+        if (null != dto.getLatitude()) {
+            event.setLatitude(dto.getLatitude().orElseThrow());
+        }
+        if (null != dto.getLongitude()) {
+            event.setLongitude(dto.getLongitude().orElseThrow());
+        }
+        if (null != dto.getLocalityId()) {
+            setLocality(event, dto.getLocalityId().orElse(null));
+        }
+        if (null != dto.getEventStatusId()) {
+            setEventStatus(event, dto.getEventStatusId().orElse(null));
+        }
+        if (null != dto.getEventTypeId()) {
+            setEventType(event, dto.getEventTypeId().orElse(null));
+        }
+        if (null != dto.getTitle()) {
+            event.setTitleByLocale(locale, dto.getTitle().orElse(null));
+        }
+        if (null != dto.getContent()) {
+            event.setContentByLocale(locale, dto.getContent().orElse(null));
+        }
+        if (null != dto.getPhotoUrls()) {
+            syncPhotos(event, dto.getPhotoUrls().orElseThrow());
+        }
+        if (null != dto.getVideos()) {
+            syncVideos(event, dto.getVideos().orElseThrow());
+        }
+        if (null != dto.getTags()) {
+            syncTags(event, dto.getTags().orElseThrow());
+        }
     }
 
     /**
      * Set event's conflict
      */
-    private void setConflict(Event event, Integer conflictId) {
+    private void setConflict(Event event, Long conflictId) {
         Conflict conflict = conflictRepository.getOne(conflictId);
         event.setConflict(conflict);
     }
@@ -321,7 +373,7 @@ public class EventServiceImpl implements EventService {
     /**
      * Set locality. If received localityId equals to null, then set to null
      */
-    private void setLocality(Event event, Integer localityId) {
+    private void setLocality(Event event, Long localityId) {
         Locality locality = null;
 
         if (null != localityId) {
@@ -334,7 +386,7 @@ public class EventServiceImpl implements EventService {
     /**
      * Set event's status. If received eventStatusId equals to null, then set to null
      */
-    private void setEventStatus(Event event, Integer eventStatusId) {
+    private void setEventStatus(Event event, Long eventStatusId) {
         EventStatus eventStatus = null;
 
         if (null != eventStatusId) {
@@ -347,7 +399,7 @@ public class EventServiceImpl implements EventService {
     /**
      * Set event's type. If received eventTypeId equals null, then set to null
      */
-    private void setEventType(Event event, Integer eventTypeId) {
+    private void setEventType(Event event, Long eventTypeId) {
         EventType eventType = null;
 
         if (null != eventTypeId) {

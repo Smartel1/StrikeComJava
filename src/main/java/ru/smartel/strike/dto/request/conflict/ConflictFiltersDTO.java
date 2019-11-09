@@ -7,8 +7,8 @@ public class ConflictFiltersDTO {
     private Integer dateTo;
     private List<Integer> conflictResultIds;
     private List<Integer> conflictReasonIds;
-    private Integer ancestorsOf;
-    private Integer childrenOf;
+    private Long ancestorsOf;
+    private Long childrenOf;
     private SearchArea near;
 
     public Integer getDateFrom() {
@@ -43,19 +43,19 @@ public class ConflictFiltersDTO {
         this.conflictReasonIds = conflictReasonIds;
     }
 
-    public Integer getAncestorsOf() {
+    public Long getAncestorsOf() {
         return ancestorsOf;
     }
 
-    public void setAncestorsOf(Integer ancestorsOf) {
+    public void setAncestorsOf(Long ancestorsOf) {
         this.ancestorsOf = ancestorsOf;
     }
 
-    public Integer getChildrenOf() {
+    public Long getChildrenOf() {
         return childrenOf;
     }
 
-    public void setChildrenOf(Integer childrenOf) {
+    public void setChildrenOf(Long childrenOf) {
         this.childrenOf = childrenOf;
     }
 

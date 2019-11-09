@@ -18,7 +18,7 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private int id;
+    private long id;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -38,7 +38,7 @@ public class Photo {
         this.url = url;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface CustomEventRepository {
-    boolean isNotParentForAnyConflicts(int eventId);
-    Event findOrThrow(int id) throws EntityNotFoundException;
-    List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, BaseListRequestDTO dto);
+    boolean isNotParentForAnyConflicts(long eventId);
+    List<Long> findIdsOrderByDateDesc(Specification<Event> specification, BaseListRequestDTO dto);
 }

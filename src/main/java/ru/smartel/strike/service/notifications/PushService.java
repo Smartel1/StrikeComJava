@@ -10,20 +10,20 @@ public interface PushService {
      * News is created by user. Notifies moderators about it
      * todo generify this method and merge with eventCreatedByUser()
      */
-    void newsCreatedByUser(Integer newsId, Integer authorId, String authorName);
+    void newsCreatedByUser(Long newsId, Long authorId, String authorName);
 
     /**
      * Event is created by user. Notifies moderators about it
      */
-    void eventCreatedByUser(Integer eventId, Integer authorId, String authorName);
+    void eventCreatedByUser(Long eventId, Long authorId, String authorName);
 
     /**
      * News has been published. Notifies all clients and news' author (if notifyAuthor eq true and fcm is not null)
      * todo generify this method and merge with eventPublished()
      */
     void newsPublished(
-            Integer newsId,
-            Integer authorId,
+            Long newsId,
+            Long authorId,
             Map<String, Locale> titlesByLocales,
             String authorFCM,
             boolean notifyAuthor
@@ -33,8 +33,8 @@ public interface PushService {
      * Event has been published. Notifies all clients and event's author (if notifyAuthor eq true and fcm is not null)
      */
     void eventPublished(
-            Integer eventId,
-            Integer authorId,
+            Long eventId,
+            Long authorId,
             Float lng, Float lat,
             Map<String, Locale> titlesByLocales,
             String authorFCM,
@@ -44,10 +44,10 @@ public interface PushService {
     /**
      * Notify author of news that moderator declined the latter
      */
-    void newsDeclined(String authorFCM, Integer newsId, Integer authorId);
+    void newsDeclined(String authorFCM, Long newsId, Long authorId);
 
     /**
      * Notify author of event that moderator declined the latter
      */
-    void eventDeclined(String authorFCM, Integer eventId, Integer authorId);
+    void eventDeclined(String authorFCM, Long eventId, Long authorId);
 }

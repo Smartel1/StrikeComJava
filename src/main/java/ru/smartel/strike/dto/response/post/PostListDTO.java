@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public abstract class PostListDTO extends TitlesContentExtendableDTO {
 
-    protected int id;
+    protected long id;
     protected long date;
     protected int views;
     protected String sourceLink;
@@ -32,11 +32,11 @@ public abstract class PostListDTO extends TitlesContentExtendableDTO {
         tags = post.getTags().stream().map(Tag::getName).collect(Collectors.toList());
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

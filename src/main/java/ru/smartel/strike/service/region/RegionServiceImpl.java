@@ -7,7 +7,6 @@ import ru.smartel.strike.dto.request.region.RegionCreateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.region.RegionDetailDTO;
 import ru.smartel.strike.entity.reference.Region;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.etc.CountryRepository;
 import ru.smartel.strike.repository.etc.RegionRepository;
 import ru.smartel.strike.service.Locale;
@@ -49,7 +48,7 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public RegionDetailDTO create(RegionCreateRequestDTO dto) throws DTOValidationException {
+    public RegionDetailDTO create(RegionCreateRequestDTO dto) {
         validator.validateCreateDTO(dto);
 
         Region region = new Region();

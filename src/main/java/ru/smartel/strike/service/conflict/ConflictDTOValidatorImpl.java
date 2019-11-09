@@ -1,23 +1,23 @@
 package ru.smartel.strike.service.conflict;
 
-import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.util.ValidationUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static ru.smartel.strike.util.ValidationUtil.*;
 
-@Service
+@Component
 public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
 
     @Override
-    public void validateListQueryDTO(ConflictListRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateListQueryDTO(ConflictListRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
@@ -28,15 +28,15 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
         }
 
         if (dto.getPerPage() < 1) {
-            addErrorMessage("per_page", new ValidationUtil.Min(1), errors);
+            addErrorMessage("perPage", new ValidationUtil.Min(1), errors);
         }
 
         throwIfErrorsExist(errors);
     }
 
     @Override
-    public void validateStoreDTO(ConflictCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateStoreDTO(ConflictCreateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
@@ -54,19 +54,19 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
 
         if (null != dto.getTitleRu()) {
             dto.getTitleRu().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_ru", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleRu", new ValidationUtil.Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEn()) {
             dto.getTitleEn().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_en", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEn", new ValidationUtil.Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEs()) {
             dto.getTitleEs().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_es", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEs", new ValidationUtil.Max(255), errors);
             });
         }
 
@@ -81,25 +81,25 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
         if (null != dto.getCompanyName()) {
             dto.getCompanyName().ifPresent(companyName -> {
                 if (companyName.length() < 3) {
-                    addErrorMessage("company_name", new Min(3), errors);
+                    addErrorMessage("companyName", new Min(3), errors);
                 } else if (companyName.length() > 500) {
-                    addErrorMessage("company_name", new Max(500), errors);
+                    addErrorMessage("companyName", new Max(500), errors);
                 }
             });
         }
 
         if (null == dto.getConflictReasonId()) {
-            addErrorMessage("conflict_reason_id", new Required(), errors);
+            addErrorMessage("conflictReasonId", new Required(), errors);
         } else if (dto.getConflictReasonId().isEmpty()) {
-            addErrorMessage("conflict_reason_id", new NotNull(), errors);
+            addErrorMessage("conflictReasonId", new NotNull(), errors);
         }
 
         throwIfErrorsExist(errors);
     }
 
     @Override
-    public void validateUpdateDTO(ConflictUpdateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateUpdateDTO(ConflictUpdateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
@@ -110,7 +110,7 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
         }
 
         if (null == dto.getConflictId()) {
-            addErrorMessage("conflict_id", new NotNull(), errors);
+            addErrorMessage("conflictId", new NotNull(), errors);
         }
 
         if (null != dto.getTitle()) {
@@ -121,27 +121,27 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
 
         if (null != dto.getTitleRu()) {
             dto.getTitleRu().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_ru", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleRu", new ValidationUtil.Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEn()) {
             dto.getTitleEn().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_en", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEn", new ValidationUtil.Max(255), errors);
             });
         }
 
         if (null != dto.getTitleEs()) {
             dto.getTitleEs().ifPresent(title -> {
-                if (title.length() > 255) addErrorMessage("title_es", new ValidationUtil.Max(255), errors);
+                if (title.length() > 255) addErrorMessage("titleEs", new ValidationUtil.Max(255), errors);
             });
         }
 
         dto.getCompanyName().ifPresent(companyName -> {
             if (companyName.length() < 3) {
-                addErrorMessage("company_name", new Min(3), errors);
+                addErrorMessage("companyName", new Min(3), errors);
             } else if (companyName.length() > 500) {
-                addErrorMessage("company_name", new Max(500), errors);
+                addErrorMessage("companyName", new Max(500), errors);
             }
         });
 

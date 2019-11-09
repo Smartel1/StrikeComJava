@@ -11,9 +11,7 @@ import java.util.List;
 @Repository
 public interface CustomConflictRepository {
 
-    Conflict findOrThrow(int id) throws EntityNotFoundException;
+    List<Long> findAllByIdGetParentEventId(List<Long> ids);
 
-    List<Integer> findAllByIdGetParentEventId(List<Integer> ids);
-
-    List<Integer> findIds(Specification<Conflict> specification, Integer page, Integer perPage);
+    List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage);
 }

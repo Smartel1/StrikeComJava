@@ -1,6 +1,9 @@
 package ru.smartel.strike.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.response.reference.ReferenceChecksumDTO;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.reference.ReferenceService;
@@ -17,17 +20,13 @@ public class ReferenceController {
         this.referenceService = referenceService;
     }
 
-    @GetMapping("reference")
-    public Map<String, List<?>> list(
-            @PathVariable("locale") Locale locale
-    ) {
+    @GetMapping("references")
+    public Map<String, List<?>> list(@PathVariable("locale") Locale locale) {
         return referenceService.getAllReferences(locale);
     }
 
-    @GetMapping("reference-checksum")
+    @GetMapping("references-checksum")
     public ReferenceChecksumDTO checksum() {
-        return new ReferenceChecksumDTO(
-                referenceService.getChecksum()
-        );
+        return new ReferenceChecksumDTO(referenceService.getChecksum());
     }
 }

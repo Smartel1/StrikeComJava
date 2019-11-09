@@ -1,25 +1,25 @@
 package ru.smartel.strike.service.event;
 
-import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.service.validation.BasePostDTOValidator;
 import ru.smartel.strike.util.ValidationUtil;
 
+import java.util.List;
 import java.util.Map;
 
 import static ru.smartel.strike.util.ValidationUtil.NotNull;
 import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
 import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
-@Service
+@Component
 public class EventDTOValidatorImpl extends BasePostDTOValidator implements EventDTOValidator {
 
     @Override
-    public void validateListQueryDTO(EventListRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = super.validateListQueryDTO(dto);
+    public void validateListQueryDTO(EventListRequestDTO dto) {
+        Map<String, List<String>> errors = super.validateListQueryDTO(dto);
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
@@ -29,8 +29,8 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
     }
 
     @Override
-    public void validateStoreDTO(EventCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = super.validateStoreDTO(dto);
+    public void validateStoreDTO(EventCreateRequestDTO dto) {
+        Map<String, List<String>> errors = super.validateStoreDTO(dto);
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new ValidationUtil.NotNull(), errors);
@@ -41,9 +41,9 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
         }
 
         if (null == dto.getConflictId()) {
-            addErrorMessage("conflict_id", new ValidationUtil.Required(), errors);
+            addErrorMessage("conflictId", new ValidationUtil.Required(), errors);
         } else if (dto.getConflictId().isEmpty()) {
-            addErrorMessage("conflict_id", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("conflictId", new ValidationUtil.NotNull(), errors);
         }
 
         if (null == dto.getLatitude()) {
@@ -62,11 +62,11 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
     }
 
     @Override
-    public void validateUpdateDTO(EventUpdateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = super.validateUpdateDTO(dto);
+    public void validateUpdateDTO(EventUpdateRequestDTO dto) {
+        Map<String, List<String>> errors = super.validateUpdateDTO(dto);
 
         if (null == dto.getEventId()) {
-            addErrorMessage("event_id", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("eventId", new ValidationUtil.NotNull(), errors);
         }
 
         if (null == dto.getLocale()) {
@@ -78,7 +78,7 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
         }
 
         if (null != dto.getConflictId() && dto.getConflictId().isEmpty()) {
-            addErrorMessage("conflict_id", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("conflictId", new ValidationUtil.NotNull(), errors);
         }
 
         if (null != dto.getDate() && dto.getDate().isEmpty()) {

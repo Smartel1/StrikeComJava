@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.Video;
 
 @Repository
-public interface VideoRepository extends JpaRepository<Video, Integer> {
+public interface VideoRepository extends JpaRepository<Video, Long> {
 }

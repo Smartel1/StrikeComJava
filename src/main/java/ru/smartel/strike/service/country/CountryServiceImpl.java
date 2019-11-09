@@ -7,7 +7,6 @@ import ru.smartel.strike.dto.request.country.CountryCreateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.country.CountryDTO;
 import ru.smartel.strike.entity.reference.Country;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.etc.CountryRepository;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.country.NamePatternCountry;
@@ -30,9 +29,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public ListWrapperDTO<CountryDTO> list(String name, Locale locale) {
-        List<Country> countries = countryRepository.findAll(
-                new NamePatternCountry(name)
-        );
+        List<Country> countries = countryRepository.findAll(new NamePatternCountry(name));
 
         return new ListWrapperDTO<>(
                 countries.stream()
@@ -44,7 +41,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public CountryDTO create(CountryCreateRequestDTO dto) throws DTOValidationException {
+    public CountryDTO create(CountryCreateRequestDTO dto) {
         validator.validateCreateDTO(dto);
 
         Country country = new Country();

@@ -18,18 +18,13 @@ public class ModerationController {
     private EventService eventService;
     private NewsService newsService;
 
-    public ModerationController(EventService eventService,
-                                NewsService newsService) {
+    public ModerationController(EventService eventService, NewsService newsService) {
         this.eventService = eventService;
         this.newsService = newsService;
     }
 
     @GetMapping("dashboard")
-    public DashboardDTO dashboard(
-    ) {
-        return DashboardDTO.of(
-                eventService.getNonPublishedCount(),
-                newsService.getNonPublishedCount()
-        );
+    public DashboardDTO dashboard() {
+        return DashboardDTO.of(eventService.getNonPublishedCount(), newsService.getNonPublishedCount());
     }
 }

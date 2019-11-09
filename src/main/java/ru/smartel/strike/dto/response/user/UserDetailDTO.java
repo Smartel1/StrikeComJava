@@ -9,15 +9,15 @@ import java.util.stream.Collectors;
 
 public class UserDetailDTO {
 
-    private int id;
+    private long id;
     private String name;
     private String uuid;
     private String email;
     private String fcm;
     private List<String> roles;
     private String imageUrl;
-    private List<Integer> favouriteEvents;
-    private List<Integer> favouriteNews;
+    private List<Long> favouriteEvents;
+    private List<Long> favouriteNews;
 
     public static UserDetailDTO from(User user) {
         UserDetailDTO instance = new UserDetailDTO();
@@ -37,11 +37,11 @@ public class UserDetailDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -93,19 +93,19 @@ public class UserDetailDTO {
         this.imageUrl = imageUrl;
     }
 
-    public List<Integer> getFavouriteEvents() {
+    public List<Long> getFavouriteEvents() {
         return favouriteEvents;
     }
 
-    public void setFavouriteEvents(List<Integer> favouriteEvents) {
+    public void setFavouriteEvents(List<Long> favouriteEvents) {
         this.favouriteEvents = favouriteEvents;
     }
 
-    public List<Integer> getFavouriteNews() {
+    public List<Long> getFavouriteNews() {
         return favouriteNews;
     }
 
-    public void setFavouriteNews(List<Integer> favouriteNews) {
+    public void setFavouriteNews(List<Long> favouriteNews) {
         this.favouriteNews = favouriteNews;
     }
 }

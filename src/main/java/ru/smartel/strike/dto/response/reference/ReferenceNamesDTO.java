@@ -6,7 +6,7 @@ import ru.smartel.strike.service.Locale;
 
 public class ReferenceNamesDTO extends NamesExtendableDTO {
 
-    private int id;
+    private long id;
 
     public static ReferenceNamesDTO of(NamedReference entity, Locale locale) {
         ReferenceNamesDTO instance = new ReferenceNamesDTO();
@@ -15,11 +15,11 @@ public class ReferenceNamesDTO extends NamesExtendableDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 }

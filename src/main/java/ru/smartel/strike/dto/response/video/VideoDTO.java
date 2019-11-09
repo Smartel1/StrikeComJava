@@ -6,7 +6,7 @@ public class VideoDTO {
 
     private String url;
     private String previewUrl;
-    private int videoTypeId;
+    private long videoTypeId;
 
     public static VideoDTO from(Video video) {
         VideoDTO instance = new VideoDTO();
@@ -32,11 +32,11 @@ public class VideoDTO {
         this.previewUrl = previewUrl;
     }
 
-    public int getVideoTypeId() {
+    public long getVideoTypeId() {
         return videoTypeId;
     }
 
-    public void setVideoTypeId(int videoTypeId) {
+    public void setVideoTypeId(long videoTypeId) {
         this.videoTypeId = videoTypeId;
     }
 }

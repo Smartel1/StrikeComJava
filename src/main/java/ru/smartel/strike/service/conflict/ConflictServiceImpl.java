@@ -3,8 +3,8 @@ package ru.smartel.strike.service.conflict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
@@ -14,16 +14,16 @@ import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
 import ru.smartel.strike.entity.reference.Industry;
-import ru.smartel.strike.exception.DTOValidationException;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
-import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
-import ru.smartel.strike.service.filters.FiltersTransformer;
+import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.specification.conflict.LocalizedConflict;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ListWrapperDTO<ConflictListDTO> list(ConflictListRequestDTO dto) throws DTOValidationException {
+    public ListWrapperDTO<ConflictListDTO> list(ConflictListRequestDTO dto) {
         dtoValidator.validateListQueryDTO(dto);
 
         //Transform filters and other restrictions to Specifications
@@ -80,7 +80,7 @@ public class ConflictServiceImpl implements ConflictService {
         }
 
         //Get count of conflicts matching specification. Because pagination and fetching dont work together
-        List<Integer> ids = conflictRepository.findIds(specification, dto.getPage(), dto.getPerPage());
+        List<Long> ids = conflictRepository.findIds(specification, dto.getPage(), dto.getPerPage());
 
         List<ConflictListDTO> conflictListDTOS = conflictRepository.findAllById(ids)
                 .stream()
@@ -92,14 +92,16 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public ConflictDetailDTO get(Integer conflictId, Locale locale) {
-        Conflict conflict = conflictRepository.findOrThrow(conflictId);
+    public ConflictDetailDTO get(long conflictId, Locale locale) {
+        Conflict conflict = conflictRepository.findById(conflictId)
+                .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+
         return ConflictDetailDTO.of(conflict, locale);
     }
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO create(ConflictCreateRequestDTO dto) throws DTOValidationException {
+    public ConflictDetailDTO create(ConflictCreateRequestDTO dto) {
         dtoValidator.validateStoreDTO(dto);
 
         Conflict conflict = new Conflict();
@@ -112,10 +114,12 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) throws DTOValidationException {
+    public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) {
         dtoValidator.validateUpdateDTO(dto);
 
-        Conflict conflict = conflictRepository.findOrThrow(dto.getConflictId());
+        Conflict conflict = conflictRepository.findById(dto.getConflictId())
+                .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+
         fillConflictFields(conflict, dto, dto.getLocale());
 
         conflictRepository.save(conflict);
@@ -124,31 +128,58 @@ public class ConflictServiceImpl implements ConflictService {
 
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public void delete(Integer conflictId) {
-        Conflict conflict = conflictRepository.findOrThrow(conflictId);
+    public void delete(long conflictId) {
+        Conflict conflict = conflictRepository.findById(conflictId)
+                .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+
         conflictRepository.delete(conflict);
     }
 
-    private void fillConflictFields(Conflict conflict, ConflictCreateRequestDTO dto, Locale locale){
-        if (null != dto.getTitle()) conflict.setTitleByLocale(locale, dto.getTitle().orElse(null));
-        if (null != dto.getTitleRu()) conflict.setTitleRu(dto.getTitleRu().orElse(null));
-        if (null != dto.getTitleEn()) conflict.setTitleEn(dto.getTitleEn().orElse(null));
-        if (null != dto.getTitleEs()) conflict.setTitleEs(dto.getTitleEs().orElse(null));
-        if (null != dto.getLatitude()) conflict.setLatitude(dto.getLatitude());
-        if (null != dto.getLongitude()) conflict.setLongitude(dto.getLongitude());
-        if (null != dto.getCompanyName()) conflict.setCompanyName(dto.getCompanyName().orElse(null));
-        if (null != dto.getDateFrom())
+    private void fillConflictFields(Conflict conflict, ConflictCreateRequestDTO dto, Locale locale) {
+        //for the sake of PATCH ;)
+        if (null != dto.getTitle()) {
+            conflict.setTitleByLocale(locale, dto.getTitle().orElse(null));
+        }
+        if (null != dto.getTitleRu()) {
+            conflict.setTitleRu(dto.getTitleRu().orElse(null));
+        }
+        if (null != dto.getTitleEn()) {
+            conflict.setTitleEn(dto.getTitleEn().orElse(null));
+        }
+        if (null != dto.getTitleEs()) {
+            conflict.setTitleEs(dto.getTitleEs().orElse(null));
+        }
+        if (null != dto.getLatitude()) {
+            conflict.setLatitude(dto.getLatitude());
+        }
+        if (null != dto.getLongitude()) {
+            conflict.setLongitude(dto.getLongitude());
+        }
+        if (null != dto.getCompanyName()) {
+            conflict.setCompanyName(dto.getCompanyName().orElse(null));
+        }
+        if (null != dto.getDateFrom()) {
             conflict.setDateFrom(LocalDateTime.ofEpochSecond(dto.getDateFrom().orElseThrow(), 0, ZoneOffset.UTC));
-        if (null != dto.getDateTo())
-                    conflict.setDateTo(LocalDateTime.ofEpochSecond(dto.getDateTo().orElseThrow(), 0, ZoneOffset.UTC));
+        }
+        if (null != dto.getDateTo()){
+            conflict.setDateTo(LocalDateTime.ofEpochSecond(dto.getDateTo().orElseThrow(), 0, ZoneOffset.UTC));
+        }
 
-        if (null != dto.getConflictReasonId()) setReason(conflict, dto.getConflictReasonId().orElse(null));
-        if (null != dto.getConflictResultId()) setResult(conflict, dto.getConflictResultId().orElse(null));
-        if (null != dto.getIndustryId()) setIndustry(conflict, dto.getIndustryId().orElse(null));
-        if (null != dto.getParentEventId()) setParentEvent(conflict, dto.getParentEventId().orElse(null));
+        if (null != dto.getConflictReasonId()) {
+            setReason(conflict, dto.getConflictReasonId().orElse(null));
+        }
+        if (null != dto.getConflictResultId()) {
+            setResult(conflict, dto.getConflictResultId().orElse(null));
+        }
+        if (null != dto.getIndustryId()) {
+            setIndustry(conflict, dto.getIndustryId().orElse(null));
+        }
+        if (null != dto.getParentEventId()) {
+            setParentEvent(conflict, dto.getParentEventId().orElse(null));
+        }
     }
 
-    private void setReason(Conflict conflict, Integer reasonId){
+    private void setReason(Conflict conflict, Long reasonId){
         ConflictReason conflictReason = null;
 
         if (null != reasonId) {
@@ -158,7 +189,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setReason(conflictReason);
     }
 
-    private void setResult(Conflict conflict, Integer resultId){
+    private void setResult(Conflict conflict, Long resultId){
         ConflictResult conflictResult = null;
 
         if (null != resultId) {
@@ -168,7 +199,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setResult(conflictResult);
     }
 
-    private void setIndustry(Conflict conflict, Integer industryId){
+    private void setIndustry(Conflict conflict, Long industryId){
         Industry industry = null;
 
         if (null != industryId) {
@@ -178,7 +209,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setIndustry(industry);
     }
 
-    private void setParentEvent(Conflict conflict, Integer parentEventId){
+    private void setParentEvent(Conflict conflict, Long parentEventId){
         Event parentEvent = null;
 
         if (null != parentEventId) {

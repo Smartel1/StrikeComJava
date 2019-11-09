@@ -6,8 +6,11 @@ import org.springframework.security.core.Authentication;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.User;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.news.NewsRepository;
+
+import javax.persistence.EntityNotFoundException;
 
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
@@ -31,18 +34,20 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
         this.newsRepository = newsRepository;
     }
 
-    public boolean isEventAuthor(Integer eventId) {
-        Event event = eventRepository.findOrThrow(eventId);
-        if (null == event) return false;
-        if (null == event.getAuthor()) return false;
-        return event.getAuthor().getId() == ((User)getAuthentication().getPrincipal()).getId();
+    public boolean isEventAuthor(Long eventId) {
+        return eventRepository.findById(eventId)
+                .map(PostEntity::getAuthor)
+                .map(User::getId)
+                .map(authorId -> authorId.equals(((User)getAuthentication().getPrincipal()).getId()))
+                .orElse(Boolean.FALSE);
     }
 
-    public boolean isNewsAuthor(Integer newsId) {
-        News news = newsRepository.findOrThrow(newsId);
-        if (null == news) return false;
-        if (null == news.getAuthor()) return false;
-        return news.getAuthor().getId() == ((User)getAuthentication().getPrincipal()).getId();
+    public boolean isNewsAuthor(Long newsId) {
+        return newsRepository.findById(newsId)
+                .map(PostEntity::getAuthor)
+                .map(User::getId)
+                .map(authorId -> authorId.equals(((User)getAuthentication().getPrincipal()).getId()))
+                .orElse(Boolean.FALSE);
     }
 
     @Override

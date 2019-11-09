@@ -13,9 +13,9 @@ import java.util.List;
  * Events from country
  */
 public class CountryEvent implements Specification<Event> {
-    private List<Integer> countryIds;
+    private List<Long> countryIds;
 
-    public CountryEvent(List<Integer> countryIds) {
+    public CountryEvent(List<Long> countryIds) {
         this.countryIds = countryIds;
     }
 

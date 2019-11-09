@@ -1,47 +1,50 @@
 package ru.smartel.strike.service.client_version;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.*;
+import static ru.smartel.strike.util.ValidationUtil.Max;
+import static ru.smartel.strike.util.ValidationUtil.NotNull;
+import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
+import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
-@Service
+@Component
 public class ClientVersionDTOValidatorImpl implements ClientVersionDTOValidator {
 
     @Override
-    public void validateListRequestDTO(ClientVersionGetNewRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateListRequestDTO(ClientVersionGetNewRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
         }
 
         if (null == dto.getClientId()) {
-            addErrorMessage("client_id", new NotNull(), errors);
+            addErrorMessage("clientId", new NotNull(), errors);
         }
 
         if (null == dto.getCurrentVersion()) {
-            addErrorMessage("current_version", new NotNull(), errors);
+            addErrorMessage("currentVersion", new NotNull(), errors);
         }
 
         throwIfErrorsExist(errors);
     }
 
     @Override
-    public void validateStoreDTO(ClientVersionCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateStoreDTO(ClientVersionCreateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
         }
 
         if (null == dto.getClientId())
-            addErrorMessage("client_id", new NotNull(), errors);
+            addErrorMessage("clientId", new NotNull(), errors);
 
         if (null == dto.getVersion())
             addErrorMessage("version", new NotNull(), errors);
@@ -50,21 +53,21 @@ public class ClientVersionDTOValidatorImpl implements ClientVersionDTOValidator 
             addErrorMessage("required", new NotNull(), errors);
 
         if (null == dto.getDescriptionRu()) {
-            addErrorMessage("description_ru", new NotNull(), errors);
+            addErrorMessage("descriptionRu", new NotNull(), errors);
         } else if (dto.getDescriptionRu().length() > 500){
-            addErrorMessage("description_ru", new Max(500), errors);
+            addErrorMessage("descriptionRu", new Max(500), errors);
         }
 
         if (null == dto.getDescriptionEn()) {
-            addErrorMessage("description_en", new NotNull(), errors);
+            addErrorMessage("descriptionEn", new NotNull(), errors);
         } else if (dto.getDescriptionEn().length() > 500){
-            addErrorMessage("description_en", new Max(500), errors);
+            addErrorMessage("descriptionEn", new Max(500), errors);
         }
 
         if (null == dto.getDescriptionEs()) {
-            addErrorMessage("description_es", new NotNull(), errors);
+            addErrorMessage("descriptionEs", new NotNull(), errors);
         } else if (dto.getDescriptionEs().length() > 500){
-            addErrorMessage("description_es", new Max(500), errors);
+            addErrorMessage("descriptionEs", new Max(500), errors);
         }
 
         throwIfErrorsExist(errors);

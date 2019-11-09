@@ -12,9 +12,9 @@ import javax.persistence.criteria.Root;
  * User's favourite news
  */
 public class FavouriteNews implements Specification<News> {
-    private int userId;
+    private long userId;
 
-    public FavouriteNews(int userId) {
+    public FavouriteNews(long userId) {
         this.userId = userId;
     }
 

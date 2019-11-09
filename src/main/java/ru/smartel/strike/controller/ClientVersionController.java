@@ -1,17 +1,21 @@
 package ru.smartel.strike.controller;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.client_version.ClientVersionService;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.client_version.ClientVersionService;
 
 @RestController
-@RequestMapping("/api/v2/{locale}")
+@RequestMapping("/api/v2/{locale}/client-versions")
 public class ClientVersionController {
 
     private ClientVersionService clientVersionService;
@@ -20,26 +24,21 @@ public class ClientVersionController {
         this.clientVersionService = clientVersionService;
     }
 
-    @GetMapping("/client-version")
-    public ListWrapperDTO<ClientVersionDTO> getNewVersions(
-            ClientVersionGetNewRequestDTO dto
-    ) throws DTOValidationException, BusinessRuleValidationException {
+    @GetMapping
+    public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         return clientVersionService.getNewVersions(dto);
     }
 
-    @PostMapping(path = "/client-version", consumes = {"application/json"})
+    @PostMapping(consumes = {"application/json"})
     public ClientVersionDTO store(
             @PathVariable("locale") Locale locale,
-            @RequestBody ClientVersionCreateRequestDTO dto
-    ) throws BusinessRuleValidationException, DTOValidationException {
+            @RequestBody ClientVersionCreateRequestDTO dto) {
         dto.setLocale(locale);
         return clientVersionService.create(dto);
     }
 
-    @DeleteMapping(path = "/client-version/{id}")
-    public void delete(
-            @PathVariable("id") int clientVersionId
-    ) {
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable("id") int clientVersionId) {
         clientVersionService.delete(clientVersionId);
     }
 }

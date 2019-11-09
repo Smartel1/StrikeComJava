@@ -13,9 +13,9 @@ import java.util.List;
  * Events with ids
  */
 public class WithIdsEvents implements Specification<Event> {
-    private List<Integer> ids;
+    private List<Long> ids;
 
-    public WithIdsEvents(List<Integer> ids) {
+    public WithIdsEvents(List<Long> ids) {
         this.ids = ids;
     }
 

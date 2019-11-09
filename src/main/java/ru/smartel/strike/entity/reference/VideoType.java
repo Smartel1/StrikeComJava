@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Objects;
 
 @Entity
 @Table(name = "video_types")
@@ -16,12 +15,12 @@ public class VideoType implements ReferenceWithCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Column
     private String code;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -31,19 +30,5 @@ public class VideoType implements ReferenceWithCode {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        VideoType videoType = (VideoType) o;
-        return id == videoType.id &&
-                code.equals(videoType.code);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, code);
     }
 }

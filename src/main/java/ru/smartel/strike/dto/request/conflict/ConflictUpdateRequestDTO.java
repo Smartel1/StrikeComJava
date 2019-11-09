@@ -5,13 +5,13 @@ package ru.smartel.strike.dto.request.conflict;
  * dto for updating conflict
  */
 public class ConflictUpdateRequestDTO extends ConflictCreateRequestDTO {
-    private Integer conflictId;
+    private Long conflictId;
 
-    public Integer getConflictId() {
+    public Long getConflictId() {
         return conflictId;
     }
 
-    public void setConflictId(Integer conflictId) {
+    public void setConflictId(Long conflictId) {
         this.conflictId = conflictId;
     }
 }

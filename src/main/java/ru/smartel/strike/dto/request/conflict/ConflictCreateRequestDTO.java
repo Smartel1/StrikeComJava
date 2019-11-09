@@ -26,10 +26,10 @@ public class ConflictCreateRequestDTO {
     private Optional<String> companyName;
     private Optional<Long> dateFrom;
     private Optional<Long> dateTo;
-    private Optional<Integer> conflictReasonId;
-    private Optional<Integer> conflictResultId;
-    private Optional<Integer> industryId;
-    private Optional<Integer> parentEventId;
+    private Optional<Long> conflictReasonId;
+    private Optional<Long> conflictResultId;
+    private Optional<Long> industryId;
+    private Optional<Long> parentEventId;
 
     public Locale getLocale() {
         return locale;
@@ -119,35 +119,35 @@ public class ConflictCreateRequestDTO {
         this.dateTo = dateTo;
     }
 
-    public Optional<Integer> getConflictReasonId() {
+    public Optional<Long> getConflictReasonId() {
         return conflictReasonId;
     }
 
-    public void setConflictReasonId(Optional<Integer> conflictReasonId) {
+    public void setConflictReasonId(Optional<Long> conflictReasonId) {
         this.conflictReasonId = conflictReasonId;
     }
 
-    public Optional<Integer> getConflictResultId() {
+    public Optional<Long> getConflictResultId() {
         return conflictResultId;
     }
 
-    public void setConflictResultId(Optional<Integer> conflictResultId) {
+    public void setConflictResultId(Optional<Long> conflictResultId) {
         this.conflictResultId = conflictResultId;
     }
 
-    public Optional<Integer> getIndustryId() {
+    public Optional<Long> getIndustryId() {
         return industryId;
     }
 
-    public void setIndustryId(Optional<Integer> industryId) {
+    public void setIndustryId(Optional<Long> industryId) {
         this.industryId = industryId;
     }
 
-    public Optional<Integer> getParentEventId() {
+    public Optional<Long> getParentEventId() {
         return parentEventId;
     }
 
-    public void setParentEventId(Optional<Integer> parentEventId) {
+    public void setParentEventId(Optional<Long> parentEventId) {
         this.parentEventId = parentEventId;
     }
 }

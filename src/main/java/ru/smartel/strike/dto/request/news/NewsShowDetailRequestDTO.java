@@ -8,7 +8,7 @@ import ru.smartel.strike.service.Locale;
  */
 public class NewsShowDetailRequestDTO {
     private Locale locale;
-    private int newsId;
+    private long newsId;
 
     public Locale getLocale() {
         return locale;
@@ -18,11 +18,11 @@ public class NewsShowDetailRequestDTO {
         this.locale = locale;
     }
 
-    public int getNewsId() {
+    public long getNewsId() {
         return newsId;
     }
 
-    public void setNewsId(int newsId) {
+    public void setNewsId(long newsId) {
         this.newsId = newsId;
     }
 }

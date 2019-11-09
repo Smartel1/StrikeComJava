@@ -9,20 +9,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
+import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.conflict.ConflictService;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.conflict.ConflictService;
 
 @RestController
-@RequestMapping("/api/v2/{locale}")
+@RequestMapping("/api/v2/{locale}/conflicts")
 public class ConflictController {
 
     private ConflictService conflictService;
@@ -31,51 +29,45 @@ public class ConflictController {
         this.conflictService = conflictService;
     }
 
-    @GetMapping("/conflict")
+    @GetMapping
     public ListWrapperDTO<ConflictListDTO> index(
             ConflictListRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws DTOValidationException {
+            @AuthenticationPrincipal User user) {
         dto.setUser(user);
         return conflictService.list(dto);
     }
 
-    @GetMapping("/conflict/{id}")
+    @GetMapping("{id}")
     public ConflictDetailDTO show(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int conflictId
-    ) {
+            @PathVariable("id") long conflictId) {
         return conflictService.get(conflictId, locale);
     }
 
-    @PostMapping(path = "/conflict")
+    @PostMapping
     public ConflictDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody ConflictCreateRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws BusinessRuleValidationException, DTOValidationException {
+            @AuthenticationPrincipal User user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return conflictService.create(dto);
     }
 
-    @PutMapping(path = "/conflict/{id}")
+    @PutMapping("{id}")
     public ConflictDetailDTO update(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int conflictId,
+            @PathVariable("id") long conflictId,
             @AuthenticationPrincipal User user,
-            @RequestBody ConflictUpdateRequestDTO dto
-    ) throws BusinessRuleValidationException, DTOValidationException {
+            @RequestBody ConflictUpdateRequestDTO dto) {
         dto.setLocale(locale);
         dto.setUser(user);
         dto.setConflictId(conflictId);
         return conflictService.update(dto);
     }
 
-    @DeleteMapping(path = "/conflict/{id}")
-    public void delete(
-            @PathVariable("id") int conflictId
-    ) throws BusinessRuleValidationException {
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable("id") long conflictId) {
         conflictService.delete(conflictId);
     }
 }

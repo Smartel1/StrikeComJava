@@ -1,7 +1,7 @@
 package ru.smartel.strike.service.filters;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.conflict.ConflictFiltersDTO;
 import ru.smartel.strike.dto.request.event.EventFiltersDTO;
 import ru.smartel.strike.dto.request.news.NewsFiltersDTO;
@@ -9,14 +9,35 @@ import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
-import ru.smartel.strike.service.filters.FiltersTransformer;
-import ru.smartel.strike.specification.conflict.*;
-import ru.smartel.strike.specification.event.*;
-import ru.smartel.strike.specification.news.*;
+import ru.smartel.strike.specification.conflict.AfterDateConflict;
+import ru.smartel.strike.specification.conflict.AncestorsOfConflict;
+import ru.smartel.strike.specification.conflict.BeforeDateConflict;
+import ru.smartel.strike.specification.conflict.ChildrenOfConflict;
+import ru.smartel.strike.specification.conflict.MatchReasonsConflict;
+import ru.smartel.strike.specification.conflict.MatchResultsConflict;
+import ru.smartel.strike.specification.conflict.NearCoordinateConflict;
+import ru.smartel.strike.specification.event.AfterDateEvent;
+import ru.smartel.strike.specification.event.BeforeDateEvent;
+import ru.smartel.strike.specification.event.BelongToConflictsEvent;
+import ru.smartel.strike.specification.event.CountryEvent;
+import ru.smartel.strike.specification.event.FavouriteEvent;
+import ru.smartel.strike.specification.event.HasTagEvent;
+import ru.smartel.strike.specification.event.MatchStatusesEvent;
+import ru.smartel.strike.specification.event.MatchTypesEvent;
+import ru.smartel.strike.specification.event.NearCoordinateEvent;
+import ru.smartel.strike.specification.event.PublishedEvent;
+import ru.smartel.strike.specification.event.RegionEvent;
+import ru.smartel.strike.specification.event.WithContentEvent;
+import ru.smartel.strike.specification.event.WithIdsEvents;
+import ru.smartel.strike.specification.news.AfterDateNews;
+import ru.smartel.strike.specification.news.BeforeDateNews;
+import ru.smartel.strike.specification.news.FavouriteNews;
+import ru.smartel.strike.specification.news.HasTagNews;
+import ru.smartel.strike.specification.news.PublishedNews;
 
 import java.util.List;
 
-@Service
+@Component
 public class FiltersTransformerImpl implements FiltersTransformer {
 
     private ConflictRepository conflictRepository;
@@ -26,7 +47,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     }
 
     @Override
-    public Specification<Event> toSpecification(EventFiltersDTO filters, Integer userId) {
+    public Specification<Event> toSpecification(EventFiltersDTO filters, Long userId) {
         Specification<Event> result = emptySpecification();
 
         if (null == filters) return result;
@@ -39,7 +60,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getTagId()) result = result.and(new HasTagEvent(filters.getTagId()));
         if (null != filters.getConflictIds()) {
             //additional query to find ids of parent events of conflicts with given ids
-            List<Integer> parentEventIds = conflictRepository.findAllByIdGetParentEventId(filters.getConflictIds());
+            List<Long> parentEventIds = conflictRepository.findAllByIdGetParentEventId(filters.getConflictIds());
             result = result.and(new BelongToConflictsEvent(filters.getConflictIds()).or(new WithIdsEvents(parentEventIds)));
         }
         if (null != filters.getFavourites() && filters.getFavourites() && null != userId) {
@@ -61,7 +82,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     }
 
     @Override
-    public Specification<News> toSpecification(NewsFiltersDTO filters, Integer userId) {
+    public Specification<News> toSpecification(NewsFiltersDTO filters, Long userId) {
         Specification<News> result = emptySpecification();
 
         if (null == filters) return result;
@@ -76,7 +97,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
     }
 
     @Override
-    public Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Integer userId) {
+    public Specification<Conflict> toSpecification(ConflictFiltersDTO filters, Long userId) {
         Specification<Conflict> result = emptySpecification();
 
         if (null == filters) return result;

@@ -5,13 +5,13 @@ package ru.smartel.strike.dto.request.event;
  * dto for updating event
  */
 public class EventUpdateRequestDTO extends EventCreateRequestDTO {
-    private Integer eventId;
+    private Long eventId;
 
-    public Integer getEventId() {
+    public Long getEventId() {
         return eventId;
     }
 
-    public void setEventId(Integer eventId) {
+    public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
 }

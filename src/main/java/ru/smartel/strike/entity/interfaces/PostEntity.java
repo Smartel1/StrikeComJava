@@ -5,13 +5,13 @@ import ru.smartel.strike.entity.User;
 
 import java.time.LocalDateTime;
 
-public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, HasTags {
+public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggable {
 
     Post getPost();
 
     void setPost(Post post);
 
-    int getId();
+    long getId();
 
     @Override
     default String getTitleRu() {

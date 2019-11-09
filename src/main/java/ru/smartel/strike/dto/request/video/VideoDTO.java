@@ -8,7 +8,7 @@ import java.util.Optional;
 public class VideoDTO {
     private String url;
     private Optional<String> previewUrl;
-    private Integer videoTypeId;
+    private Long videoTypeId;
 
     public String getUrl() {
         return url;
@@ -26,11 +26,11 @@ public class VideoDTO {
         this.previewUrl = previewUrl;
     }
 
-    public Integer getVideoTypeId() {
+    public Long getVideoTypeId() {
         return videoTypeId;
     }
 
-    public void setVideoTypeId(Integer videoTypeId) {
+    public void setVideoTypeId(Long videoTypeId) {
         this.videoTypeId = videoTypeId;
     }
 }

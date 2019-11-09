@@ -10,22 +10,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
-import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
+import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.exception.BusinessRuleValidationException;
-import ru.smartel.strike.exception.DTOValidationException;
-import ru.smartel.strike.service.event.EventService;
+import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.event.EventService;
 
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v2/{locale}")
+@RequestMapping("/api/v2/{locale}/events")
 public class EventController {
 
     private EventService eventService;
@@ -34,63 +33,57 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @GetMapping("/event")
+    @GetMapping
     public ListWrapperDTO<EventListDTO> index(
             EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) throws DTOValidationException {
+    ) throws ValidationException {
         dto.setUser(user);
         return eventService.list(dto);
     }
 
-    @GetMapping("/event/{id}")
+    @GetMapping("{id}")
     public EventDetailDTO show(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int eventId,
+            @PathVariable("id") long eventId,
             @RequestParam(value = "withRelatives", required = false) boolean withRelatives
     ) {
         return eventService.incrementViewsAndGet(eventId, locale, withRelatives);
     }
 
-    @PostMapping("/event/{id}/favourite")
+    @PostMapping("{id}/favourites")
     public void setFavourite(
-            @PathVariable("id") int eventId,
+            @PathVariable("id") long eventId,
             @RequestParam(value = "favourite") boolean isFavourite,
-            @AuthenticationPrincipal User user
-    ) {
+            @AuthenticationPrincipal User user) {
         Optional.ofNullable(user).ifPresent(
-                usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite)
-        );
+                usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite));
     }
 
-    @PostMapping(path = "/event")
+    @PostMapping
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody EventCreateRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws BusinessRuleValidationException, DTOValidationException {
+            @AuthenticationPrincipal User user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return eventService.create(dto);
     }
 
-    @PutMapping(path = "/event/{id}")
+    @PutMapping("{id}")
     public EventDetailDTO update(
             @PathVariable("locale") Locale locale,
-            @PathVariable("id") int eventId,
+            @PathVariable("id") long eventId,
             @AuthenticationPrincipal User user,
-            @RequestBody EventUpdateRequestDTO dto
-    ) throws BusinessRuleValidationException, DTOValidationException {
+            @RequestBody EventUpdateRequestDTO dto) {
         dto.setEventId(eventId);
         dto.setLocale(locale);
         dto.setUser(user);
         return eventService.update(dto);
     }
 
-    @DeleteMapping(path = "/event/{id}")
-    public void delete(
-            @PathVariable("id") int eventId
-    ) throws BusinessRuleValidationException {
+    @DeleteMapping("{id}")
+    public void delete(@PathVariable("id") long eventId) {
         eventService.delete(eventId);
     }
 }

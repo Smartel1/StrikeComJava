@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.Region;
 
 @Repository
-public interface RegionRepository extends JpaRepository<Region, Integer>, JpaSpecificationExecutor<Region> {
+public interface RegionRepository extends JpaRepository<Region, Long>, JpaSpecificationExecutor<Region> {
 }

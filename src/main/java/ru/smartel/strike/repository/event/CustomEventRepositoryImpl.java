@@ -20,7 +20,7 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
     EntityManager entityManager;
 
     @Override
-    public boolean isNotParentForAnyConflicts(int eventId) {
+    public boolean isNotParentForAnyConflicts(long eventId) {
         Long count = (Long) entityManager.createQuery(
                 "select count(c.id) " +
                         "from " + Conflict.class.getName() + " c " +
@@ -30,18 +30,10 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
         return count.equals(0L);
     }
 
-
     @Override
-    public Event findOrThrow(int id) throws EntityNotFoundException {
-        return Optional.ofNullable(entityManager.find(Event.class, id)).orElseThrow(
-                () -> new EntityNotFoundException("Событие не найдено")
-        );
-    }
-
-    @Override
-    public List<Integer> findIdsOrderByDateDesc(Specification<Event> specification, BaseListRequestDTO dto) {
+    public List<Long> findIdsOrderByDateDesc(Specification<Event> specification, BaseListRequestDTO dto) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Integer> idQuery = cb.createQuery(Integer.class);
+        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<Event> root = idQuery.from(Event.class);
         idQuery.select(root.get("id"))
                 .orderBy(cb.desc(root.get("post").get("date")));

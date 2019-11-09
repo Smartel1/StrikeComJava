@@ -2,15 +2,15 @@ package ru.smartel.strike.dto.response.user;
 
 import ru.smartel.strike.entity.User;
 
-public class UserDTO {
+public class AuthorDTO {
 
-    private int id;
+    private long id;
     private String name;
     private String email;
     private String imageUrl;
 
-    public static UserDTO from(User user) {
-        UserDTO instance = new UserDTO();
+    public static AuthorDTO from(User user) {
+        AuthorDTO instance = new AuthorDTO();
         instance.setId(user.getId());
         instance.setName(user.getName());
         instance.setEmail(user.getEmail());
@@ -18,11 +18,11 @@ public class UserDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.Industry;
 
 @Repository
-public interface IndustryRepository extends JpaRepository<Industry, Integer> {
+public interface IndustryRepository extends JpaRepository<Industry, Long> {
 }

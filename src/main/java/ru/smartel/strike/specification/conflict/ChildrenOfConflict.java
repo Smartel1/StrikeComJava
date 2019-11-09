@@ -13,9 +13,9 @@ import javax.persistence.criteria.Root;
  */
 public class ChildrenOfConflict implements Specification<Conflict> {
 
-    private int parentId;
+    private long parentId;
 
-    public ChildrenOfConflict(int parentId) {
+    public ChildrenOfConflict(long parentId) {
         this.parentId = parentId;
     }
 

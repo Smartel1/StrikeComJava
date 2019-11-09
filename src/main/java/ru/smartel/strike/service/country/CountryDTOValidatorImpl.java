@@ -1,40 +1,43 @@
 package ru.smartel.strike.service.country;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.smartel.strike.dto.request.country.CountryCreateRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.*;
+import static ru.smartel.strike.util.ValidationUtil.Min;
+import static ru.smartel.strike.util.ValidationUtil.NotNull;
+import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
+import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
-@Service
+@Component
 public class CountryDTOValidatorImpl implements CountryDTOValidator {
     @Override
-    public void validateCreateDTO(CountryCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateCreateDTO(CountryCreateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
         }
 
         if (null == dto.getNameRu()) {
-            addErrorMessage("name_ru", new NotNull(), errors);
+            addErrorMessage("nameRu", new NotNull(), errors);
         } else if (dto.getNameRu().length() < 1) {
-            addErrorMessage("name_ru", new Min(1), errors);
+            addErrorMessage("nameRu", new Min(1), errors);
         }
 
         if (null == dto.getNameEn()) {
-            addErrorMessage("name_en", new NotNull(), errors);
+            addErrorMessage("nameEn", new NotNull(), errors);
         } else if (dto.getNameEn().length() < 1) {
-            addErrorMessage("name_en", new Min(1), errors);
+            addErrorMessage("nameEn", new Min(1), errors);
         }
 
         if (null == dto.getNameEs()) {
-            addErrorMessage("name_es", new NotNull(), errors);
+            addErrorMessage("nameEs", new NotNull(), errors);
         } else if (dto.getNameEn().length() < 1) {
-            addErrorMessage("name_es", new Min(1), errors);
+            addErrorMessage("nameEs", new Min(1), errors);
         }
 
         throwIfErrorsExist(errors);

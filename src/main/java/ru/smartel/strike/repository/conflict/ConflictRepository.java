@@ -6,9 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.Conflict;
 
 @Repository
-public interface ConflictRepository extends
-        JpaRepository<Conflict, Integer>,
-        CustomConflictRepository,
-        JpaSpecificationExecutor<Conflict>
-{
+public interface ConflictRepository extends JpaRepository<Conflict, Long>, CustomConflictRepository,
+        JpaSpecificationExecutor<Conflict> {
 }

@@ -10,6 +10,5 @@ import java.util.List;
 
 @Repository
 public interface CustomNewsRepository {
-    News findOrThrow(int id) throws EntityNotFoundException;
-    List<Integer> findIdsOrderByDateDesc(Specification<News> specification, BaseListRequestDTO dto);
+    List<Long> findIdsOrderByDateDesc(Specification<News> specification, BaseListRequestDTO dto);
 }

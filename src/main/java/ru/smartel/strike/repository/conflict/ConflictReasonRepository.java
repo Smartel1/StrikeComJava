@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.reference.ConflictReason;
 
 @Repository
-public interface ConflictReasonRepository extends JpaRepository<ConflictReason, Integer> {
+public interface ConflictReasonRepository extends JpaRepository<ConflictReason, Long> {
 }

@@ -1,7 +1,7 @@
 package ru.smartel.strike.dto.response.post;
 
 import ru.smartel.strike.dto.response.TitlesContentExtendableDTO;
-import ru.smartel.strike.dto.response.user.UserDTO;
+import ru.smartel.strike.dto.response.user.AuthorDTO;
 import ru.smartel.strike.dto.response.video.VideoDTO;
 import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
 
-    protected int id;
+    protected long id;
     protected boolean published;
     protected long date;
     protected int views;
@@ -23,7 +23,7 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
     protected List<String> photos;
     protected List<VideoDTO> videos;
     protected List<String> tags;
-    protected UserDTO author;
+    protected AuthorDTO author;
 
     public void setCommonFieldsOf(PostEntity post, Locale locale) {
         setContentsOf(post, locale);
@@ -35,14 +35,14 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
         setPhotos(post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList()));
         setVideos(post.getVideos().stream().map(VideoDTO::from).collect(Collectors.toList()));
         setTags(post.getTags().stream().map(Tag::getName).collect(Collectors.toList()));
-        setAuthor(Optional.ofNullable(post.getAuthor()).map(UserDTO::from).orElse(null));
+        setAuthor(Optional.ofNullable(post.getAuthor()).map(AuthorDTO::from).orElse(null));
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -102,11 +102,11 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
         this.tags = tags;
     }
 
-    public UserDTO getAuthor() {
+    public AuthorDTO getAuthor() {
         return author;
     }
 
-    public void setAuthor(UserDTO author) {
+    public void setAuthor(AuthorDTO author) {
         this.author = author;
     }
 }

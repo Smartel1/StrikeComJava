@@ -2,18 +2,21 @@ package ru.smartel.strike.service.region;
 
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.request.region.RegionCreateRequestDTO;
-import ru.smartel.strike.exception.DTOValidationException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.*;
+import static ru.smartel.strike.util.ValidationUtil.Min;
+import static ru.smartel.strike.util.ValidationUtil.NotNull;
+import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
+import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
 
 @Service
 public class RegionDTOValidatorImpl implements RegionDTOValidator {
     @Override
-    public void validateCreateDTO(RegionCreateRequestDTO dto) throws DTOValidationException {
-        Map<String, String> errors = new HashMap<>();
+    public void validateCreateDTO(RegionCreateRequestDTO dto) {
+        Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
             addErrorMessage("locale", new NotNull(), errors);
