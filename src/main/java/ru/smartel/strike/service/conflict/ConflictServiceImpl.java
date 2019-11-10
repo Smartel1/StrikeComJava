@@ -3,6 +3,7 @@ package ru.smartel.strike.service.conflict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ConflictServiceImpl implements ConflictService {
 
     private ConflictDTOValidator dtoValidator;
@@ -40,6 +42,7 @@ public class ConflictServiceImpl implements ConflictService {
     private ConflictResultRepository conflictResultRepository;
     private IndustryRepository industryRepository;
     private EventRepository eventRepository;
+
 
     public ConflictServiceImpl(ConflictDTOValidator dtoValidator,
                                FiltersTransformer filtersTransformer,
@@ -107,7 +110,7 @@ public class ConflictServiceImpl implements ConflictService {
         Conflict conflict = new Conflict();
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.save(conflict);
+        conflictRepository.saveManagingNestedTree(conflict);
 
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
@@ -122,7 +125,7 @@ public class ConflictServiceImpl implements ConflictService {
 
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.save(conflict);
+        conflictRepository.saveManagingNestedTree(conflict);
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
 

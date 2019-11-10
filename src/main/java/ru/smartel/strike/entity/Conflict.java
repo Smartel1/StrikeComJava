@@ -2,6 +2,7 @@ package ru.smartel.strike.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import pl.exsio.nestedj.model.NestedNode;
 import ru.smartel.strike.entity.interfaces.Titles;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "conflicts")
-public class Conflict implements Titles {
+public class Conflict implements NestedNode<Long>, Titles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -38,18 +39,17 @@ public class Conflict implements Titles {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Conflict parent;
+    @Column(name = "parent_id")
+    private Long parentId;
 
-    @Column(name = "lft")
-    private int lft;
+    @Column(name = "lft", nullable = false)
+    private Long treeLeft; //dont set default value. Let it fail if not set while saving entity
 
-    @Column(name = "rgt")
-    private int rgt;
+    @Column(name = "rgt", nullable = false)
+    private Long treeRight; //dont set default value. Let it fail if not set while saving entity
 
-    @Column(name = "lvl")
-    private int lvl;
+    @Column(name = "lvl", nullable = false)
+    private Long treeLevel; //dont set default value. Let it fail if not set while saving entity
 
     @Column(name = "title_ru")
     private String titleRu;
@@ -94,40 +94,53 @@ public class Conflict implements Titles {
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public Conflict getParent() {
-        return parent;
+    @Override
+    public Long getTreeLeft() {
+        return treeLeft;
     }
 
-    public void setParent(Conflict parent) {
-        this.parent = parent;
+    @Override
+    public Long getTreeRight() {
+        return treeRight;
     }
 
-    public int getLft() {
-        return lft;
+    @Override
+    public Long getTreeLevel() {
+        return treeLevel;
     }
 
-    public void setLft(int lft) {
-        this.lft = lft;
+    @Override
+    public Long getParentId() {
+        return parentId;
     }
 
-    public int getRgt() {
-        return rgt;
+    @Override
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setRgt(int rgt) {
-        this.rgt = rgt;
+    @Override
+    public void setTreeLeft(Long treeLeft) {
+        this.treeLeft = treeLeft;
     }
 
-    public int getLvl() {
-        return lvl;
+    @Override
+    public void setTreeRight(Long treeRight) {
+        this.treeRight = treeRight;
     }
 
-    public void setLvl(int lvl) {
-        this.lvl = lvl;
+    @Override
+    public void setTreeLevel(Long treeLevel) {
+        this.treeLevel = treeLevel;
+    }
+
+    @Override
+    public void setParentId(Long parent) {
+        this.parentId = parent;
     }
 
     public String getTitleRu() {
@@ -240,5 +253,15 @@ public class Conflict implements Titles {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Conflict{" +
+                "id=" + id +
+                ", companyName='" + companyName + '\'' +
+                ", dateFrom=" + dateFrom +
+                ", dateTo=" + dateTo +
+                '}';
     }
 }
