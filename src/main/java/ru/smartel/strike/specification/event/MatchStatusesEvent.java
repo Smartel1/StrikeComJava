@@ -13,9 +13,9 @@ import java.util.List;
  * Events with statuses
  */
 public class MatchStatusesEvent implements Specification<Event> {
-    private List<Integer> statusIds;
+    private List<Long> statusIds;
 
-    public MatchStatusesEvent(List<Integer> statusIds) {
+    public MatchStatusesEvent(List<Long> statusIds) {
         this.statusIds = statusIds;
     }
 

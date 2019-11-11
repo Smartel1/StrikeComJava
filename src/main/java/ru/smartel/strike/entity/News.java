@@ -5,23 +5,35 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.AccessType;
-import ru.smartel.strike.entity.interfaces.*;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "News")
 @Table(name = "news")
-public class News implements Commentable, Post, TitlesContents {
+public class News implements PostEntity {
+
+    @Embedded
+    private Post post = new Post();
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
-    private int id;
+    private long id;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -31,47 +43,8 @@ public class News implements Commentable, Post, TitlesContents {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "title_ru")
-    private String titleRu;
-
-    @Column(name = "title_en")
-    private String titleEn;
-
-    @Column(name = "title_es")
-    private String titleEs;
-
-    @Column(name = "content_ru", columnDefinition = "TEXT")
-    private String contentRu;
-
-    @Column(name = "content_en", columnDefinition = "TEXT")
-    private String contentEn;
-
-    @Column(name = "content_es", columnDefinition = "TEXT")
-    private String contentEs;
-
-    @NotNull
-    @Column(name = "date", nullable = false)
-    private LocalDateTime date;
-
-    @Column(name = "views", nullable = false)
-    private Integer views = 0;
-
-    @Column(name = "published", nullable = false)
-    private boolean published = false;
-
-    @Size(max = 500)
-    @Column(name = "source_link", length = 500)
-    private String sourceLink;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User author;
-
-    @ManyToMany(cascade = {CascadeType.REMOVE})
-    @JoinTable(name = "comment_news",
-            inverseJoinColumns = {@JoinColumn(name = "comment_id")},
-            joinColumns = {@JoinColumn(name = "news_id")}
-    )
-    private Set<Comment> comments = new HashSet<>();
+    @ManyToMany(mappedBy = "favouriteNews")
+    private Set<User> likedUsers = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "news_photo",
@@ -79,7 +52,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "photo_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Photo> photos;
+    private Set<Photo> photos = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     @JoinTable(name = "news_video",
@@ -87,7 +60,7 @@ public class News implements Commentable, Post, TitlesContents {
             inverseJoinColumns = {@JoinColumn(name = "video_id", referencedColumnName = "id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Video> videos;
+    private Set<Video> videos = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(name = "news_tag",
@@ -97,112 +70,40 @@ public class News implements Commentable, Post, TitlesContents {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Tag> tags = new HashSet<>();
 
-    public int getId() {
+    @Override
+    public Post getPost() {
+        return post;
+    }
+
+    @Override
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    @Override
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    @Override
-    public User getAuthor() {
-        return author;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    @Override
-    public void setAuthor(User author) {
-        this.author = author;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public String getTitleEn() {
-        return titleEn;
+    public Set<User> getLikedUsers() {
+        return likedUsers;
     }
 
-    public void setTitleEn(String titleEn) {
-        this.titleEn = titleEn;
-    }
-
-    public String getTitleEs() {
-        return titleEs;
-    }
-
-    public void setTitleEs(String titleEs) {
-        this.titleEs = titleEs;
-    }
-
-    public String getTitleRu() {
-        return titleRu;
-    }
-
-    public void setTitleRu(String titleRu) {
-        this.titleRu = titleRu;
-    }
-
-    public String getContentRu() {
-        return contentRu;
-    }
-
-    public void setContentRu(String contentRu) {
-        this.contentRu = contentRu;
-    }
-
-    public String getContentEn() {
-        return contentEn;
-    }
-
-    public void setContentEn(String contentEn) {
-        this.contentEn = contentEn;
-    }
-
-    public String getContentEs() {
-        return contentEs;
-    }
-
-    public void setContentEs(String contentEs) {
-        this.contentEs = contentEs;
-    }
-
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public Integer getViews() {
-        return views;
-    }
-
-    public void setViews(Integer views) {
-        this.views = views;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public String getSourceLink() {
-        return sourceLink;
-    }
-
-    public void setSourceLink(String sourceLink) {
-        this.sourceLink = sourceLink;
-    }
-
-    @Override
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    @Override
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
+    public void setLikedUsers(Set<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 
     public Set<Photo> getPhotos() {
@@ -227,13 +128,5 @@ public class News implements Commentable, Post, TitlesContents {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

@@ -2,7 +2,6 @@ package ru.smartel.strike.security.filter;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -10,11 +9,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.repository.UserRepository;
-import ru.smartel.strike.security.FirebaseAuthenticationException;
+import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
 
-import javax.servlet.*;
+import javax.persistence.EntityNotFoundException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Set;
@@ -43,7 +46,8 @@ public class FirebaseTokenFilter implements Filter {
     }
 
     private void authenticate(String bearer) throws AuthenticationException {
-        User user  = userRepository.findFirstByUuid("yBjIs0BELQSsWvyPAHcrGZa2hJi2");
+        User user  = userRepository.findFirstByUuid("yBjIs0BELQSsWvyPAHcrGZa2hJi2")
+                .orElseThrow(() -> new EntityNotFoundException("Временный пользователь yBjIs0BELQSsWvyPAHcrGZa2hJi2 не найден"));
         SecurityContextHolder.getContext().setAuthentication(
                 new UserAuthenticationToken(user, getUserAuthorities(user), null, true)
         );

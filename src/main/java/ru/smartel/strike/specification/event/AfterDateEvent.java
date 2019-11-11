@@ -22,7 +22,7 @@ public class AfterDateEvent implements Specification<Event> {
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.greaterThanOrEqualTo(root.get("date"),
+        return cb.greaterThanOrEqualTo(root.get("post").get("date"),
                 LocalDateTime.ofEpochSecond(dateFrom, 0, ZoneOffset.UTC));
     }
 }

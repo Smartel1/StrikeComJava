@@ -21,14 +21,10 @@
 ### News
  One of the main entities.
  Doesn't belong to conflicts, however similar to the event
-### Comment
- Belongs to news or event
-### Comment claims
- Belongs to comment. Created by users
 ### Photo (URL, not a file)
- May be attached to event, news or comment
+ May be attached to event or news
 ### Video (URL, preview URL and type)
- May be attached to event, news or comment
+ May be attached to event or news
 ### Client version
  Service entity for mobile clients. Helps to control updates necessity
 ### References

@@ -20,6 +20,6 @@ public class PublishedEvent implements Specification<Event> {
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.get("published"), published);
+        return cb.equal(root.get("post").get("published"), published);
     }
 }

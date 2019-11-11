@@ -5,20 +5,19 @@ public abstract class BusinessRule {
     public boolean when = true;
 
     /**
-     * Определить, проходит ли правило
+     * Returns true if rule passes
      */
     abstract public boolean passes();
 
     /**
-     * Сообщение об ошибке
+     * Forms error message
      */
     abstract public String message();
 
     /**
-     * Условие, когда правило применяется
+     * Rule apply condition
      */
-    public BusinessRule when(boolean condition)
-    {
+    public BusinessRule when(boolean condition) {
         when = condition;
         return this;
     }

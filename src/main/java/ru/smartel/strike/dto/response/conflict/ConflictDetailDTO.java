@@ -8,36 +8,38 @@ import java.time.ZoneOffset;
 
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
-    public ConflictDetailDTO (Conflict conflict, Locale locale) {
-        super(conflict, locale);
-        id = conflict.getId();
-        latitude = conflict.getLatitude();
-        longitude = conflict.getLongitude();
-        companyName = conflict.getCompanyName();
-        dateFrom = null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null;
-        dateTo = null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null;
-        conflictReasonId = null != conflict.getConflictReason() ? conflict.getConflictReason().getId() : null;
-        conflictResultId = null != conflict.getConflictResult() ? conflict.getConflictResult().getId() : null;
-        industryId = null != conflict.getIndustry() ? conflict.getIndustry().getId() : null;
-        parentEventId = null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null;
-    }
-
-    private int id;
+    private long id;
     private double latitude;
     private double longitude;
     private String companyName;
     private Long dateFrom;
     private Long dateTo;
-    private Integer conflictReasonId;
-    private Integer conflictResultId;
-    private Integer industryId;
-    private Integer parentEventId;
+    private Long conflictReasonId;
+    private Long conflictResultId;
+    private Long industryId;
+    private Long parentEventId;
 
-    public int getId() {
+    public static ConflictDetailDTO of(Conflict conflict, Locale locale) {
+        ConflictDetailDTO instance = new ConflictDetailDTO();
+        instance.setTitlesOf(conflict, locale);
+        instance.setId(conflict.getId());
+        instance.setLatitude(conflict.getLatitude());
+        instance.setLongitude(conflict.getLongitude());
+        instance.setCompanyName(conflict.getCompanyName());
+        instance.setDateFrom(null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
+        instance.setDateTo(null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
+        instance.setConflictReasonId(null != conflict.getReason() ? conflict.getReason().getId() : null);
+        instance.setConflictResultId(null != conflict.getResult() ? conflict.getResult().getId() : null);
+        instance.setIndustryId(null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
+        instance.setParentEventId(null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
+        return instance;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -81,35 +83,35 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         this.dateTo = dateTo;
     }
 
-    public Integer getConflictReasonId() {
+    public Long getConflictReasonId() {
         return conflictReasonId;
     }
 
-    public void setConflictReasonId(Integer conflictReasonId) {
+    public void setConflictReasonId(Long conflictReasonId) {
         this.conflictReasonId = conflictReasonId;
     }
 
-    public Integer getConflictResultId() {
+    public Long getConflictResultId() {
         return conflictResultId;
     }
 
-    public void setConflictResultId(Integer conflictResultId) {
+    public void setConflictResultId(Long conflictResultId) {
         this.conflictResultId = conflictResultId;
     }
 
-    public Integer getIndustryId() {
+    public Long getIndustryId() {
         return industryId;
     }
 
-    public void setIndustryId(Integer industryId) {
+    public void setIndustryId(Long industryId) {
         this.industryId = industryId;
     }
 
-    public Integer getParentEventId() {
+    public Long getParentEventId() {
         return parentEventId;
     }
 
-    public void setParentEventId(Integer parentEventId) {
+    public void setParentEventId(Long parentEventId) {
         this.parentEventId = parentEventId;
     }
 }

@@ -4,15 +4,17 @@ import ru.smartel.strike.entity.Video;
 
 public class VideoDTO {
 
-    public VideoDTO(Video video) {
-        url = video.getUrl();
-        previewUrl = video.getPreviewUrl();
-        videoTypeId = video.getVideoType().getId();
-    }
-
     private String url;
     private String previewUrl;
-    private int videoTypeId;
+    private long videoTypeId;
+
+    public static VideoDTO from(Video video) {
+        VideoDTO instance = new VideoDTO();
+        instance.setUrl(video.getUrl());
+        instance.setPreviewUrl(video.getPreviewUrl());
+        instance.setVideoTypeId(video.getVideoType().getId());
+        return instance;
+    }
 
     public String getUrl() {
         return url;
@@ -30,11 +32,11 @@ public class VideoDTO {
         this.previewUrl = previewUrl;
     }
 
-    public int getVideoTypeId() {
+    public long getVideoTypeId() {
         return videoTypeId;
     }
 
-    public void setVideoTypeId(int videoTypeId) {
+    public void setVideoTypeId(long videoTypeId) {
         this.videoTypeId = videoTypeId;
     }
 }

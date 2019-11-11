@@ -1,74 +1,29 @@
 package ru.smartel.strike.dto.response.event;
 
-import ru.smartel.strike.dto.response.TitlesContentExtendableDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
-import ru.smartel.strike.dto.response.video.VideoDTO;
+import ru.smartel.strike.dto.response.post.PostListDTO;
 import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.Photo;
-import ru.smartel.strike.entity.Tag;
 import ru.smartel.strike.service.Locale;
 
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.stream.Collectors;
+public class EventListDTO extends PostListDTO {
 
-public class EventListDTO extends TitlesContentExtendableDTO {
-
-    public EventListDTO(Event event, Locale locale) {
-        super(event, locale);
-        id = event.getId();
-        date = event.getDate().toEpochSecond(ZoneOffset.UTC);
-        views = event.getViews();
-        latitude = event.getLatitude();
-        longitude = event.getLongitude();
-        sourceLink = event.getSourceLink();
-        conflictId = event.getConflict().getId();
-        eventStatusId = null != event.getStatus() ? event.getStatus().getId() : null;
-        eventTypeId = null != event.getType() ? event.getType().getId() : null;
-        photos = event.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList());
-        videos = event.getVideos().stream().map(VideoDTO::new).collect(Collectors.toList());
-        tags = event.getTags().stream().map(Tag::getName).collect(Collectors.toList());
-        conflict = new ConflictDetailDTO(event.getConflict(), locale);
-        commentsCount = event.getComments().size();
-    }
-
-    private int id;
-    private long date;
-    private int views;
     private double latitude;
     private double longitude;
-    private String sourceLink;
-    private int conflictId;
-    private Integer eventStatusId;
-    private Integer eventTypeId;
-    private List<String> photos;
-    private List<VideoDTO> videos;
-    private List<String> tags;
+    private long conflictId;
+    private Long eventStatusId;
+    private Long eventTypeId;
     private ConflictDetailDTO conflict;
-    private int commentsCount;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getDate() {
-        return date;
-    }
-
-    public void setDate(long date) {
-        this.date = date;
-    }
-
-    public int getViews() {
-        return views;
-    }
-
-    public void setViews(int views) {
-        this.views = views;
+    public static EventListDTO of(Event event, Locale locale) {
+        EventListDTO instance = new EventListDTO();
+        instance.setCommonFieldsOf(event, locale);
+        instance.setLatitude(event.getLatitude());
+        instance.setLongitude(event.getLongitude());
+        instance.setConflictId(event.getConflict().getId());
+        instance.setEventStatusId(null != event.getStatus() ? event.getStatus().getId() : null);
+        instance.setEventTypeId(null != event.getType() ? event.getType().getId() : null);
+        instance.setConflict(ConflictDetailDTO.of(event.getConflict(), locale));
+        return instance;
     }
 
     public double getLatitude() {
@@ -87,60 +42,28 @@ public class EventListDTO extends TitlesContentExtendableDTO {
         this.longitude = longitude;
     }
 
-    public String getSourceLink() {
-        return sourceLink;
-    }
-
-    public void setSourceLink(String sourceLink) {
-        this.sourceLink = sourceLink;
-    }
-
-    public int getConflictId() {
+    public long getConflictId() {
         return conflictId;
     }
 
-    public void setConflictId(int conflictId) {
+    public void setConflictId(long conflictId) {
         this.conflictId = conflictId;
     }
 
-    public Integer getEventStatusId() {
+    public Long getEventStatusId() {
         return eventStatusId;
     }
 
-    public void setEventStatusId(Integer eventStatusId) {
+    public void setEventStatusId(Long eventStatusId) {
         this.eventStatusId = eventStatusId;
     }
 
-    public Integer getEventTypeId() {
+    public Long getEventTypeId() {
         return eventTypeId;
     }
 
-    public void setEventTypeId(Integer eventTypeId) {
+    public void setEventTypeId(Long eventTypeId) {
         this.eventTypeId = eventTypeId;
-    }
-
-    public List<String> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<String> photos) {
-        this.photos = photos;
-    }
-
-    public List<VideoDTO> getVideos() {
-        return videos;
-    }
-
-    public void setVideos(List<VideoDTO> videos) {
-        this.videos = videos;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
     }
 
     public ConflictDetailDTO getConflict() {
@@ -149,13 +72,5 @@ public class EventListDTO extends TitlesContentExtendableDTO {
 
     public void setConflict(ConflictDetailDTO conflict) {
         this.conflict = conflict;
-    }
-
-    public int getCommentsCount() {
-        return commentsCount;
-    }
-
-    public void setCommentsCount(int commentsCount) {
-        this.commentsCount = commentsCount;
     }
 }

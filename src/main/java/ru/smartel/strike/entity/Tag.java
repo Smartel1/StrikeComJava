@@ -1,6 +1,11 @@
 package ru.smartel.strike.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "tags")
@@ -8,7 +13,7 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private int id;
+    private long id;
 
     @Column
     private String name;
@@ -20,7 +25,7 @@ public class Tag {
         this.name = name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

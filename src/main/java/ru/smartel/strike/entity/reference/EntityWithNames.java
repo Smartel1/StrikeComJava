@@ -4,7 +4,12 @@ import org.springframework.data.annotation.AccessType;
 import ru.smartel.strike.entity.interfaces.Names;
 import ru.smartel.strike.service.Locale;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import java.util.Objects;
 
 @MappedSuperclass
 abstract public class EntityWithNames implements Names {
@@ -13,7 +18,7 @@ abstract public class EntityWithNames implements Names {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
-    int id;
+    long id;
     @Column(name = "name_ru")
     String nameRu;
     @Column(name = "name_en")
@@ -30,11 +35,11 @@ abstract public class EntityWithNames implements Names {
         this.nameEs = nameEs;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -80,5 +85,21 @@ abstract public class EntityWithNames implements Names {
             default:
                 return "";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityWithNames that = (EntityWithNames) o;
+        return id == that.id &&
+                Objects.equals(nameRu, that.nameRu) &&
+                Objects.equals(nameEn, that.nameEn) &&
+                Objects.equals(nameEs, that.nameEs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, nameRu, nameEn, nameEs);
     }
 }

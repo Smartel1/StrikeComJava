@@ -1,13 +1,13 @@
 package ru.smartel.strike.entity.reference;
 
-import ru.smartel.strike.entity.interfaces.Reference;
+import ru.smartel.strike.entity.interfaces.NamedReference;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "event_statuses")
-public class EventStatus extends EntityWithNames implements Reference {
+public class EventStatus extends EntityWithNames implements NamedReference {
 
     public EventStatus() {
     }

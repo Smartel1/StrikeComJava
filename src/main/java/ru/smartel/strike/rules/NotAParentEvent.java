@@ -1,13 +1,13 @@
 package ru.smartel.strike.rules;
 
-import ru.smartel.strike.repository.EventRepository;
+import ru.smartel.strike.repository.event.EventRepository;
 
 public class NotAParentEvent extends BusinessRule {
 
-    private int eventId;
+    private long eventId;
     private EventRepository repository;
 
-    public NotAParentEvent(int eventId, EventRepository repository) {
+    public NotAParentEvent(long eventId, EventRepository repository) {
         this.eventId = eventId;
         this.repository = repository;
     }

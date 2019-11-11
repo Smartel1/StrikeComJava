@@ -1,9 +1,3 @@
-
-INSERT INTO public.claim_types (name_ru, name_en, name_es) VALUES ('Комментарий не по теме', 'offtopic', 'no es el tema');
-INSERT INTO public.claim_types (name_ru, name_en, name_es) VALUES ('Другая причина', 'other reason', 'otro');
-INSERT INTO public.claim_types (name_ru, name_en, name_es) VALUES ('Нецензурная брань', 'swearing', 'juramento');
-INSERT INTO public.claim_types (name_ru, name_en, name_es) VALUES ('Реклама сторонних ресурсов', 'third-party advertising', 'publicidad');
-
 INSERT INTO public.conflict_reasons (name_ru, name_en, name_es) VALUES ('Оплата труда', 'Salary', 'remuneración');
 INSERT INTO public.conflict_reasons (name_ru, name_en, name_es) VALUES ('Задержка ЗП', 'Delay salary', 'Salarios Atrasados');
 INSERT INTO public.conflict_reasons (name_ru, name_en, name_es) VALUES ('Сокращения', 'Contraction', 'Contracción');
@@ -18,7 +12,6 @@ INSERT INTO public.conflict_reasons (name_ru, name_en, name_es) VALUES ('Кол�
 INSERT INTO public.conflict_results (name_ru, name_en, name_es) VALUES ('Удовлетворены полностью', 'Completely satisfied', 'Completamente satisfecho');
 INSERT INTO public.conflict_results (name_ru, name_en, name_es) VALUES ('Удовлетворены частично', 'Partially satisfied', 'Parcialmente satisfecho');
 INSERT INTO public.conflict_results (name_ru, name_en, name_es) VALUES ('Не удовлетворены', 'Not satisfied', 'No satisfecho');
-
 
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Россия', 'Russia', 'Rusia');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Азербайджан', 'Azerbaijan', 'Azerbaiyán');
@@ -75,4 +68,3 @@ INSERT INTO public.industries (name_ru, name_en, name_es) VALUES ('Образо�
 INSERT INTO public.video_types (code) VALUES ('youtube_link');
 INSERT INTO public.video_types (code) VALUES ('vk_link');
 INSERT INTO public.video_types (code) VALUES ('other');
-

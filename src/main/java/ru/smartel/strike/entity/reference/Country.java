@@ -1,6 +1,6 @@
 package ru.smartel.strike.entity.reference;
 
-import ru.smartel.strike.entity.interfaces.Reference;
+import ru.smartel.strike.entity.interfaces.NamedReference;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "countries")
-public class Country extends EntityWithNames implements Reference {
+public class Country extends EntityWithNames implements NamedReference {
     public Country() {
     }
 

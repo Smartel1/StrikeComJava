@@ -9,7 +9,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
- * Events near to point
+ * Events near the point
  * Haversine formula
  * 6371 * acos(cos(radians(:lat)) * cos(radians(e.latitude)) * cos(radians(e.longitude) - radians(:lng)) + sin(radians(:lat)) * sin(radians(e.latitude))) <= :radius
  * https://stackoverflow.com/questions/21084886/how-to-calculate-distance-using-latitude-and-longitude

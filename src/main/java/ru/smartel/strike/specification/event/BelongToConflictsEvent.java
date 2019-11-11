@@ -13,9 +13,9 @@ import java.util.List;
  * Events belong to conflicts or are parents of conflicts
  */
 public class BelongToConflictsEvent implements Specification<Event> {
-    private List<Integer> conflictIds;
+    private List<Long> conflictIds;
 
-    public BelongToConflictsEvent(List<Integer> conflictIds) {
+    public BelongToConflictsEvent(List<Long> conflictIds) {
         this.conflictIds = conflictIds;
     }
 

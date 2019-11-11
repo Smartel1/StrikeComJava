@@ -13,9 +13,9 @@ import java.util.List;
  * Events with types
  */
 public class MatchTypesEvent implements Specification<Event> {
-    private List<Integer> typeIds;
+    private List<Long> typeIds;
 
-    public MatchTypesEvent(List<Integer> typeIds) {
+    public MatchTypesEvent(List<Long> typeIds) {
         this.typeIds = typeIds;
     }
 
