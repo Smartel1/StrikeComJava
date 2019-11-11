@@ -21,6 +21,7 @@ import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.event.EventService;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @RestController
@@ -37,7 +38,7 @@ public class EventController {
     public ListWrapperDTO<EventListDTO> index(
             EventListRequestDTO dto,
             @AuthenticationPrincipal User user
-    ) throws ValidationException {
+    ) {
         dto.setUser(user);
         return eventService.list(dto);
     }
@@ -65,9 +66,10 @@ public class EventController {
             @PathVariable("locale") Locale locale,
             @RequestBody EventCreateRequestDTO dto,
             @AuthenticationPrincipal User user) {
-        dto.setLocale(locale);
-        dto.setUser(user);
-        return eventService.create(dto);
+        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
+//        dto.setLocale(locale);
+//        dto.setUser(user);
+//        return eventService.create(dto);
     }
 
     @PutMapping("{id}")
@@ -76,14 +78,16 @@ public class EventController {
             @PathVariable("id") long eventId,
             @AuthenticationPrincipal User user,
             @RequestBody EventUpdateRequestDTO dto) {
-        dto.setEventId(eventId);
-        dto.setLocale(locale);
-        dto.setUser(user);
-        return eventService.update(dto);
+        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
+//        dto.setEventId(eventId);
+//        dto.setLocale(locale);
+//        dto.setUser(user);
+//        return eventService.update(dto);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") long eventId) {
-        eventService.delete(eventId);
+        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
+//        eventService.delete(eventId);
     }
 }
