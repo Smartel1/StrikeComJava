@@ -38,6 +38,7 @@ public class FirebaseTokenFilter implements Filter {
         String bearer = ((HttpServletRequest)request).getHeader("Authorization");
 
         if (bearer != null) {
+            System.out.println("User uses bearer: " + bearer);
             if (!bearer.startsWith("Bearer ")) {
                 throw new BadCredentialsException("Некорректный заголовок Authorization (должен начинаться с \"bearer\")");
             }

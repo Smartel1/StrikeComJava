@@ -14,7 +14,7 @@ import java.io.IOException;
 @Configuration
 public class FirebaseConf implements WebMvcConfigurer {
 
-    @Value("firebase.authentication")
+    @Value("${firebase.authentication}")
     private String serviceAccountJson;
 
     @PostConstruct
