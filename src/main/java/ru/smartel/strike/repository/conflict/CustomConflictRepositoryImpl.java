@@ -2,6 +2,7 @@ package ru.smartel.strike.repository.conflict;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.NestedNodeRepository;
 import ru.smartel.strike.entity.Conflict;
 
@@ -12,7 +13,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-
+@Transactional
 public class CustomConflictRepositoryImpl implements CustomConflictRepository {
 
     @PersistenceContext
@@ -30,19 +31,29 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
     }
 
     @Override
-    public void saveManagingNestedTree(Conflict conflict) {
-        if (null == conflict.getParentEvent()) {
-            //If this conflict has no parent, then set lvl=0; lft and rgt according to nested set spec
-            Long maxRight = getMaxRight();
-            conflict.setTreeLeft(maxRight + 1);
-            conflict.setTreeRight(maxRight + 2);
-            conflict.setTreeLevel(0L);
-            entityManager.persist(conflict);
+    public void rebuildTree() {
+        conflictNestedNodeRepository.rebuildTree();
+    }
+
+    @Override
+    public void insertAsLastChildOf(Conflict conflict, Conflict parent) {
+        if (parent != null) {
+            conflictNestedNodeRepository.insertAsLastChildOf(conflict, parent);
         } else {
-            //If conflict has parent conflict (through parentEvent) - let NestedNodeRepository rule it
-            Conflict parentConflict = conflict.getParentEvent().getConflict();
-            conflictNestedNodeRepository.insertAsLastChildOf(conflict, parentConflict);
+            //saving as conflict with no parent
+            conflict.setTreeLevel(0L);
+            conflict.setTreeLeft(getMaxRight() + 1);
+            conflict.setTreeRight(getMaxRight() + 2);
+            entityManager.persist(conflict);
         }
+    }
+
+    @Override
+    public boolean hasChildren(Conflict conflict) {
+        Long childrenCount = (Long) entityManager.createQuery("select count(c) from Conflict c where c.parentId = :id")
+                .setParameter("id", conflict.getId())
+                .getSingleResult();
+        return !childrenCount.equals(0L);
     }
 
     private Long getMaxRight() {

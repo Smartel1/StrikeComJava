@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +43,6 @@ public class ConflictServiceImpl implements ConflictService {
     private ConflictResultRepository conflictResultRepository;
     private IndustryRepository industryRepository;
     private EventRepository eventRepository;
-
 
     public ConflictServiceImpl(ConflictDTOValidator dtoValidator,
                                FiltersTransformer filtersTransformer,
@@ -110,7 +110,11 @@ public class ConflictServiceImpl implements ConflictService {
         Conflict conflict = new Conflict();
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.saveManagingNestedTree(conflict);
+        Conflict parentConflict = Optional.ofNullable(conflict.getParentEvent())
+                .map(Event::getConflict)
+                .orElse(null);
+
+        conflictRepository.insertAsLastChildOf(conflict, parentConflict);
 
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
@@ -125,7 +129,12 @@ public class ConflictServiceImpl implements ConflictService {
 
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.saveManagingNestedTree(conflict);
+        Conflict parentConflict = Optional.ofNullable(conflict.getParentEvent())
+                .map(Event::getConflict)
+                .orElse(null);
+
+        conflictRepository.insertAsLastChildOf(conflict, parentConflict);
+
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
 
@@ -134,6 +143,10 @@ public class ConflictServiceImpl implements ConflictService {
     public void delete(long conflictId) {
         Conflict conflict = conflictRepository.findById(conflictId)
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+
+        if (conflictRepository.hasChildren(conflict)) {
+            throw new IllegalStateException("В текущей реализации нельзя удалять конфликты, у которых есть потомки");
+        };
 
         conflictRepository.delete(conflict);
     }

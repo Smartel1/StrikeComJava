@@ -11,7 +11,16 @@ public interface CustomConflictRepository {
 
     List<Long> findAllByIdGetParentEventId(List<Long> ids);
 
-    void saveManagingNestedTree(Conflict conflict);
+    /**
+     * Rebuilds nested set tree.
+     * This method is extremely expensive.
+     * TODO refactor
+     */
+    void rebuildTree();
+
+    void insertAsLastChildOf(Conflict conflict, Conflict parent);
+
+    boolean hasChildren(Conflict conflict);
 
     List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage);
 }
