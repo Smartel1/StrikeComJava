@@ -3,7 +3,7 @@ package ru.smartel.strike.dto.request.event;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 
 import java.util.Optional;
@@ -15,7 +15,7 @@ public class EventCreateRequestDTO extends PostRequestDTO {
     @JsonIgnore
     private Locale locale;
     @JsonIgnore
-    private User user;
+    private UserPrincipal user;
     private Optional<Long> conflictId;
     private Optional<Float> latitude;
     private Optional<Float> longitude;
@@ -31,11 +31,11 @@ public class EventCreateRequestDTO extends PostRequestDTO {
         this.locale = locale;
     }
 
-    public User getUser() {
+    public UserPrincipal getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserPrincipal user) {
         this.user = user;
     }
 

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
+import ru.smartel.strike.security.token.UserPrincipal;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.Filter;
@@ -49,7 +50,7 @@ public class FirebaseTokenFilter implements Filter {
         User user  = userRepository.findFirstByUuid("yBjIs0BELQSsWvyPAHcrGZa2hJi2")
                 .orElseThrow(() -> new EntityNotFoundException("Временный пользователь yBjIs0BELQSsWvyPAHcrGZa2hJi2 не найден"));
         SecurityContextHolder.getContext().setAuthentication(
-                new UserAuthenticationToken(user, getUserAuthorities(user), null, true)
+                new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), null, true)
         );
 //        FirebaseToken token;
 //
@@ -72,7 +73,7 @@ public class FirebaseTokenFilter implements Filter {
 //        }
 //
 //        SecurityContextHolder.getContext().setAuthentication(
-//                new UserAuthenticationToken(user, getUserAuthorities(user), token, true)
+//                new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), token, true)
 //        );
     }
 

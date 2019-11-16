@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.user.UserUpdateRequestDTO;
 import ru.smartel.strike.dto.response.user.UserDetailDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.user.UserService;
 
 @RestController
@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public UserDetailDTO get(@AuthenticationPrincipal User user) {
+    public UserDetailDTO get(@AuthenticationPrincipal UserPrincipal user) {
         return userService.get(user.getId());
     }
 
