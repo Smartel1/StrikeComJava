@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventFavouritesRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
@@ -50,10 +51,9 @@ public class EventController {
     @PostMapping("{id}/favourites")
     public void setFavourite(
             @PathVariable("id") long eventId,
-            @RequestParam(value = "favourite") boolean isFavourite,
+            @RequestBody EventFavouritesRequestDTO dto,
             @AuthenticationPrincipal User user) {
-        Optional.ofNullable(user).ifPresent(
-                usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite));
+        Optional.ofNullable(user).ifPresent(usr -> eventService.setFavourite(eventId, usr.getId(), dto.isFavourite()));
     }
 
     @PostMapping
