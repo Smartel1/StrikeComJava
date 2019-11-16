@@ -124,7 +124,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @PreAuthorize("permitAll()")
     public NewsDetailDTO incrementViewsAndGet(NewsShowDetailRequestDTO dto) {
-        News news = newsRepository.findById(dto.getNewsId())
+        News news = newsRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Новость не найдена"));
 
         news.setViews(news.getViews() + 1);
