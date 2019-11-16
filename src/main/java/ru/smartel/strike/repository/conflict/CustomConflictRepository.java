@@ -27,4 +27,18 @@ public interface CustomConflictRepository {
      * @return true if conflict has child conflicts
      */
     boolean hasChildren(Conflict conflict);
+
+    /**
+     * Get root conflict of conflict tree
+     * @param conflict
+     * @return
+     */
+    Conflict getRootConflict(Conflict conflict);
+
+    /**
+     * Get conflict's descendants (not only children)
+     * @param conflict
+     * @return
+     */
+    List<Conflict> getDescendantsAndSelf(Conflict conflict);
 }

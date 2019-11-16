@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.NestedNodeRepository;
+import pl.exsio.nestedj.model.Tree;
 import ru.smartel.strike.entity.Conflict;
 
 import javax.persistence.EntityManager;
@@ -77,5 +78,25 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
             //happens if no rows in the table
             return 0L;
         }
+    }
+
+    @Override
+    public Conflict getRootConflict(Conflict conflict) {
+        return (Conflict) entityManager.createQuery(
+                "select c from Conflict c where treeLevel = :rootLevel and treeLeft <= :lft and treeRight >= :rgt")
+                .setParameter("rootLevel", 0L)
+                .setParameter("rgt", conflict.getTreeRight())
+                .setParameter("lft", conflict.getTreeLeft())
+                .getSingleResult();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Conflict> getDescendantsAndSelf(Conflict conflict) {
+        return entityManager.createQuery(
+                "select c from Conflict c where treeLeft >= :lft and treeRight <= :rgt")
+                .setParameter("rgt", conflict.getTreeRight())
+                .setParameter("lft", conflict.getTreeLeft())
+                .getResultList();
     }
 }

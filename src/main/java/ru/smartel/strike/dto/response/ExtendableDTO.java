@@ -10,7 +10,7 @@ import java.util.Map;
  * Класс-заготовка для DTO, которые содержат необязательные поля.
  * Такие поля сериализуются в json как обычные поля класса
  */
-public abstract class ExtendableDTO {
+public class ExtendableDTO {
 
     private Map<String, Object> optionalFields = new HashMap<>();
 
