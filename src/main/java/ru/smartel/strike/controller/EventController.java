@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
@@ -43,12 +43,8 @@ public class EventController {
     }
 
     @GetMapping("{id}")
-    public EventDetailDTO show(
-            @PathVariable("locale") Locale locale,
-            @PathVariable("id") long eventId,
-            @RequestParam(value = "withRelatives", required = false) boolean withRelatives
-    ) {
-        return eventService.incrementViewsAndGet(eventId, locale, withRelatives);
+    public EventDetailDTO show(EventShowDetailRequestDTO dto) {
+        return eventService.incrementViewsAndGet(dto);
     }
 
     @PostMapping("{id}/favourites")

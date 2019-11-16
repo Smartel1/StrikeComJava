@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
+import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
@@ -145,18 +146,19 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
-    public EventDetailDTO incrementViewsAndGet(Long eventId, Locale locale, boolean withRelatives) {
-        Event event = eventRepository.findById(eventId)
+    public EventDetailDTO incrementViewsAndGet(EventShowDetailRequestDTO dto) {
+        Event event = eventRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
 
         event.setViews(event.getViews() + 1);
-        EventDetailDTO dto = EventDetailDTO.of(event, locale);
 
-        if (withRelatives) {
-            dto.add("relatives", null);
+        EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
+
+        if (dto.isWithRelatives()) {
+            result.add("relatives", null); //todo implement
         }
 
-        return dto;
+        return result;
     }
 
     @Override
