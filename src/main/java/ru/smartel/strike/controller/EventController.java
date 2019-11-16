@@ -16,8 +16,8 @@ import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
-import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.ValidationException;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.event.EventService;
 
@@ -36,7 +36,7 @@ public class EventController {
     @GetMapping
     public ListWrapperDTO<EventListDTO> index(
             EventListRequestDTO dto,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserPrincipal user
     ) throws ValidationException {
         dto.setUser(user);
         return eventService.list(dto);
@@ -55,7 +55,7 @@ public class EventController {
     public void setFavourite(
             @PathVariable("id") long eventId,
             @RequestParam(value = "favourite") boolean isFavourite,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         Optional.ofNullable(user).ifPresent(
                 usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite));
     }
@@ -64,7 +64,7 @@ public class EventController {
     public EventDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody EventCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return eventService.create(dto);
@@ -74,7 +74,7 @@ public class EventController {
     public EventDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long eventId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody EventUpdateRequestDTO dto) {
         dto.setEventId(eventId);
         dto.setLocale(locale);
