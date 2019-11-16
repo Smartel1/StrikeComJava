@@ -13,7 +13,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class CustomConflictRepositoryImpl implements CustomConflictRepository {
 
     @PersistenceContext
@@ -31,8 +31,18 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
     }
 
     @Override
-    public void rebuildTree() {
-        conflictNestedNodeRepository.rebuildTree();
+    public List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
+        Root<Conflict> root = idQuery.from(Conflict.class);
+        idQuery.select(root.get("id"));
+
+        idQuery.where(specification.toPredicate(root, idQuery, cb));
+
+        return entityManager.createQuery(idQuery)
+                .setMaxResults(perPage)
+                .setFirstResult((page - 1) * perPage)
+                .getResultList();
     }
 
     @Override
@@ -56,6 +66,10 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
         return !childrenCount.equals(0L);
     }
 
+    /**
+     * Get max 'treeRight' value of conflicts tree or 0L if tree is empty
+     * @return max rgt
+     */
     private Long getMaxRight() {
         try {
             return (Long)entityManager.createQuery("select max(treeRight) from Conflict").getSingleResult();
@@ -63,20 +77,5 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
             //happens if no rows in the table
             return 0L;
         }
-    }
-
-    @Override
-    public List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
-        Root<Conflict> root = idQuery.from(Conflict.class);
-        idQuery.select(root.get("id"));
-
-        idQuery.where(specification.toPredicate(root, idQuery, cb));
-
-        return entityManager.createQuery(idQuery)
-                .setMaxResults(perPage)
-                .setFirstResult((page - 1) * perPage)
-                .getResultList();
     }
 }
