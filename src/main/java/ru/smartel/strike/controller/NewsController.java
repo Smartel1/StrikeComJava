@@ -18,7 +18,7 @@ import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.news.NewsService;
 
@@ -37,7 +37,7 @@ public class NewsController {
     @GetMapping
     public ListWrapperDTO<NewsListDTO> index(
             NewsListRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setUser(user);
         return newsService.list(dto);
     }
@@ -51,7 +51,7 @@ public class NewsController {
     public void setFavourite(
             @PathVariable("id") long newsId,
             @RequestBody NewsFavouritesRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         Optional.ofNullable(user).ifPresent(usr -> newsService.setFavourite(newsId, usr.getId(), dto.isFavourite()));
     }
 
@@ -59,7 +59,7 @@ public class NewsController {
     public NewsDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody NewsCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return newsService.create(dto);
@@ -69,7 +69,7 @@ public class NewsController {
     public NewsDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long newsId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody NewsUpdateRequestDTO dto ) {
         dto.setNewsId(newsId);
         dto.setLocale(locale);

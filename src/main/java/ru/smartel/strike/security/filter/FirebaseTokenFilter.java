@@ -13,6 +13,7 @@ import ru.smartel.strike.entity.User;
 import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.security.FirebaseAuthenticationException;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
+import ru.smartel.strike.security.token.UserPrincipal;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.Filter;
@@ -70,7 +71,7 @@ public class FirebaseTokenFilter implements Filter {
         }
 
         SecurityContextHolder.getContext().setAuthentication(
-                new UserAuthenticationToken(user, getUserAuthorities(user), token, true)
+                new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), token, true)
         );
     }
 
