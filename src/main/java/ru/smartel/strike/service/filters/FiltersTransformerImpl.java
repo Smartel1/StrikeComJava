@@ -36,6 +36,7 @@ import ru.smartel.strike.specification.news.HasTagNews;
 import ru.smartel.strike.specification.news.PublishedNews;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class FiltersTransformerImpl implements FiltersTransformer {
@@ -90,7 +91,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getPublished()) result = result.and(new PublishedNews(filters.getPublished()));
         if (null != filters.getDateFrom()) result = result.and(new AfterDateNews(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateNews(filters.getDateTo()));
-        if (null != filters.getFavourites() && null != userId) result = result.and(new FavouriteNews(userId));
+        if (null != filters.getFavourites() && filters.getFavourites() && null != userId) result = result.and(new FavouriteNews(userId));
         if (null != filters.getTagId()) result = result.and(new HasTagNews(filters.getTagId()));
 
         return result;
