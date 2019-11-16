@@ -238,7 +238,7 @@ public class EventServiceImpl implements EventService {
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != event.isPublished();
 
         boolean changingConflictJoint =
-                null != dto.getConflictId() && (dto.getConflictId().orElseThrow() != event.getConflict().getId());
+                null != dto.getConflictId() && (!dto.getConflictId().orElseThrow().equals(event.getConflict().getId()));
 
         businessValidationService.validate(
                 new UserCanModerate(user).when(changingPublicationStatus

@@ -16,10 +16,7 @@ import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.service.Locale;
-
-import java.util.Collections;
 import ru.smartel.strike.service.conflict.ConflictService;
 
 @RestController
@@ -52,10 +49,9 @@ public class ConflictController {
             @PathVariable("locale") Locale locale,
             @RequestBody ConflictCreateRequestDTO dto,
             @AuthenticationPrincipal User user) {
-        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
-//        dto.setLocale(locale);
-//        dto.setUser(user);
-//        return conflictService.create(dto);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        return conflictService.create(dto);
     }
 
     @PutMapping("{id}")
@@ -64,16 +60,14 @@ public class ConflictController {
             @PathVariable("id") long conflictId,
             @AuthenticationPrincipal User user,
             @RequestBody ConflictUpdateRequestDTO dto) {
-        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
-//        dto.setLocale(locale);
-//        dto.setUser(user);
-//        dto.setConflictId(conflictId);
-//        return conflictService.update(dto);
+        dto.setLocale(locale);
+        dto.setUser(user);
+        dto.setConflictId(conflictId);
+        return conflictService.update(dto);
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable("id") long conflictId) {
-        throw new ValidationException(Collections.singletonMap("error", Collections.singletonList("non implemented")));
-//        conflictService.delete(conflictId);
+        conflictService.delete(conflictId);
     }
 }
