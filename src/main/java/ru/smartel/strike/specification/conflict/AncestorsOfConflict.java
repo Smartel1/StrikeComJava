@@ -24,8 +24,8 @@ public class AncestorsOfConflict implements Specification<Conflict> {
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return cb.and(
-                cb.greaterThan(root.get("rgt"), rgt),
-                cb.lessThan(root.get("lft"), lft)
+                cb.greaterThan(root.get("treeRight"), rgt),
+                cb.lessThan(root.get("treeLeft"), lft)
         );
     }
 }

@@ -14,7 +14,7 @@ public interface CustomConflictRepository {
     List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage);
 
     /**
-     * Persist conflict as child of another conflict of as root (if parent == null).
+     * Persist conflict as child of another conflict or as root (if parent == null).
      * In case of conflict already exists in tree - replace
      * @param conflict transient or persistent conflict
      * @param parent persistent parent conflict or null
