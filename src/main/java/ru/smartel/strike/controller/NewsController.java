@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsFavouritesRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
@@ -49,10 +50,9 @@ public class NewsController {
     @PostMapping("{id}/favourites")
     public void setFavourite(
             @PathVariable("id") long newsId,
-            @RequestParam(value = "favourite") boolean isFavourite,
+            @RequestBody NewsFavouritesRequestDTO dto,
             @AuthenticationPrincipal User user) {
-        Optional.ofNullable(user).ifPresent(
-                usr -> newsService.setFavourite(newsId, usr.getId(), isFavourite));
+        Optional.ofNullable(user).ifPresent(usr -> newsService.setFavourite(newsId, usr.getId(), dto.isFavourite()));
     }
 
     @PostMapping
