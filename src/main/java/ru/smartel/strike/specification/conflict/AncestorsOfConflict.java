@@ -13,10 +13,10 @@ import javax.persistence.criteria.Root;
  */
 public class AncestorsOfConflict implements Specification<Conflict> {
 
-    private int lft;
-    private int rgt;
+    private long lft;
+    private long rgt;
 
-    public AncestorsOfConflict(int lft, int rgt) {
+    public AncestorsOfConflict(long lft, long rgt) {
         this.lft = lft;
         this.rgt = rgt;
     }

@@ -137,13 +137,15 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             });
         }
 
-        dto.getCompanyName().ifPresent(companyName -> {
-            if (companyName.length() < 3) {
-                addErrorMessage("companyName", new Min(3), errors);
-            } else if (companyName.length() > 500) {
-                addErrorMessage("companyName", new Max(500), errors);
-            }
-        });
+        if (null != dto.getCompanyName()) {
+            dto.getCompanyName().ifPresent(companyName -> {
+                if (companyName.length() < 3) {
+                    addErrorMessage("companyName", new Min(3), errors);
+                } else if (companyName.length() > 500) {
+                    addErrorMessage("companyName", new Max(500), errors);
+                }
+            });
+        }
 
         throwIfErrorsExist(errors);
     }
