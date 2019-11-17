@@ -261,7 +261,7 @@ public class EventServiceImpl implements EventService {
 
         fillEventFields(event, dto, dto.getLocale());
 
-        if (event.isPublished()) {
+        if (event.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
             Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))

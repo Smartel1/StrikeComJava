@@ -13,3 +13,6 @@ server:
 
 firebase:
   authentication: ${FB_AUTH_JSON}
+
+push:
+  enabled: ${PUSH_ENABLED} #todo depends on dev/prod
