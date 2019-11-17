@@ -501,7 +501,7 @@ public class EventServiceImpl implements EventService {
                                 eventDTO.setTitlesOf(evn, locale);
                                 return eventDTO;
                             })
-                            .sorted(Comparator.comparingInt(dto -> (int) dto.getDate()))
+                            .sorted(Comparator.comparingLong(BriefEventDTO::getDate))
                             .collect(Collectors.toList())
                     );
                     return confDTO;
