@@ -1,10 +1,14 @@
 package ru.smartel.strike.dto.response.event;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.smartel.strike.dto.response.conflict.BriefConflictWithEventsDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.post.PostDetailDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.service.Locale;
+
+import java.util.List;
 
 public class EventDetailDTO extends PostDetailDTO {
 
@@ -15,6 +19,8 @@ public class EventDetailDTO extends PostDetailDTO {
     private Long eventTypeId;
     private ConflictDetailDTO conflict;
     private ExtendedLocalityDTO locality;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<BriefConflictWithEventsDTO> relatives;
 
     public static EventDetailDTO of(Event event, Locale locale) {
         EventDetailDTO instance = new EventDetailDTO();
@@ -83,5 +89,13 @@ public class EventDetailDTO extends PostDetailDTO {
 
     public void setLocality(ExtendedLocalityDTO locality) {
         this.locality = locality;
+    }
+
+    public List<BriefConflictWithEventsDTO> getRelatives() {
+        return relatives;
+    }
+
+    public void setRelatives(List<BriefConflictWithEventsDTO> relatives) {
+        this.relatives = relatives;
     }
 }
