@@ -27,4 +27,10 @@ public interface CustomConflictRepository {
      * @return true if conflict has child conflicts
      */
     boolean hasChildren(Conflict conflict);
+
+    /**
+     * Remove conflict from tree
+     * @param conflict conflict to remove
+     */
+    void deleteFromTree(Conflict conflict);
 }
