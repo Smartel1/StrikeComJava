@@ -51,11 +51,7 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
         if (parent != null) {
             conflictNestedNodeRepository.insertAsLastChildOf(conflict, parent);
         } else {
-            //saving as conflict with no parent
-            conflict.setTreeLevel(0L);
-            conflict.setTreeLeft(getMaxRight() + 1);
-            conflict.setTreeRight(getMaxRight() + 2);
-            entityManager.persist(conflict);
+            conflictNestedNodeRepository.insertAsLastRoot(conflict);
         }
     }
 
@@ -67,17 +63,9 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
         return !childrenCount.equals(0L);
     }
 
-    /**
-     * Get max 'treeRight' value of conflicts tree or 0L if tree is empty
-     * @return max rgt
-     */
-    private Long getMaxRight() {
-        try {
-            return (Long)entityManager.createQuery("select max(treeRight) from Conflict").getSingleResult();
-        } catch (Exception ex) {
-            //happens if no rows in the table
-            return 0L;
-        }
+    @Override
+    public void deleteFromTree(Conflict conflict) {
+        conflictNestedNodeRepository.removeSingle(conflict);
     }
 
     @Override

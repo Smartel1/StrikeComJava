@@ -148,7 +148,7 @@ public class ConflictServiceImpl implements ConflictService {
             throw new IllegalStateException("В текущей реализации нельзя удалять конфликты, у которых есть потомки");
         };
 
-        conflictRepository.delete(conflict);
+        conflictRepository.deleteFromTree(conflict);
     }
 
     private void fillConflictFields(Conflict conflict, ConflictCreateRequestDTO dto, Locale locale) {

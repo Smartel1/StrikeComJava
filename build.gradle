@@ -31,9 +31,9 @@ dependencies {
     compile 'com.google.firebase:firebase-admin:6.8.1'
     compile 'com.github.java-json-tools:json-schema-validator:2.2.10'
     compile 'org.flywaydb:flyway-core:5.2.4'
-    compile 'com.github.eXsio:nestedj:4.0.0'
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
+    compile 'com.github.eXsio:nestedj:4.1.0'
 
     // test dependencies
     testCompile('org.springframework.boot:spring-boot-starter-test') {

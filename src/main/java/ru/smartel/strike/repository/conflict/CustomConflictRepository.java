@@ -41,4 +41,10 @@ public interface CustomConflictRepository {
      * @return
      */
     List<Conflict> getDescendantsAndSelf(Conflict conflict);
+
+    /**
+     * Remove conflict from tree
+     * @param conflict conflict to remove
+     */
+    void deleteFromTree(Conflict conflict);
 }
