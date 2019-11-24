@@ -41,8 +41,8 @@ public class PushServiceImpl implements PushService {
                 .setTopic(TOPIC_ADMIN)
                 .setNotification(new Notification("ЗабастКом", "На модерации новость от " + authorName))
                 .putData("id", String.valueOf(newsId))
-                .putData("creator_name", authorName)
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("creatorName", authorName)
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("type", "admin") // wth is that?
                 .build();
 
@@ -56,8 +56,8 @@ public class PushServiceImpl implements PushService {
                 .setTopic(TOPIC_ADMIN)
                 .setNotification(new Notification("ЗабастКом", "На модерации событие от " + authorName))
                 .putData("id", String.valueOf(eventId))
-                .putData("creator_name", authorName)
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("creatorName", authorName)
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("type", "admin") // wth is that?
                 .build();
 
@@ -98,11 +98,11 @@ public class PushServiceImpl implements PushService {
                 //idk why always Russian
                 .setNotification(new Notification("Забастком", "Ваша новость не прошла модерацию и была удалена"))
                 .putData("id", String.valueOf(newsId))
-                .putData("message_ru", "Предложенный Вами пост не прошел модерацию и был удалён")
-                .putData("message_en", "The news you proposed was removed")
-                .putData("message_es", "Las noticias que propusiste fueron eliminadas")
-                .putData("message_de", "Der von Ihnen vorgeschlagene Beitrag hat die Moderation nicht bestanden und wurde gelöscht")
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("messageRu", "Предложенный Вами пост не прошел модерацию и был удалён")
+                .putData("messageEn", "The news you proposed was removed")
+                .putData("messageEs", "Las noticias que propusiste fueron eliminadas")
+                .putData("messageDe", "Der von Ihnen vorgeschlagene Beitrag hat die Moderation nicht bestanden und wurde gelöscht")
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("type", "moderated") // wth is that?
                 .build();
         sendAsync(message);
@@ -120,7 +120,7 @@ public class PushServiceImpl implements PushService {
                 .setNotification(new Notification("Забастком", "Ваше событие не прошло модерацию и было удалено"))
                 .putData("id", String.valueOf(eventId))
                 .putData("message", "Ваше событие не прошло модерацию и было удаленон")
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("type", "moderated") // wth is that?
                 .build();
         sendAsync(message);
@@ -173,8 +173,8 @@ public class PushServiceImpl implements PushService {
                 .setTopic(topic)
                 .setNotification(new Notification(notificationTitle, notificationBody))
                 .putData("id", String.valueOf(newsId))
-                .putData("creator_id", String.valueOf(authorId))
-                .putData("creator_id", title)
+                .putData("creatorId", String.valueOf(authorId))
+                .putData("title", title)
                 .putData("type", "news") // wth is that?
                 .build();
         sendAsync(message);
@@ -229,8 +229,8 @@ public class PushServiceImpl implements PushService {
                 .putData("id", String.valueOf(eventId))
                 .putData("lat", String.valueOf(lat))
                 .putData("lng", String.valueOf(lng))
-                .putData("creator_id", String.valueOf(authorId))
-                .putData("creator_id", title)
+                .putData("creatorId", String.valueOf(authorId))
+                .putData("title", title)
                 .putData("type", "news") // wth is that?
                 .build();
         sendAsync(message);
@@ -252,11 +252,11 @@ public class PushServiceImpl implements PushService {
                 //idk why always Russian
                 .setNotification(new Notification("Забастком", "Предложенный Вами пост прошел модерацию"))
                 .putData("id", String.valueOf(newsId))
-                .putData("message_ru", "Предложенный Вами пост прошел модерацию")
-                .putData("message_en", "The news you proposed was published")
-                .putData("message_es", "Las noticias que propusiste fueron publicadas")
-                .putData("message_de", "Ihr Beitrag wurde moderiert")
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("messageRu", "Предложенный Вами пост прошел модерацию")
+                .putData("messageEn", "The news you proposed was published")
+                .putData("messageEs", "Las noticias que propusiste fueron publicadas")
+                .putData("messageDe", "Ihr Beitrag wurde moderiert")
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("type", "moderated") // wth is that?
                 .build();
         sendAsync(message);
@@ -280,11 +280,11 @@ public class PushServiceImpl implements PushService {
                 //idk why always Russian
                 .setNotification(new Notification("Забастком", "Предложенный Вами пост прошел модерацию"))
                 .putData("id", String.valueOf(eventId))
-                .putData("message_ru", "Предложенный Вами пост прошел модерацию")
-                .putData("message_en", "The news you proposed was published")
-                .putData("message_es", "Las noticias que propusiste fueron publicadas")
-                .putData("message_es", "Ihr Beitrag wurde moderiert")
-                .putData("creator_id", String.valueOf(authorId))
+                .putData("messageRu", "Предложенный Вами пост прошел модерацию")
+                .putData("messageEn", "The news you proposed was published")
+                .putData("messageEs", "Las noticias que propusiste fueron publicadas")
+                .putData("messageDe", "Ihr Beitrag wurde moderiert")
+                .putData("creatorId", String.valueOf(authorId))
                 .putData("lat", String.valueOf(lat))
                 .putData("lng", String.valueOf(lng))
                 .putData("type", "moderated") // wth is that?
