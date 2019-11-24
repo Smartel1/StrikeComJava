@@ -18,7 +18,7 @@ public class ClientVersion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private int id;
+    private long id;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -49,7 +49,7 @@ public class ClientVersion {
     @Column(name = "description_de")
     private String descriptionDe;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

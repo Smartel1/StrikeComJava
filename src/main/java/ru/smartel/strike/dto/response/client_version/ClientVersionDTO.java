@@ -5,7 +5,7 @@ import ru.smartel.strike.entity.ClientVersion;
 import ru.smartel.strike.service.Locale;
 
 public class ClientVersionDTO extends ExtendableDTO {
-    private int id;
+    private long id;
     private String version;
     private boolean isRequired;
 
@@ -25,11 +25,11 @@ public class ClientVersionDTO extends ExtendableDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
