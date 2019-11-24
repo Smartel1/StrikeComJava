@@ -13,10 +13,10 @@ import javax.persistence.criteria.Root;
  */
 public class AncestorsOfConflict implements Specification<Conflict> {
 
-    private int lft;
-    private int rgt;
+    private long lft;
+    private long rgt;
 
-    public AncestorsOfConflict(int lft, int rgt) {
+    public AncestorsOfConflict(long lft, long rgt) {
         this.lft = lft;
         this.rgt = rgt;
     }
@@ -24,8 +24,8 @@ public class AncestorsOfConflict implements Specification<Conflict> {
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return cb.and(
-                cb.greaterThan(root.get("rgt"), rgt),
-                cb.lessThan(root.get("lft"), lft)
+                cb.greaterThan(root.get("treeRight"), rgt),
+                cb.lessThan(root.get("treeLeft"), lft)
         );
     }
 }

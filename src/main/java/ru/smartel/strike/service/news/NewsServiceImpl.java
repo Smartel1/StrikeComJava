@@ -219,7 +219,7 @@ public class NewsServiceImpl implements NewsService {
 
         fillNewsFields(news, dto, dto.getLocale());
 
-        if (news.isPublished()) {
+        if (news.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
             Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))

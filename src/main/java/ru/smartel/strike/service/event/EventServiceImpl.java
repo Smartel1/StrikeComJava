@@ -10,6 +10,8 @@ import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
+import ru.smartel.strike.dto.response.conflict.BriefConflictWithEventsDTO;
+import ru.smartel.strike.dto.response.event.BriefEventDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.entity.Conflict;
@@ -44,10 +46,12 @@ import ru.smartel.strike.specification.event.PublishedEvent;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -155,7 +159,7 @@ public class EventServiceImpl implements EventService {
         EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
 
         if (dto.isWithRelatives()) {
-            result.add("relatives", null); //todo implement
+            result.add("relatives", getRelatives(event, dto.getLocale()));
         }
 
         return result;
@@ -240,7 +244,7 @@ public class EventServiceImpl implements EventService {
                 null != dto.getPublished() && dto.getPublished().orElseThrow() != event.isPublished();
 
         boolean changingConflictJoint =
-                null != dto.getConflictId() && (dto.getConflictId().orElseThrow() != event.getConflict().getId());
+                null != dto.getConflictId() && (!dto.getConflictId().orElseThrow().equals(event.getConflict().getId()));
 
         businessValidationService.validate(
                 new UserCanModerate(user).when(changingPublicationStatus
@@ -257,7 +261,7 @@ public class EventServiceImpl implements EventService {
 
         fillEventFields(event, dto, dto.getLocale());
 
-        if (event.isPublished()) {
+        if (event.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
             Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
@@ -460,5 +464,48 @@ public class EventServiceImpl implements EventService {
                                 .orElse(new Tag(tagName)))
                         .collect(Collectors.toList())
         );
+    }
+
+    /**
+     * Get related events grouped by containing conflicts.
+     * Related means they belongs to same root conflict
+     * @param event
+     * @param locale
+     * @return
+     */
+    private List<BriefConflictWithEventsDTO> getRelatives(Event event, Locale locale) {
+        Conflict conflict = event.getConflict();
+        if (conflict == null) {
+            return new ArrayList<>();
+        }
+
+        //get root conflict
+        Conflict rootConflict = conflictRepository.getRootConflict(conflict);
+
+        //get all conflicts caused by root
+        List<Conflict> conflictsOfRoot = conflictRepository.getDescendantsAndSelf(rootConflict);
+
+        //Create list of conflict DTOs. Each containing its events list
+        return conflictsOfRoot.stream()
+                .map(conf -> {
+                    BriefConflictWithEventsDTO confDTO = new BriefConflictWithEventsDTO();
+                    confDTO.setId(conf.getId());
+                    confDTO.setParentConflictId(conf.getParentId());
+                    confDTO.setParentEventId(
+                            Optional.ofNullable(conf.getParentEvent()).map(Event::getId).orElse(null));
+                    confDTO.setEvents(conf.getEvents().stream()
+                            .map(evn -> {
+                                BriefEventDTO eventDTO = new BriefEventDTO();
+                                eventDTO.setId(evn.getId());
+                                eventDTO.setDate(evn.getDate().toEpochSecond(ZoneOffset.UTC));
+                                eventDTO.setTitlesOf(evn, locale);
+                                return eventDTO;
+                            })
+                            .sorted(Comparator.comparingLong(BriefEventDTO::getDate))
+                            .collect(Collectors.toList())
+                    );
+                    return confDTO;
+                })
+                .collect(Collectors.toList());
     }
 }

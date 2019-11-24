@@ -2,6 +2,7 @@ package ru.smartel.strike.security.filter;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -10,7 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.repository.etc.UserRepository;
+import ru.smartel.strike.security.FirebaseAuthenticationException;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
+import ru.smartel.strike.security.token.UserPrincipal;
 
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.Filter;
@@ -36,6 +39,7 @@ public class FirebaseTokenFilter implements Filter {
         String bearer = ((HttpServletRequest)request).getHeader("Authorization");
 
         if (bearer != null) {
+            System.out.println("User uses bearer: " + bearer);
             if (!bearer.startsWith("Bearer ")) {
                 throw new BadCredentialsException("Некорректный заголовок Authorization (должен начинаться с \"bearer\")");
             }
@@ -46,34 +50,29 @@ public class FirebaseTokenFilter implements Filter {
     }
 
     private void authenticate(String bearer) throws AuthenticationException {
-        User user  = userRepository.findFirstByUuid("yBjIs0BELQSsWvyPAHcrGZa2hJi2")
-                .orElseThrow(() -> new EntityNotFoundException("Временный пользователь yBjIs0BELQSsWvyPAHcrGZa2hJi2 не найден"));
+        FirebaseToken token;
+
+        try {
+            token = FirebaseAuth.getInstance().verifyIdToken(bearer);
+        } catch (FirebaseAuthException e) {
+            throw new FirebaseAuthenticationException(e.getMessage());
+        }
+
+        String uuid = (String)token.getClaims().get("sub");
+
+        User user = userRepository.findFirstByUuid(uuid).orElse(null);
+        if (null == user) {
+            user = new User();
+            try {
+                updateUserFields(user, uuid);
+            } catch (FirebaseAuthException e) {
+                throw new FirebaseAuthenticationException(e.getMessage());
+            }
+        }
+
         SecurityContextHolder.getContext().setAuthentication(
-                new UserAuthenticationToken(user, getUserAuthorities(user), null, true)
+                new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), token, true)
         );
-//        FirebaseToken token;
-//
-//        try {
-//            token = FirebaseAuth.getInstance().verifyIdToken(bearer);
-//        } catch (FirebaseAuthException e) {
-//            throw new FirebaseAuthenticationException(e.getMessage());
-//        }
-//
-//        String uuid = (String)token.getClaims().get("sub");
-//
-//        User user = userRepository.findFirstByUuid(uuid);
-//        if (null == user) {
-//            user = new User();
-//            try {
-//                updateUserFields(user, uuid);
-//            } catch (FirebaseAuthException e) {
-//                throw new FirebaseAuthenticationException(e.getMessage());
-//            }
-//        }
-//
-//        SecurityContextHolder.getContext().setAuthentication(
-//                new UserAuthenticationToken(user, getUserAuthorities(user), token, true)
-//        );
     }
 
     private void updateUserFields(User user, String uuid) throws FirebaseAuthException {

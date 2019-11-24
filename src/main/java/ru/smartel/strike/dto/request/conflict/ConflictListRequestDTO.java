@@ -1,12 +1,12 @@
 package ru.smartel.strike.dto.request.conflict;
 
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 
 public class ConflictListRequestDTO extends BaseListRequestDTO {
     private Locale locale;
-    private User user;
+    private UserPrincipal user;
     private boolean brief;
     private ConflictFiltersDTO filters = new ConflictFiltersDTO();
 
@@ -18,11 +18,11 @@ public class ConflictListRequestDTO extends BaseListRequestDTO {
         this.locale = locale;
     }
 
-    public User getUser() {
+    public UserPrincipal getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserPrincipal user) {
         this.user = user;
     }
 

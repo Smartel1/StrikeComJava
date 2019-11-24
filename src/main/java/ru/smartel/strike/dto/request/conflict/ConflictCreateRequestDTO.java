@@ -3,7 +3,7 @@ package ru.smartel.strike.dto.request.conflict;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 
 import java.util.Optional;
@@ -16,7 +16,7 @@ public class ConflictCreateRequestDTO {
     @JsonIgnore
     private Locale locale;
     @JsonIgnore
-    private User user;
+    private UserPrincipal user;
     private Optional<String> title;
     private Optional<String> titleRu;
     private Optional<String> titleEn;
@@ -39,11 +39,11 @@ public class ConflictCreateRequestDTO {
         this.locale = locale;
     }
 
-    public User getUser() {
+    public UserPrincipal getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserPrincipal user) {
         this.user = user;
     }
 

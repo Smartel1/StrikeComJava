@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
+import ru.smartel.strike.dto.request.news.NewsFavouritesRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.news.NewsService;
 
@@ -36,7 +37,7 @@ public class NewsController {
     @GetMapping
     public ListWrapperDTO<NewsListDTO> index(
             NewsListRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setUser(user);
         return newsService.list(dto);
     }
@@ -49,17 +50,16 @@ public class NewsController {
     @PostMapping("{id}/favourites")
     public void setFavourite(
             @PathVariable("id") long newsId,
-            @RequestParam(value = "favourite") boolean isFavourite,
-            @AuthenticationPrincipal User user) {
-        Optional.ofNullable(user).ifPresent(
-                usr -> newsService.setFavourite(newsId, usr.getId(), isFavourite));
+            @RequestBody NewsFavouritesRequestDTO dto,
+            @AuthenticationPrincipal UserPrincipal user) {
+        Optional.ofNullable(user).ifPresent(usr -> newsService.setFavourite(newsId, usr.getId(), dto.isFavourite()));
     }
 
     @PostMapping
     public NewsDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody NewsCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return newsService.create(dto);
@@ -69,7 +69,7 @@ public class NewsController {
     public NewsDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long newsId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody NewsUpdateRequestDTO dto ) {
         dto.setNewsId(newsId);
         dto.setLocale(locale);

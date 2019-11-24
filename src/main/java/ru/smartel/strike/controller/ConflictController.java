@@ -15,7 +15,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictService;
 
@@ -32,7 +32,7 @@ public class ConflictController {
     @GetMapping
     public ListWrapperDTO<ConflictListDTO> index(
             ConflictListRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setUser(user);
         return conflictService.list(dto);
     }
@@ -48,7 +48,7 @@ public class ConflictController {
     public ConflictDetailDTO store(
             @PathVariable("locale") Locale locale,
             @RequestBody ConflictCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
         return conflictService.create(dto);
@@ -58,7 +58,7 @@ public class ConflictController {
     public ConflictDetailDTO update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody ConflictUpdateRequestDTO dto) {
         dto.setLocale(locale);
         dto.setUser(user);

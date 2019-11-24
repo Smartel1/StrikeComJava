@@ -3,6 +3,7 @@ package ru.smartel.strike.service.conflict;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
@@ -28,9 +29,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(rollbackFor = Exception.class)
 public class ConflictServiceImpl implements ConflictService {
 
     private ConflictDTOValidator dtoValidator;
@@ -107,7 +110,11 @@ public class ConflictServiceImpl implements ConflictService {
         Conflict conflict = new Conflict();
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.save(conflict);
+        Conflict parentConflict = Optional.ofNullable(conflict.getParentEvent())
+                .map(Event::getConflict)
+                .orElse(null);
+
+        conflictRepository.insertAsLastChildOf(conflict, parentConflict);
 
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
@@ -122,7 +129,12 @@ public class ConflictServiceImpl implements ConflictService {
 
         fillConflictFields(conflict, dto, dto.getLocale());
 
-        conflictRepository.save(conflict);
+        Conflict parentConflict = Optional.ofNullable(conflict.getParentEvent())
+                .map(Event::getConflict)
+                .orElse(null);
+
+        conflictRepository.insertAsLastChildOf(conflict, parentConflict);
+
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
 
@@ -132,7 +144,11 @@ public class ConflictServiceImpl implements ConflictService {
         Conflict conflict = conflictRepository.findById(conflictId)
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
-        conflictRepository.delete(conflict);
+        if (conflictRepository.hasChildren(conflict)) {
+            throw new IllegalStateException("В текущей реализации нельзя удалять конфликты, у которых есть потомки");
+        };
+
+        conflictRepository.deleteFromTree(conflict);
     }
 
     private void fillConflictFields(Conflict conflict, ConflictCreateRequestDTO dto, Locale locale) {
