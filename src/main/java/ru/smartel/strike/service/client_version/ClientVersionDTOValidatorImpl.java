@@ -70,6 +70,12 @@ public class ClientVersionDTOValidatorImpl implements ClientVersionDTOValidator 
             addErrorMessage("descriptionEs", new Max(500), errors);
         }
 
+        if (null == dto.getDescriptionDe()) {
+            addErrorMessage("descriptionDe", new NotNull(), errors);
+        } else if (dto.getDescriptionDe().length() > 500){
+            addErrorMessage("descriptionDe", new Max(500), errors);
+        }
+
         throwIfErrorsExist(errors);
     }
 }

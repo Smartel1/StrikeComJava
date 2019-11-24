@@ -46,6 +46,9 @@ public class ClientVersion {
     @Column(name = "description_es")
     private String descriptionEs;
 
+    @Column(name = "description_de")
+    private String descriptionDe;
+
     public int getId() {
         return id;
     }
@@ -98,6 +101,14 @@ public class ClientVersion {
         this.descriptionEs = descriptionEs;
     }
 
+    public String getDescriptionDe() {
+        return descriptionDe;
+    }
+
+    public void setDescriptionDe(String descriptionDe) {
+        this.descriptionDe = descriptionDe;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -114,6 +125,8 @@ public class ClientVersion {
                 return getDescriptionEn();
             case ES:
                 return getDescriptionEs();
+            case DE:
+                return getDescriptionDe();
             default:
                 return "";
         }

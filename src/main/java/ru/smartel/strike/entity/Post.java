@@ -20,6 +20,9 @@ public class Post {
     @Column(name = "title_es")
     private String titleEs;
 
+    @Column(name = "title_de")
+    private String titleDe;
+
     @Column(name = "content_ru", columnDefinition = "TEXT")
     private String contentRu;
 
@@ -28,6 +31,9 @@ public class Post {
 
     @Column(name = "content_es", columnDefinition = "TEXT")
     private String contentEs;
+
+    @Column(name = "content_de", columnDefinition = "TEXT")
+    private String contentDe;
 
     @NotNull
     @Column(name = "date", nullable = false)
@@ -54,6 +60,14 @@ public class Post {
         this.author = author;
     }
 
+    public String getTitleRu() {
+        return titleRu;
+    }
+
+    public void setTitleRu(String titleRu) {
+        this.titleRu = titleRu;
+    }
+
     public String getTitleEn() {
         return titleEn;
     }
@@ -70,12 +84,12 @@ public class Post {
         this.titleEs = titleEs;
     }
 
-    public String getTitleRu() {
-        return titleRu;
+    public String getTitleDe() {
+        return titleDe;
     }
 
-    public void setTitleRu(String titleRu) {
-        this.titleRu = titleRu;
+    public void setTitleDe(String titleDe) {
+        this.titleDe = titleDe;
     }
 
     public String getContentRu() {
@@ -100,6 +114,14 @@ public class Post {
 
     public void setContentEs(String contentEs) {
         this.contentEs = contentEs;
+    }
+
+    public String getContentDe() {
+        return contentDe;
+    }
+
+    public void setContentDe(String contentDe) {
+        this.contentDe = contentDe;
     }
 
     public LocalDateTime getDate() {

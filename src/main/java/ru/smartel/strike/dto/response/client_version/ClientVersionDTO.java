@@ -18,6 +18,7 @@ public class ClientVersionDTO extends ExtendableDTO {
             instance.add("descriptionRu", clientVersion.getDescriptionRu());
             instance.add("descriptionEn", clientVersion.getDescriptionEn());
             instance.add("descriptionEs", clientVersion.getDescriptionEs());
+            instance.add("descriptionDe", clientVersion.getDescriptionDe());
         } else {
             instance.add("description", clientVersion.getDescriptionByLocale(locale));
         }

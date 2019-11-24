@@ -36,8 +36,14 @@ public class CountryDTOValidatorImpl implements CountryDTOValidator {
 
         if (null == dto.getNameEs()) {
             addErrorMessage("nameEs", new NotNull(), errors);
-        } else if (dto.getNameEn().length() < 1) {
+        } else if (dto.getNameEs().length() < 1) {
             addErrorMessage("nameEs", new Min(1), errors);
+        }
+
+        if (null == dto.getNameDe()) {
+            addErrorMessage("nameDe", new NotNull(), errors);
+        } else if (dto.getNameDe().length() < 1) {
+            addErrorMessage("nameDe", new Min(1), errors);
         }
 
         throwIfErrorsExist(errors);

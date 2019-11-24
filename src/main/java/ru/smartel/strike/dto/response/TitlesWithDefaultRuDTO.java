@@ -19,6 +19,8 @@ public class TitlesWithDefaultRuDTO {
     private Optional<String> titleEn;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Optional<String> titleEs;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Optional<String> titleDe;
 
     /**
      * Set titles of dto according to locale.
@@ -31,6 +33,7 @@ public class TitlesWithDefaultRuDTO {
             titleRu = Optional.ofNullable(entity.getTitleRu());
             titleEn = Optional.ofNullable(entity.getTitleEn());
             titleEs = Optional.ofNullable(entity.getTitleEs());
+            titleDe = Optional.ofNullable(entity.getTitleDe());
         } else {
             //If title is not localized use default (Ru)
             //Never contains null. Maybe its not good
@@ -71,5 +74,13 @@ public class TitlesWithDefaultRuDTO {
 
     public void setTitleEs(Optional<String> titleEs) {
         this.titleEs = titleEs;
+    }
+
+    public Optional<String> getTitleDe() {
+        return titleDe;
+    }
+
+    public void setTitleDe(Optional<String> titleDe) {
+        this.titleDe = titleDe;
     }
 }

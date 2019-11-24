@@ -13,8 +13,8 @@ public class Country extends EntityWithNames implements NamedReference {
     public Country() {
     }
 
-    public Country(String nameRu, String nameEn, String nameEs, List<Region> regions) {
-        super(nameRu, nameEn, nameEs);
+    public Country(String nameRu, String nameEn, String nameEs, String nameDe, List<Region> regions) {
+        super(nameRu, nameEn, nameEs, nameDe);
         this.regions = regions;
     }
 

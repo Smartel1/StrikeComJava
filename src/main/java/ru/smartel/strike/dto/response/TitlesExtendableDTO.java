@@ -13,6 +13,7 @@ public abstract class TitlesExtendableDTO extends ExtendableDTO {
             add("titleRu", entity.getTitleRu());
             add("titleEn", entity.getTitleEn());
             add("titleEs", entity.getTitleEs());
+            add("titleDe", entity.getTitleDe());
         } else {
             add("title", entity.getTitleByLocale(locale));
         }

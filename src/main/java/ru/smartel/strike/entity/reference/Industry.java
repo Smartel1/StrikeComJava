@@ -12,7 +12,7 @@ public class Industry extends EntityWithNames implements NamedReference {
     public Industry() {
     }
 
-    public Industry(String nameRu, String nameEn, String nameEs) {
-        super(nameRu, nameEn, nameEs);
+    public Industry(String nameRu, String nameEn, String nameEs, String nameDe) {
+        super(nameRu, nameEn, nameEs, nameDe);
     }
 }

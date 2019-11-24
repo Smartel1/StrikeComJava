@@ -22,9 +22,11 @@ public class PushServiceImpl implements PushService {
     private static final String TOPIC_NEWS_RU = "news_ru";
     private static final String TOPIC_NEWS_EN = "news_en";
     private static final String TOPIC_NEWS_ES = "news_es";
+    private static final String TOPIC_NEWS_DE = "news_de";
     private static final String TOPIC_EVENTS_RU = "events_ru";
     private static final String TOPIC_EVENTS_EN = "events_en";
     private static final String TOPIC_EVENTS_ES = "events_es";
+    private static final String TOPIC_EVENTS_DE = "events_de";
 
     private FirebaseMessaging firebaseMessaging;
 
@@ -99,6 +101,7 @@ public class PushServiceImpl implements PushService {
                 .putData("message_ru", "Предложенный Вами пост не прошел модерацию и был удалён")
                 .putData("message_en", "The news you proposed was removed")
                 .putData("message_es", "Las noticias que propusiste fueron eliminadas")
+                .putData("message_de", "Der von Ihnen vorgeschlagene Beitrag hat die Moderation nicht bestanden und wurde gelöscht")
                 .putData("creator_id", String.valueOf(authorId))
                 .putData("type", "moderated") // wth is that?
                 .build();
@@ -156,6 +159,12 @@ public class PushServiceImpl implements PushService {
                 notificationBody = title != null ? title : "La noticia ha sido publicada";
                 break;
             }
+            case DE: {
+                topic = TOPIC_NEWS_DE;
+                notificationTitle = "ZabastCom";
+                notificationBody = title != null ? title : "Die Anwendung hat Nachrichten veröffentlicht";
+                break;
+            }
             default:
                 throw new IllegalStateException("unknown topic for locale " + locale);
         }
@@ -204,6 +213,12 @@ public class PushServiceImpl implements PushService {
                 notificationBody = title != null ? title : "El evento ha sido publicado";
                 break;
             }
+            case DE: {
+                topic = TOPIC_EVENTS_DE;
+                notificationTitle = "ZabastCom";
+                notificationBody = title != null ? title : "Eine Veranstaltung wird in der Anwendung veröffentlicht";
+                break;
+            }
             default:
                 throw new IllegalStateException("unknown topic for locale " + locale);
         }
@@ -240,6 +255,7 @@ public class PushServiceImpl implements PushService {
                 .putData("message_ru", "Предложенный Вами пост прошел модерацию")
                 .putData("message_en", "The news you proposed was published")
                 .putData("message_es", "Las noticias que propusiste fueron publicadas")
+                .putData("message_de", "Ihr Beitrag wurde moderiert")
                 .putData("creator_id", String.valueOf(authorId))
                 .putData("type", "moderated") // wth is that?
                 .build();
@@ -267,6 +283,7 @@ public class PushServiceImpl implements PushService {
                 .putData("message_ru", "Предложенный Вами пост прошел модерацию")
                 .putData("message_en", "The news you proposed was published")
                 .putData("message_es", "Las noticias que propusiste fueron publicadas")
+                .putData("message_es", "Ihr Beitrag wurde moderiert")
                 .putData("creator_id", String.valueOf(authorId))
                 .putData("lat", String.valueOf(lat))
                 .putData("lng", String.valueOf(lng))

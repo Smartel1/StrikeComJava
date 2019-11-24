@@ -23,7 +23,8 @@ public class WithContentEvent implements Specification<Event> {
         return cb.or(
                 cb.like(cb.lower(root.get("contentRu")), desiredContent),
                 cb.like(cb.lower(root.get("contentEn")), desiredContent),
-                cb.like(cb.lower(root.get("contentEs")), desiredContent)
+                cb.like(cb.lower(root.get("contentEs")), desiredContent),
+                cb.like(cb.lower(root.get("contentDe")), desiredContent)
         );
     }
 }

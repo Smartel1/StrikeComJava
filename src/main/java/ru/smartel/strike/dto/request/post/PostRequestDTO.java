@@ -17,10 +17,12 @@ public abstract class PostRequestDTO {
     private Optional<String> titleRu;
     private Optional<String> titleEn;
     private Optional<String> titleEs;
+    private Optional<String> titleDe;
     private Optional<String> content;
     private Optional<String> contentRu;
     private Optional<String> contentEn;
     private Optional<String> contentEs;
+    private Optional<String> contentDe;
     private Optional<Long> date;
     private Optional<String> sourceLink;
     private Optional<List<String>> tags;
@@ -67,6 +69,14 @@ public abstract class PostRequestDTO {
         this.titleEs = titleEs;
     }
 
+    public Optional<String> getTitleDe() {
+        return titleDe;
+    }
+
+    public void setTitleDe(Optional<String> titleDe) {
+        this.titleDe = titleDe;
+    }
+
     public Optional<String> getContent() {
         return content;
     }
@@ -97,6 +107,14 @@ public abstract class PostRequestDTO {
 
     public void setContentEs(Optional<String> contentEs) {
         this.contentEs = contentEs;
+    }
+
+    public Optional<String> getContentDe() {
+        return contentDe;
+    }
+
+    public void setContentDe(Optional<String> contentDe) {
+        this.contentDe = contentDe;
     }
 
     public Optional<Long> getDate() {

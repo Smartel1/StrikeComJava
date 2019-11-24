@@ -48,6 +48,7 @@ public class CountryServiceImpl implements CountryService {
         country.setNameRu(dto.getNameRu());
         country.setNameEn(dto.getNameEn());
         country.setNameEs(dto.getNameEs());
+        country.setNameDe(dto.getNameDe());
         countryRepository.save(country);
 
         return CountryDTO.of(country, dto.getLocale());

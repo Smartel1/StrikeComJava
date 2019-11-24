@@ -44,6 +44,16 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
     }
 
     @Override
+    default String getTitleDe() {
+        return getPost().getTitleDe();
+    }
+
+    @Override
+    default void setTitleDe(String titleDe) {
+        getPost().setTitleDe(titleDe);
+    }
+
+    @Override
     default String getContentRu() {
         return getPost().getContentRu();
     }
@@ -72,6 +82,17 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
     @Override
     default void setContentEs(String contentEs) {
         getPost().setContentEs(contentEs);
+
+    }
+
+    @Override
+    default String getContentDe() {
+        return getPost().getContentDe();
+    }
+
+    @Override
+    default void setContentDe(String contentDe) {
+        getPost().setContentDe(contentDe);
 
     }
 

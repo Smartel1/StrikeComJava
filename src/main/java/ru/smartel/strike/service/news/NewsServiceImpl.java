@@ -273,6 +273,9 @@ public class NewsServiceImpl implements NewsService {
         if (null != dto.getTitleEs()) {
             news.setTitleEs(dto.getTitleEs().orElse(null));
         }
+        if (null != dto.getTitleDe()) {
+            news.setTitleDe(dto.getTitleDe().orElse(null));
+        }
         if (null != dto.getContentRu()) {
             news.setContentRu(dto.getContentRu().orElse(null));
         }
@@ -281,6 +284,9 @@ public class NewsServiceImpl implements NewsService {
         }
         if (null != dto.getContentEs()) {
             news.setContentEs(dto.getContentEs().orElse(null));
+        }
+        if (null != dto.getContentDe()) {
+            news.setContentDe(dto.getContentDe().orElse(null));
         }
         if (null != dto.getPublished()) {
             news.setPublished(dto.getPublished().orElseThrow());

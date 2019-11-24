@@ -21,6 +21,7 @@ public class ConflictCreateRequestDTO {
     private Optional<String> titleRu;
     private Optional<String> titleEn;
     private Optional<String> titleEs;
+    private Optional<String> titleDe;
     private Float latitude;
     private Float longitude;
     private Optional<String> companyName;
@@ -77,6 +78,14 @@ public class ConflictCreateRequestDTO {
 
     public void setTitleEs(Optional<String> titleEs) {
         this.titleEs = titleEs;
+    }
+
+    public Optional<String> getTitleDe() {
+        return titleDe;
+    }
+
+    public void setTitleDe(Optional<String> titleDe) {
+        this.titleDe = titleDe;
     }
 
     public Float getLatitude() {

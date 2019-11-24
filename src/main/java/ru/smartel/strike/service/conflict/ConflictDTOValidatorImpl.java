@@ -70,6 +70,12 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             });
         }
 
+        if (null != dto.getTitleDe()) {
+            dto.getTitleDe().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("titleDe", new ValidationUtil.Max(255), errors);
+            });
+        }
+
         if (null == dto.getLatitude()) {
             addErrorMessage("latitude", new NotNull(), errors);
         }
@@ -134,6 +140,12 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
         if (null != dto.getTitleEs()) {
             dto.getTitleEs().ifPresent(title -> {
                 if (title.length() > 255) addErrorMessage("titleEs", new ValidationUtil.Max(255), errors);
+            });
+        }
+
+        if (null != dto.getTitleDe()) {
+            dto.getTitleDe().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("titleDe", new ValidationUtil.Max(255), errors);
             });
         }
 

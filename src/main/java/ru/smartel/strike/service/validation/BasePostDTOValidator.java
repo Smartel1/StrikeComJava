@@ -85,6 +85,12 @@ public class BasePostDTOValidator {
             });
         }
 
+        if (null != dto.getTitleDe()) {
+            dto.getTitleDe().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("titleDe", new Max(255), errors);
+            });
+        }
+
         if (null != dto.getSourceLink()) {
             dto.getSourceLink().ifPresent(link -> {
                 if (link.length() > 255) addErrorMessage("sourceLink", new Max(255), errors);
@@ -112,6 +118,12 @@ public class BasePostDTOValidator {
         if (null != dto.getContentEs()) {
             dto.getContentEs().ifPresent(content -> {
                 if (content.length() < 3) addErrorMessage("contentEs", new Min(3), errors);
+            });
+        }
+
+        if (null != dto.getContentDe()) {
+            dto.getContentDe().ifPresent(content -> {
+                if (content.length() < 3) addErrorMessage("contentDe", new Min(3), errors);
             });
         }
 

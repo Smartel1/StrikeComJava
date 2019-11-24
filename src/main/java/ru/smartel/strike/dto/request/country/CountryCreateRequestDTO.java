@@ -11,6 +11,7 @@ public class CountryCreateRequestDTO {
     private String nameRu;
     private String nameEn;
     private String nameEs;
+    private String nameDe;
 
     public Locale getLocale() {
         return locale;
@@ -42,5 +43,13 @@ public class CountryCreateRequestDTO {
 
     public void setNameEs(String nameEs) {
         this.nameEs = nameEs;
+    }
+
+    public String getNameDe() {
+        return nameDe;
+    }
+
+    public void setNameDe(String nameDe) {
+        this.nameDe = nameDe;
     }
 }

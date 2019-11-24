@@ -60,6 +60,9 @@ public class Conflict implements NestedNode<Long>, Titles {
     @Column(name = "title_es")
     private String titleEs;
 
+    @Column(name = "title_de")
+    private String titleDe;
+
     @Column(name = "latitude", nullable = false)
     private Float latitude;
 
@@ -165,6 +168,14 @@ public class Conflict implements NestedNode<Long>, Titles {
 
     public void setTitleEs(String titleEs) {
         this.titleEs = titleEs;
+    }
+
+    public String getTitleDe() {
+        return titleDe;
+    }
+
+    public void setTitleDe(String titleDe) {
+        this.titleDe = titleDe;
     }
 
     public Float getLatitude() {

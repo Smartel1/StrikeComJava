@@ -165,6 +165,9 @@ public class ConflictServiceImpl implements ConflictService {
         if (null != dto.getTitleEs()) {
             conflict.setTitleEs(dto.getTitleEs().orElse(null));
         }
+        if (null != dto.getTitleDe()) {
+            conflict.setTitleDe(dto.getTitleDe().orElse(null));
+        }
         if (null != dto.getLatitude()) {
             conflict.setLatitude(dto.getLatitude());
         }

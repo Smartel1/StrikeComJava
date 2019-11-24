@@ -29,7 +29,7 @@ public class RegionDTOValidatorImpl implements RegionDTOValidator {
         }
 
         if (null == dto.getCountryId()) {
-            addErrorMessage("country_id", new NotNull(), errors);
+            addErrorMessage("countryId", new NotNull(), errors);
         }
 
         throwIfErrorsExist(errors);

@@ -18,7 +18,7 @@ public class UserDTOValidatorImpl implements UserDTOValidator {
         Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getUserId()) {
-            addErrorMessage("user_id", new NotNull(), errors);
+            addErrorMessage("userId", new NotNull(), errors);
         }
 
         throwIfErrorsExist(errors);

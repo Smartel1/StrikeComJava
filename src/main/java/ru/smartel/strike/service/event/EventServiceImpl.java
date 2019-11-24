@@ -324,6 +324,9 @@ public class EventServiceImpl implements EventService {
         if (null != dto.getTitleEs()) {
             event.setTitleEs(dto.getTitleEs().orElse(null));
         }
+        if (null != dto.getTitleDe()) {
+            event.setTitleDe(dto.getTitleDe().orElse(null));
+        }
         if (null != dto.getContentRu()) {
             event.setContentRu(dto.getContentRu().orElse(null));
         }
@@ -332,6 +335,9 @@ public class EventServiceImpl implements EventService {
         }
         if (null != dto.getContentEs()) {
             event.setContentEs(dto.getContentEs().orElse(null));
+        }
+        if (null != dto.getContentDe()) {
+            event.setContentDe(dto.getContentDe().orElse(null));
         }
         if (null != dto.getPublished()) {
             event.setPublished(dto.getPublished().orElseThrow());
