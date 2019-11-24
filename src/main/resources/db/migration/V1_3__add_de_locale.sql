@@ -1,5 +1,3 @@
-ALTER TABLE public.claim_types
-    ADD COLUMN name_de VARCHAR(255);
 ALTER TABLE public.client_versions
     ADD COLUMN description_de VARCHAR(500) NOT NULL DEFAULT '';
 ALTER TABLE public.conflict_reasons
