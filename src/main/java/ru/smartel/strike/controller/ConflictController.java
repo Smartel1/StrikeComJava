@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
@@ -38,24 +39,24 @@ public class ConflictController {
     }
 
     @GetMapping("{id}")
-    public ConflictDetailDTO show(
+    public DetailWrapperDTO<ConflictDetailDTO> show(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
-        return conflictService.get(conflictId, locale);
+        return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
     }
 
     @PostMapping
-    public ConflictDetailDTO store(
+    public DetailWrapperDTO<ConflictDetailDTO> store(
             @PathVariable("locale") Locale locale,
             @RequestBody ConflictCreateRequestDTO dto,
             @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
-        return conflictService.create(dto);
+        return new DetailWrapperDTO<>(conflictService.create(dto));
     }
 
     @PutMapping("{id}")
-    public ConflictDetailDTO update(
+    public DetailWrapperDTO<ConflictDetailDTO> update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId,
             @AuthenticationPrincipal UserPrincipal user,
@@ -63,7 +64,7 @@ public class ConflictController {
         dto.setLocale(locale);
         dto.setUser(user);
         dto.setConflictId(conflictId);
-        return conflictService.update(dto);
+        return new DetailWrapperDTO<>(conflictService.update(dto));
     }
 
     @DeleteMapping("{id}")

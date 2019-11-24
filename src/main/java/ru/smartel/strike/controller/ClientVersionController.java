@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.client_version.ClientVersionDTO;
 import ru.smartel.strike.service.Locale;
@@ -30,11 +31,11 @@ public class ClientVersionController {
     }
 
     @PostMapping(consumes = {"application/json"})
-    public ClientVersionDTO store(
+    public DetailWrapperDTO<ClientVersionDTO> store(
             @PathVariable("locale") Locale locale,
             @RequestBody ClientVersionCreateRequestDTO dto) {
         dto.setLocale(locale);
-        return clientVersionService.create(dto);
+        return new DetailWrapperDTO<>(clientVersionService.create(dto));
     }
 
     @DeleteMapping("{id}")

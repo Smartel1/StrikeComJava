@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.moderation.DashboardDTO;
 import ru.smartel.strike.service.event.EventService;
 import ru.smartel.strike.service.news.NewsService;
@@ -24,7 +25,8 @@ public class ModerationController {
     }
 
     @GetMapping("dashboard")
-    public DashboardDTO dashboard() {
-        return DashboardDTO.of(eventService.getNonPublishedCount(), newsService.getNonPublishedCount());
+    public DetailWrapperDTO<DashboardDTO> dashboard() {
+        return new DetailWrapperDTO<>(
+                DashboardDTO.of(eventService.getNonPublishedCount(), newsService.getNonPublishedCount()));
     }
 }

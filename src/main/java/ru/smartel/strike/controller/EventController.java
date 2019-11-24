@@ -15,6 +15,7 @@ import ru.smartel.strike.dto.request.event.EventFavouritesRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
@@ -46,8 +47,8 @@ public class EventController {
     }
 
     @GetMapping("{id}")
-    public EventDetailDTO show(EventShowDetailRequestDTO dto) {
-        return eventService.incrementViewsAndGet(dto);
+    public DetailWrapperDTO<EventDetailDTO> show(EventShowDetailRequestDTO dto) {
+        return new DetailWrapperDTO<>(eventService.incrementViewsAndGet(dto));
     }
 
     @PostMapping("{id}/favourites")
@@ -59,17 +60,17 @@ public class EventController {
     }
 
     @PostMapping
-    public EventDetailDTO store(
+    public DetailWrapperDTO<EventDetailDTO> store(
             @PathVariable("locale") Locale locale,
             @RequestBody EventCreateRequestDTO dto,
             @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
-        return eventService.create(dto);
+        return new DetailWrapperDTO<>(eventService.create(dto));
     }
 
     @PutMapping("{id}")
-    public EventDetailDTO update(
+    public DetailWrapperDTO<EventDetailDTO> update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long eventId,
             @AuthenticationPrincipal UserPrincipal user,
@@ -77,7 +78,7 @@ public class EventController {
         dto.setEventId(eventId);
         dto.setLocale(locale);
         dto.setUser(user);
-        return eventService.update(dto);
+        return new DetailWrapperDTO<>(eventService.update(dto));
     }
 
     @DeleteMapping("{id}")
