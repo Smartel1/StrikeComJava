@@ -10,9 +10,9 @@ public abstract class NamesExtendableDTO extends ExtendableDTO {
 
     protected void setNamesOf(Names entity, Locale locale) {
         if (locale == Locale.ALL) {
-            add("name_ru", entity.getNameRu());
-            add("name_en", entity.getNameEn());
-            add("name_es", entity.getNameEs());
+            add("nameRu", entity.getNameRu());
+            add("nameEn", entity.getNameEn());
+            add("nameEs", entity.getNameEs());
         } else {
             add("name", entity.getNameByLocale(locale));
         }
