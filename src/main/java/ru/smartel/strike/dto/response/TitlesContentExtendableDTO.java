@@ -11,9 +11,9 @@ public abstract class TitlesContentExtendableDTO extends TitlesExtendableDTO {
     public void setContentsOf(TitlesContents entity, Locale locale) {
         setTitlesOf(entity, locale);
         if (locale == Locale.ALL) {
-            add("content_ru", entity.getContentRu());
-            add("content_en", entity.getContentEn());
-            add("content_es", entity.getContentEs());
+            add("contentRu", entity.getContentRu());
+            add("contentEn", entity.getContentEn());
+            add("contentEs", entity.getContentEs());
         } else {
             add("content", entity.getContentByLocale(locale));
         }

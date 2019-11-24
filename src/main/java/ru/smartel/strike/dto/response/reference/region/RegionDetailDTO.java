@@ -13,9 +13,9 @@ public class RegionDetailDTO extends ExtendableDTO {
         instance.setId(region.getId());
         instance.setName(region.getName());
         if (locale.equals(Locale.ALL)) {
-            instance.add("country_ru", region.getCountry().getNameRu());
-            instance.add("country_en", region.getCountry().getNameEn());
-            instance.add("country_es", region.getCountry().getNameEs());
+            instance.add("countryRu", region.getCountry().getNameRu());
+            instance.add("countryEn", region.getCountry().getNameEn());
+            instance.add("countryEs", region.getCountry().getNameEs());
         } else {
             instance.add("country", region.getCountry().getNameByLocale(locale));
         }
