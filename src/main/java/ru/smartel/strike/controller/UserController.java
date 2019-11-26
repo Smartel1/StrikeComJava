@@ -4,7 +4,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +15,7 @@ import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.user.UserService;
 
 @RestController
-@RequestMapping("/api/v2/{locale}/users")
+@RequestMapping("/api/v2/{locale}/me")
 public class UserController {
 
     private UserService userService;
@@ -31,16 +30,18 @@ public class UserController {
         return new DetailWrapperDTO<>(userService.get(user.getId()));
     }
 
-    @PutMapping("{id}")
+    @PutMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public DetailWrapperDTO<UserDetailDTO> update(@PathVariable("id") long id, @RequestBody UserUpdateRequestDTO dto) {
-        dto.setUserId(id);
+    public DetailWrapperDTO<UserDetailDTO> update(
+            @AuthenticationPrincipal UserPrincipal user,
+            @RequestBody UserUpdateRequestDTO dto) {
+        dto.setUserId(user.getId());
         return new DetailWrapperDTO<>(userService.update(dto));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public void delete(@PathVariable("id") long id) {
-       userService.delete(id);
+    public void delete(@AuthenticationPrincipal UserPrincipal user) {
+       userService.delete(user.getId());
     }
 }
