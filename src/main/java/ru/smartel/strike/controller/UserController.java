@@ -2,6 +2,7 @@ package ru.smartel.strike.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,8 +32,15 @@ public class UserController {
     }
 
     @PutMapping("{id}")
+    @PreAuthorize("isFullyAuthenticated()")
     public DetailWrapperDTO<UserDetailDTO> update(@PathVariable("id") long id, @RequestBody UserUpdateRequestDTO dto) {
         dto.setUserId(id);
         return new DetailWrapperDTO<>(userService.update(dto));
+    }
+
+    @DeleteMapping("{id}")
+    @PreAuthorize("isFullyAuthenticated()")
+    public void delete(@PathVariable("id") long id) {
+       userService.delete(id);
     }
 }

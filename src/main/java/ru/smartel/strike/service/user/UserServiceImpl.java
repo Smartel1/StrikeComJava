@@ -47,4 +47,10 @@ public class UserServiceImpl implements UserService {
 
         return UserDetailDTO.from(user);
     }
+
+    @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId")
+    public void delete(Long userId) {
+        userRepository.deleteById(userId);
+    }
 }
