@@ -8,7 +8,9 @@ import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.service.Locale;
 
+import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 
 public class EventDetailDTO extends PostDetailDTO {
 
@@ -19,6 +21,7 @@ public class EventDetailDTO extends PostDetailDTO {
     private Long eventTypeId;
     private ConflictDetailDTO conflict;
     private ExtendedLocalityDTO locality;
+    private Long createdAt;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<BriefConflictWithEventsDTO> relatives;
 
@@ -32,6 +35,9 @@ public class EventDetailDTO extends PostDetailDTO {
         instance.setEventTypeId(null != event.getType() ? event.getType().getId() : null);
         instance.setConflict(ConflictDetailDTO.of(event.getConflict(), locale));
         instance.setLocality(null != event.getLocality() ? ExtendedLocalityDTO.of(event.getLocality(), locale) : null);
+        instance.setCreatedAt(Optional.ofNullable(event.getCreatedAt())
+                .map(d -> d.toEpochSecond(ZoneOffset.UTC))
+                .orElse(null));
         return instance;
     }
 
@@ -89,6 +95,14 @@ public class EventDetailDTO extends PostDetailDTO {
 
     public void setLocality(ExtendedLocalityDTO locality) {
         this.locality = locality;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public List<BriefConflictWithEventsDTO> getRelatives() {

@@ -5,6 +5,7 @@ import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
@@ -18,6 +19,7 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
     private Long conflictResultId;
     private Long industryId;
     private Long parentEventId;
+    private Long createdAt;
 
     public static ConflictDetailDTO of(Conflict conflict, Locale locale) {
         ConflictDetailDTO instance = new ConflictDetailDTO();
@@ -32,6 +34,9 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         instance.setConflictResultId(null != conflict.getResult() ? conflict.getResult().getId() : null);
         instance.setIndustryId(null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
         instance.setParentEventId(null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
+        instance.setCreatedAt(Optional.ofNullable(conflict.getCreatedAt())
+                .map(d -> d.toEpochSecond(ZoneOffset.UTC))
+                .orElse(null));
         return instance;
     }
 
@@ -105,6 +110,14 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
 
     public void setIndustryId(Long industryId) {
         this.industryId = industryId;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getParentEventId() {
