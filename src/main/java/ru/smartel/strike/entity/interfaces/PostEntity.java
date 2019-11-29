@@ -30,7 +30,7 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
 
     @Override
     default void setTitleEn(String titleEn) {
-        getPost().setTitleEs(titleEn);
+        getPost().setTitleEn(titleEn);
     }
 
     @Override
