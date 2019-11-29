@@ -142,7 +142,7 @@ public class EventServiceImpl implements EventService {
 
         List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
                 .map(e -> EventListDTO.of(e, dto.getLocale()))
-                .sorted(Comparator.comparingLong(EventListDTO::getDate))
+                .sorted((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(eventListDTOs, responseMeta);

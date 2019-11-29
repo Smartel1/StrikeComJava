@@ -115,7 +115,7 @@ public class NewsServiceImpl implements NewsService {
 
         List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
                 .map(e -> NewsListDTO.of(e, dto.getLocale()))
-                .sorted(Comparator.comparingLong(NewsListDTO::getDate))
+                .sorted((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(newsListDTOs, responseMeta);
