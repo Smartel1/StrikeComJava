@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public abstract class PostListDTO extends TitlesContentExtendableDTO {
 
     protected long id;
+    protected boolean published;
     protected long date;
     protected int views;
     protected String sourceLink;
@@ -23,6 +24,7 @@ public abstract class PostListDTO extends TitlesContentExtendableDTO {
 
     protected void setCommonFieldsOf(PostEntity post, Locale locale) {
         setContentsOf(post, locale);
+        published = post.isPublished();
         id = post.getId();
         date = post.getDate().toEpochSecond(ZoneOffset.UTC);
         views = post.getViews();
@@ -38,6 +40,14 @@ public abstract class PostListDTO extends TitlesContentExtendableDTO {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isPublished() {
+        return published;
+    }
+
+    public void setPublished(boolean published) {
+        this.published = published;
     }
 
     public long getDate() {
