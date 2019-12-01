@@ -1,6 +1,7 @@
 package ru.smartel.strike.service.news;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,6 +124,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
+    @PostAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or returnObject.published")
     public NewsDetailDTO incrementViewsAndGet(NewsShowDetailRequestDTO dto) {
         News news = newsRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Новость не найдена"));

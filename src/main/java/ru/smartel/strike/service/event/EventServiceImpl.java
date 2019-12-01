@@ -1,6 +1,7 @@
 package ru.smartel.strike.service.event;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,6 +151,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @PreAuthorize("permitAll()")
+    @PostAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or returnObject.published")
     public EventDetailDTO incrementViewsAndGet(EventShowDetailRequestDTO dto) {
         Event event = eventRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
