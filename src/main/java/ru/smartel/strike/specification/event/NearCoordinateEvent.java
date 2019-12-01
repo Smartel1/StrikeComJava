@@ -15,11 +15,11 @@ import javax.persistence.criteria.Root;
  * https://stackoverflow.com/questions/21084886/how-to-calculate-distance-using-latitude-and-longitude
  */
 public class NearCoordinateEvent implements Specification<Event> {
-    private Double latitude;
-    private Double longitude;
+    private Float latitude;
+    private Float longitude;
     private Integer radius;
 
-    public NearCoordinateEvent(Double latitude, Double longitude, Integer radius) {
+    public NearCoordinateEvent(Float latitude, Float longitude, Integer radius) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;

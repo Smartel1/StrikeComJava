@@ -25,6 +25,18 @@ public class EventDTOValidatorImpl extends BasePostDTOValidator implements Event
             addErrorMessage("locale", new NotNull(), errors);
         }
 
+        if (null != dto.getFilters() && null != dto.getFilters().getNear()) {
+            if (null == dto.getFilters().getNear().getLat()) {
+                addErrorMessage("filters.near.lat", new NotNull(), errors);
+            }
+            if (null == dto.getFilters().getNear().getLng()) {
+                addErrorMessage("filters.near.lng", new NotNull(), errors);
+            }
+            if (null == dto.getFilters().getNear().getRadius()) {
+                addErrorMessage("filters.near.radius", new NotNull(), errors);
+            }
+        }
+
         throwIfErrorsExist(errors);
     }
 

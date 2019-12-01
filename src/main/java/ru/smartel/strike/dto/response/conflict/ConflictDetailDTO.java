@@ -10,8 +10,8 @@ import java.util.Optional;
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
     private long id;
-    private double latitude;
-    private double longitude;
+    private float latitude;
+    private float longitude;
     private String companyName;
     private Long dateFrom;
     private Long dateTo;
@@ -48,19 +48,19 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         this.id = id;
     }
 
-    public double getLatitude() {
+    public float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(float latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(float longitude) {
         this.longitude = longitude;
     }
 
