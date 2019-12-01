@@ -13,6 +13,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional(rollbackFor = Exception.class)
 public class CustomConflictRepositoryImpl implements CustomConflictRepository {
@@ -48,11 +49,18 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
 
     @Override
     public void insertAsLastChildOf(Conflict conflict, Conflict parent) {
-        if (parent != null) {
-            conflictNestedNodeRepository.insertAsLastChildOf(conflict, parent);
+        if (parent == null) {
+            if (conflict.getParentId() != null || conflict.getTreeRight() == null) {
+                // set service fields if not set or if set incorrect
+                conflictNestedNodeRepository.insertAsLastRoot(conflict);
+            }
         } else {
-            conflictNestedNodeRepository.insertAsLastRoot(conflict);
+            if (!parent.getId().equals(conflict.getParentId()) || conflict.getTreeRight() == null) {
+                // set service fields if not set or if set incorrect
+                conflictNestedNodeRepository.insertAsLastChildOf(conflict, parent);
+            }
         }
+        entityManager.persist(conflict);
     }
 
     @Override

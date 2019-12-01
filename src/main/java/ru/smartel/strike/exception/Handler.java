@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import pl.exsio.nestedj.ex.InvalidNodesHierarchyException;
 import ru.smartel.strike.dto.exception.ApiErrorDTO;
 
 import javax.persistence.EntityNotFoundException;
@@ -69,6 +70,14 @@ public class Handler {
     public ApiErrorDTO processMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         logger.warn("Not supported method", ex);
         return new ApiErrorDTO("Request method not supported", Collections.emptyList());
+    }
+
+    @ExceptionHandler(InvalidNodesHierarchyException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public ApiErrorDTO processMethodNotSupportedException(InvalidNodesHierarchyException ex) {
+        logger.warn("Conflicts hierarchy error", ex);
+        return new ApiErrorDTO("Request method not supported", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

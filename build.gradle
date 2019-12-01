@@ -33,7 +33,7 @@ dependencies {
     compile 'org.flywaydb:flyway-core:5.2.4'
     compile 'io.springfox:springfox-swagger2:2.9.2'
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
-    compile 'com.github.eXsio:nestedj:4.1.0'
+    compile 'com.github.eXsio:nestedj:4.1.1'
 
     // test dependencies
     testCompile('org.springframework.boot:spring-boot-starter-test') {
