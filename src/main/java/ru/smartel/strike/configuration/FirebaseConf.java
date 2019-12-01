@@ -7,14 +7,13 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Configuration
-public class FirebaseConf implements WebMvcConfigurer {
+public class FirebaseConf {
 
     @Value("${firebase.authentication}")
     private String serviceAccountJson;
