@@ -21,7 +21,7 @@ public class Region {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Column
     private String name;
@@ -34,7 +34,7 @@ public class Region {
     @OneToMany(mappedBy = "region")
     private List<Locality> localities;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

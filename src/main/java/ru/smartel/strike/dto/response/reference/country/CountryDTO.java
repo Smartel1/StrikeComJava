@@ -5,7 +5,6 @@ import ru.smartel.strike.entity.reference.Country;
 import ru.smartel.strike.service.Locale;
 
 public class CountryDTO extends NamesExtendableDTO {
-
     private long id;
 
     public long getId() {

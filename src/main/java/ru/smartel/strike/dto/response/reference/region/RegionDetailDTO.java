@@ -5,7 +5,7 @@ import ru.smartel.strike.entity.reference.Region;
 import ru.smartel.strike.service.Locale;
 
 public class RegionDetailDTO extends ExtendableDTO {
-    private int id;
+    private long id;
     private String name;
 
     public static RegionDetailDTO of(Region region, Locale locale) {
@@ -23,11 +23,11 @@ public class RegionDetailDTO extends ExtendableDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

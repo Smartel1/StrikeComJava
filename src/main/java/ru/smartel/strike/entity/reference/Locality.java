@@ -19,7 +19,7 @@ public class Locality {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Column
     private String name;
@@ -29,7 +29,7 @@ public class Locality {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Region region;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

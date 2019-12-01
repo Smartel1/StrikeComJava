@@ -5,7 +5,7 @@ import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.service.Locale;
 
 public class LocalityDetailDTO extends ExtendableDTO {
-    private int id;
+    private long id;
     private String name;
     private String region;
 
@@ -24,11 +24,11 @@ public class LocalityDetailDTO extends ExtendableDTO {
         return instance;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
