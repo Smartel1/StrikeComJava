@@ -178,10 +178,14 @@ public class ConflictServiceImpl implements ConflictService {
             conflict.setCompanyName(dto.getCompanyName().orElse(null));
         }
         if (null != dto.getDateFrom()) {
-            conflict.setDateFrom(LocalDateTime.ofEpochSecond(dto.getDateFrom().orElseThrow(), 0, ZoneOffset.UTC));
+            dto.getDateFrom()
+                    .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
+                    .ifPresent(conflict::setDateFrom);
         }
         if (null != dto.getDateTo()){
-            conflict.setDateTo(LocalDateTime.ofEpochSecond(dto.getDateTo().orElseThrow(), 0, ZoneOffset.UTC));
+            dto.getDateTo()
+                    .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
+                    .ifPresent(conflict::setDateTo);
         }
 
         if (null != dto.getConflictReasonId()) {
