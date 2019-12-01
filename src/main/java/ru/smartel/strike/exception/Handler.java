@@ -54,7 +54,7 @@ public class Handler {
         if (null != ex.getCause() && ex.getCause() instanceof ConstraintViolationException) {
             if (null != ex.getCause().getCause() && ex.getCause().getCause() instanceof PSQLException) {
                 String message = ex.getCause().getCause().getMessage();
-                logger.warn("Constraint violated", ex);
+                logger.warn("Constraint violated: {}", message);
                 return new ApiErrorDTO("Constraint violated", message);
             }
         }
