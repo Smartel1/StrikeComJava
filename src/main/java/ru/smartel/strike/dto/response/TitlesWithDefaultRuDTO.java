@@ -1,7 +1,7 @@
 package ru.smartel.strike.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import ru.smartel.strike.entity.interfaces.Titles;
+import ru.smartel.strike.entity.interfaces.HavingTitles;
 import ru.smartel.strike.service.Locale;
 
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class TitlesWithDefaultRuDTO {
      * @param entity entity to get titles from
      * @param locale chosen locale
      */
-    public void setTitlesOf(Titles entity, Locale locale) {
+    public void setTitlesOf(HavingTitles entity, Locale locale) {
         if (locale.equals(Locale.ALL)) {
             titleRu = Optional.ofNullable(entity.getTitleRu());
             titleEn = Optional.ofNullable(entity.getTitleEn());

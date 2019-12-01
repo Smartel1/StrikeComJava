@@ -3,7 +3,7 @@ package ru.smartel.strike.dto.response.event;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import ru.smartel.strike.dto.response.TitlesWithDefaultRuDTO;
-import ru.smartel.strike.entity.interfaces.Titles;
+import ru.smartel.strike.entity.interfaces.HavingTitles;
 import ru.smartel.strike.service.Locale;
 
 public class BriefEventDTO {
@@ -12,7 +12,7 @@ public class BriefEventDTO {
     @JsonUnwrapped
     private TitlesWithDefaultRuDTO titles = new TitlesWithDefaultRuDTO();
 
-    public void setTitlesOf(Titles entity, Locale locale) {
+    public void setTitlesOf(HavingTitles entity, Locale locale) {
         titles.setTitlesOf(entity, locale);
     }
 

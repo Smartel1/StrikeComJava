@@ -1,6 +1,7 @@
 package ru.smartel.strike.dto.response.reference;
 
-import ru.smartel.strike.entity.interfaces.ReferenceWithCode;
+
+import ru.smartel.strike.entity.reference.ReferenceWithCode;
 
 public class ReferenceCodeDTO {
 

@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.reference.ReferenceCodeDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesDTO;
-import ru.smartel.strike.entity.interfaces.NamedReference;
-import ru.smartel.strike.entity.interfaces.ReferenceWithCode;
+import ru.smartel.strike.entity.reference.EntityWithNames;
+import ru.smartel.strike.entity.reference.ReferenceWithCode;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
@@ -88,7 +88,7 @@ public class ReferenceServiceImpl implements ReferenceService {
         return String.valueOf(referencesHash);
     }
 
-    private List<ReferenceNamesDTO> mapReferencesWithNamesToDTOs(List<? extends NamedReference> references, Locale locale) {
+    private List<ReferenceNamesDTO> mapReferencesWithNamesToDTOs(List<? extends EntityWithNames> references, Locale locale) {
         return references.stream()
                 .map(ref -> ReferenceNamesDTO.of(ref, locale))
                 .collect(toList());

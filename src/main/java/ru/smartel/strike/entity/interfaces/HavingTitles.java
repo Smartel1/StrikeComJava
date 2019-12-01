@@ -2,7 +2,7 @@ package ru.smartel.strike.entity.interfaces;
 
 import ru.smartel.strike.service.Locale;
 
-public interface Titles {
+public interface HavingTitles {
 
     String getTitleRu();
 

@@ -1,6 +1,6 @@
 package ru.smartel.strike.dto.response;
 
-import ru.smartel.strike.entity.interfaces.Titles;
+import ru.smartel.strike.entity.interfaces.HavingTitles;
 import ru.smartel.strike.service.Locale;
 
 /**
@@ -8,7 +8,7 @@ import ru.smartel.strike.service.Locale;
  */
 public abstract class TitlesExtendableDTO extends ExtendableDTO {
 
-    public void setTitlesOf(Titles entity, Locale locale) {
+    public void setTitlesOf(HavingTitles entity, Locale locale) {
         if (locale == Locale.ALL) {
             add("titleRu", entity.getTitleRu());
             add("titleEn", entity.getTitleEn());

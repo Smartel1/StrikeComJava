@@ -1,6 +1,6 @@
 package ru.smartel.strike.entity.interfaces;
 
-public interface Code {
+public interface HavingCode {
 
     String getCode();
 

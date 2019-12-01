@@ -1,8 +1,7 @@
 package ru.smartel.strike.entity.reference;
 
 import org.springframework.data.annotation.AccessType;
-import ru.smartel.strike.entity.interfaces.Names;
-import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.entity.interfaces.HavingNames;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -12,7 +11,7 @@ import javax.persistence.MappedSuperclass;
 import java.util.Objects;
 
 @MappedSuperclass
-abstract public class EntityWithNames implements Names {
+abstract public class EntityWithNames implements HavingNames {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,22 +82,6 @@ abstract public class EntityWithNames implements Names {
     @Override
     public void setNameDe(String nameDe) {
         this.nameDe = nameDe;
-    }
-
-    @Override
-    public String getNameByLocale(Locale locale) {
-        switch (locale) {
-            case RU:
-                return getNameRu();
-            case EN:
-                return getNameEn();
-            case ES:
-                return getNameEs();
-            case DE:
-                return getNameDe();
-            default:
-                return "";
-        }
     }
 
     @Override

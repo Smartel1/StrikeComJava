@@ -1,17 +1,19 @@
 package ru.smartel.strike.entity.interfaces;
 
+import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Post;
+import ru.smartel.strike.entity.Tag;
 import ru.smartel.strike.entity.User;
+import ru.smartel.strike.entity.Video;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
-public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggable {
+public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
 
     Post getPost();
 
     void setPost(Post post);
-
-    long getId();
 
     @Override
     default String getTitleRu() {
@@ -71,7 +73,6 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
     @Override
     default void setContentEn(String contentEn) {
         getPost().setContentEn(contentEn);
-
     }
 
     @Override
@@ -82,7 +83,6 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
     @Override
     default void setContentEs(String contentEs) {
         getPost().setContentEs(contentEs);
-
     }
 
     @Override
@@ -93,7 +93,6 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
     @Override
     default void setContentDe(String contentDe) {
         getPost().setContentDe(contentDe);
-
     }
 
     default LocalDateTime getDate() {
@@ -136,4 +135,15 @@ public interface PostEntity extends TitlesContents, HasPhotos, HasVideos, Taggab
         getPost().setAuthor(author);
     }
 
+    Set<Photo> getPhotos();
+
+    void setPhotos(Set<Photo> photos);
+
+    Set<Video> getVideos();
+
+    void setVideos(Set<Video> videos);
+
+    Set<Tag> getTags();
+
+    void setTags(Set<Tag> tags);
 }

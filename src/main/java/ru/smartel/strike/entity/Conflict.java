@@ -3,7 +3,7 @@ package ru.smartel.strike.entity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import pl.exsio.nestedj.model.NestedNode;
-import ru.smartel.strike.entity.interfaces.Titles;
+import ru.smartel.strike.entity.interfaces.HavingTitles;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
 import ru.smartel.strike.entity.reference.Industry;
@@ -25,7 +25,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "conflicts")
-public class Conflict implements NestedNode<Long>, Titles {
+public class Conflict implements NestedNode<Long>, HavingTitles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
