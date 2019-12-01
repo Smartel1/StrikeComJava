@@ -12,7 +12,7 @@ public class EventStatus extends EntityWithNames implements NamedReference {
     public EventStatus() {
     }
 
-    public EventStatus(String nameRu, String nameEn, String nameEs) {
-        super(nameRu, nameEn, nameEs);
+    public EventStatus(String nameRu, String nameEn, String nameEs, String nameDe) {
+        super(nameRu, nameEn, nameEs, nameDe);
     }
 }

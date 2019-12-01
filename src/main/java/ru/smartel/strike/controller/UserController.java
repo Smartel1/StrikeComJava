@@ -2,19 +2,20 @@ package ru.smartel.strike.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.user.UserUpdateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.user.UserDetailDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.user.UserService;
 
 @RestController
-@RequestMapping("/api/v2/{locale}/users")
+@RequestMapping("/api/v2/{locale}/me")
 public class UserController {
 
     private UserService userService;
@@ -25,13 +26,22 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("isFullyAuthenticated()")
-    public UserDetailDTO get(@AuthenticationPrincipal User user) {
-        return userService.get(user.getId());
+    public DetailWrapperDTO<UserDetailDTO> get(@AuthenticationPrincipal UserPrincipal user) {
+        return new DetailWrapperDTO<>(userService.get(user.getId()));
     }
 
-    @PutMapping("{id}")
-    public UserDetailDTO update(@PathVariable("id") long id, @RequestBody UserUpdateRequestDTO dto) {
-        dto.setUserId(id);
-        return userService.update(dto);
+    @PutMapping
+    @PreAuthorize("isFullyAuthenticated()")
+    public DetailWrapperDTO<UserDetailDTO> update(
+            @AuthenticationPrincipal UserPrincipal user,
+            @RequestBody UserUpdateRequestDTO dto) {
+        dto.setUserId(user.getId());
+        return new DetailWrapperDTO<>(userService.update(dto));
+    }
+
+    @DeleteMapping
+    @PreAuthorize("isFullyAuthenticated()")
+    public void delete(@AuthenticationPrincipal UserPrincipal user) {
+       userService.delete(user.getId());
     }
 }

@@ -16,6 +16,10 @@ public interface Contents {
 
     void setContentEs(String contentEs);
 
+    String getContentDe();
+
+    void setContentDe(String contentDe);
+
     default String getContentByLocale(Locale locale) {
         switch (locale) {
             case RU:
@@ -24,6 +28,8 @@ public interface Contents {
                 return getContentEn();
             case ES:
                 return getContentEs();
+            case DE:
+                return getContentDe();
             default:
                 return "";
         }
@@ -39,6 +45,9 @@ public interface Contents {
                 break;
             case ES:
                 setContentEs(content);
+                break;
+            case DE:
+                setContentDe(content);
                 break;
         }
     }

@@ -6,15 +6,19 @@ public interface Names {
 
     String getNameRu();
 
-    void setNameRu(String name_ru);
+    void setNameRu(String nameRu);
 
     String getNameEn();
 
-    void setNameEn(String name_en);
+    void setNameEn(String nameEn);
 
     String getNameEs();
 
-    void setNameEs(String name_es);
+    void setNameEs(String nameEs);
+
+    String getNameDe();
+
+    void setNameDe(String nameDe);
 
     String getNameByLocale(Locale locale);
 }

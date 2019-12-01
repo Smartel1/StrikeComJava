@@ -1,6 +1,7 @@
 package ru.smartel.strike.service.news;
 
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,7 +116,7 @@ public class NewsServiceImpl implements NewsService {
 
         List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
                 .map(e -> NewsListDTO.of(e, dto.getLocale()))
-                .sorted(Comparator.comparingLong(NewsListDTO::getDate))
+                .sorted((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(newsListDTOs, responseMeta);
@@ -123,6 +124,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     @PreAuthorize("permitAll()")
+    @PostAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or returnObject.published")
     public NewsDetailDTO incrementViewsAndGet(NewsShowDetailRequestDTO dto) {
         News news = newsRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Новость не найдена"));
@@ -219,7 +221,7 @@ public class NewsServiceImpl implements NewsService {
 
         fillNewsFields(news, dto, dto.getLocale());
 
-        if (news.isPublished()) {
+        if (news.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
             Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
@@ -273,6 +275,9 @@ public class NewsServiceImpl implements NewsService {
         if (null != dto.getTitleEs()) {
             news.setTitleEs(dto.getTitleEs().orElse(null));
         }
+        if (null != dto.getTitleDe()) {
+            news.setTitleDe(dto.getTitleDe().orElse(null));
+        }
         if (null != dto.getContentRu()) {
             news.setContentRu(dto.getContentRu().orElse(null));
         }
@@ -281,6 +286,9 @@ public class NewsServiceImpl implements NewsService {
         }
         if (null != dto.getContentEs()) {
             news.setContentEs(dto.getContentEs().orElse(null));
+        }
+        if (null != dto.getContentDe()) {
+            news.setContentDe(dto.getContentDe().orElse(null));
         }
         if (null != dto.getPublished()) {
             news.setPublished(dto.getPublished().orElseThrow());

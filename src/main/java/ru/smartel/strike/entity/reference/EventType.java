@@ -12,7 +12,7 @@ public class EventType extends EntityWithNames implements NamedReference {
     public EventType() {
     }
 
-    public EventType(String nameRu, String nameEn, String nameEs) {
-        super(nameRu, nameEn, nameEs);
+    public EventType(String nameRu, String nameEn, String nameEs, String nameDe) {
+        super(nameRu, nameEn, nameEs, nameDe);
     }
 }

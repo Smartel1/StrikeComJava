@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.region.RegionCreateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.region.RegionDetailDTO;
 import ru.smartel.strike.service.Locale;
@@ -36,10 +37,10 @@ public class RegionController {
     }
 
     @PostMapping
-    public RegionDetailDTO create (
+    public DetailWrapperDTO<RegionDetailDTO> create (
             @PathVariable("locale") Locale locale,
             @RequestBody RegionCreateRequestDTO dto) {
         dto.setLocale(locale);
-        return regionService.create(dto);
+        return new DetailWrapperDTO<>(regionService.create(dto));
     }
 }

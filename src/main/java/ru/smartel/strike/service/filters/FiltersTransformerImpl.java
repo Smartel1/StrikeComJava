@@ -112,7 +112,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
             if (null == descendant) {
                 result = result.and(falseSpecification());
             } else {
-                result = result.and(new AncestorsOfConflict(descendant.getLft(), descendant.getRgt()));
+                result = result.and(new AncestorsOfConflict(descendant.getTreeLeft(), descendant.getTreeRight()));
             }
         }
         if (null != filters.getChildrenOf()) result = result.and(new ChildrenOfConflict(filters.getChildrenOf()));

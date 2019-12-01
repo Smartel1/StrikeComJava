@@ -31,6 +31,18 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             addErrorMessage("perPage", new ValidationUtil.Min(1), errors);
         }
 
+        if (null != dto.getFilters() && null != dto.getFilters().getNear()) {
+            if (null == dto.getFilters().getNear().getLat()) {
+                addErrorMessage("filters.near.lat", new NotNull(), errors);
+            }
+            if (null == dto.getFilters().getNear().getLng()) {
+                addErrorMessage("filters.near.lng", new NotNull(), errors);
+            }
+            if (null == dto.getFilters().getNear().getRadius()) {
+                addErrorMessage("filters.near.radius", new NotNull(), errors);
+            }
+        }
+
         throwIfErrorsExist(errors);
     }
 
@@ -67,6 +79,12 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
         if (null != dto.getTitleEs()) {
             dto.getTitleEs().ifPresent(title -> {
                 if (title.length() > 255) addErrorMessage("titleEs", new ValidationUtil.Max(255), errors);
+            });
+        }
+
+        if (null != dto.getTitleDe()) {
+            dto.getTitleDe().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("titleDe", new ValidationUtil.Max(255), errors);
             });
         }
 
@@ -137,13 +155,21 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             });
         }
 
-        dto.getCompanyName().ifPresent(companyName -> {
-            if (companyName.length() < 3) {
-                addErrorMessage("companyName", new Min(3), errors);
-            } else if (companyName.length() > 500) {
-                addErrorMessage("companyName", new Max(500), errors);
-            }
-        });
+        if (null != dto.getTitleDe()) {
+            dto.getTitleDe().ifPresent(title -> {
+                if (title.length() > 255) addErrorMessage("titleDe", new ValidationUtil.Max(255), errors);
+            });
+        }
+
+        if (null != dto.getCompanyName()) {
+            dto.getCompanyName().ifPresent(companyName -> {
+                if (companyName.length() < 3) {
+                    addErrorMessage("companyName", new Min(3), errors);
+                } else if (companyName.length() > 500) {
+                    addErrorMessage("companyName", new Max(500), errors);
+                }
+            });
+        }
 
         throwIfErrorsExist(errors);
     }

@@ -20,19 +20,21 @@ abstract public class EntityWithNames implements Names {
     @AccessType(AccessType.Type.PROPERTY) //чтобы доставать id из прокси (без загрузки объекта из базы)
     long id;
     @Column(name = "name_ru")
-    String nameRu;
+    private String nameRu;
     @Column(name = "name_en")
-    String nameEn;
+    private String nameEn;
     @Column(name = "name_es")
-    String nameEs;
+    private String nameEs;
+    @Column(name = "name_de")
+    private String nameDe;
 
-    public EntityWithNames() {
-    }
+    EntityWithNames() {}
 
-    public EntityWithNames(String nameRu, String nameEn, String nameEs) {
+    public EntityWithNames(String nameRu, String nameEn, String nameEs, String nameDe) {
         this.nameRu = nameRu;
         this.nameEn = nameEn;
         this.nameEs = nameEs;
+        this.nameDe = nameDe;
     }
 
     public long getId() {
@@ -74,6 +76,16 @@ abstract public class EntityWithNames implements Names {
     }
 
     @Override
+    public String getNameDe() {
+        return nameDe;
+    }
+
+    @Override
+    public void setNameDe(String nameDe) {
+        this.nameDe = nameDe;
+    }
+
+    @Override
     public String getNameByLocale(Locale locale) {
         switch (locale) {
             case RU:
@@ -82,6 +94,8 @@ abstract public class EntityWithNames implements Names {
                 return getNameEn();
             case ES:
                 return getNameEs();
+            case DE:
+                return getNameDe();
             default:
                 return "";
         }

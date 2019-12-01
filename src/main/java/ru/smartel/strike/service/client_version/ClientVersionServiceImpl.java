@@ -67,6 +67,7 @@ public class ClientVersionServiceImpl implements ClientVersionService {
         version.setDescriptionRu(dto.getDescriptionRu());
         version.setDescriptionEn(dto.getDescriptionEn());
         version.setDescriptionEs(dto.getDescriptionEs());
+        version.setDescriptionDe(dto.getDescriptionDe());
 
         clientVersionRepository.save(version);
 

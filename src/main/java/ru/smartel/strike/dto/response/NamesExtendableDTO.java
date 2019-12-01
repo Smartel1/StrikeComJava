@@ -13,6 +13,7 @@ public abstract class NamesExtendableDTO extends ExtendableDTO {
             add("nameRu", entity.getNameRu());
             add("nameEn", entity.getNameEn());
             add("nameEs", entity.getNameEs());
+            add("nameDe", entity.getNameDe());
         } else {
             add("name", entity.getNameByLocale(locale));
         }

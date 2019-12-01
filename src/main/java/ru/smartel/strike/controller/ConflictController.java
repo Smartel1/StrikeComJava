@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
-import ru.smartel.strike.entity.User;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictService;
 
@@ -32,38 +33,38 @@ public class ConflictController {
     @GetMapping
     public ListWrapperDTO<ConflictListDTO> index(
             ConflictListRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setUser(user);
         return conflictService.list(dto);
     }
 
     @GetMapping("{id}")
-    public ConflictDetailDTO show(
+    public DetailWrapperDTO<ConflictDetailDTO> show(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
-        return conflictService.get(conflictId, locale);
+        return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
     }
 
     @PostMapping
-    public ConflictDetailDTO store(
+    public DetailWrapperDTO<ConflictDetailDTO> store(
             @PathVariable("locale") Locale locale,
             @RequestBody ConflictCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
-        return conflictService.create(dto);
+        return new DetailWrapperDTO<>(conflictService.create(dto));
     }
 
     @PutMapping("{id}")
-    public ConflictDetailDTO update(
+    public DetailWrapperDTO<ConflictDetailDTO> update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody ConflictUpdateRequestDTO dto) {
         dto.setLocale(locale);
         dto.setUser(user);
         dto.setConflictId(conflictId);
-        return conflictService.update(dto);
+        return new DetailWrapperDTO<>(conflictService.update(dto));
     }
 
     @DeleteMapping("{id}")

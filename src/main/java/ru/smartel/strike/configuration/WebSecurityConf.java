@@ -1,5 +1,6 @@
 package ru.smartel.strike.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +18,14 @@ public class WebSecurityConf extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .antMatcher("/api/**")
-                .addFilterBefore(new FirebaseTokenFilter(userRepository), AnonymousAuthenticationFilter.class)
+                .addFilterBefore(new FirebaseTokenFilter(userRepository, objectMapper), AnonymousAuthenticationFilter.class)
                 .logout().disable()
                 .requestCache().disable()
                 .httpBasic().disable()

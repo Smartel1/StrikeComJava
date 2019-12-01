@@ -23,7 +23,8 @@ public class NamePatternCountry implements Specification<Country> {
                 criteriaBuilder.or(
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("nameRu")), pattern),
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("nameEn")), pattern),
-                        criteriaBuilder.like(criteriaBuilder.lower(root.get("nameEs")), pattern)
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("nameEs")), pattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("nameDe")), pattern)
                 );
     }
 }

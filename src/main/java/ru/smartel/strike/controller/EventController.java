@@ -11,14 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventFavouritesRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.ValidationException;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.event.EventService;
 
@@ -37,46 +40,45 @@ public class EventController {
     @GetMapping
     public ListWrapperDTO<EventListDTO> index(
             EventListRequestDTO dto,
-            @AuthenticationPrincipal User user
-    ) throws ValidationException {
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
         dto.setUser(user);
         return eventService.list(dto);
     }
 
     @GetMapping("{id}")
-    public EventDetailDTO show(EventShowDetailRequestDTO dto) {
-        return eventService.incrementViewsAndGet(dto);
+    public DetailWrapperDTO<EventDetailDTO> show(EventShowDetailRequestDTO dto) {
+        return new DetailWrapperDTO<>(eventService.incrementViewsAndGet(dto));
     }
 
     @PostMapping("{id}/favourites")
     public void setFavourite(
             @PathVariable("id") long eventId,
-            @RequestParam(value = "favourite") boolean isFavourite,
-            @AuthenticationPrincipal User user) {
-        Optional.ofNullable(user).ifPresent(
-                usr -> eventService.setFavourite(eventId, usr.getId(), isFavourite));
+            @RequestBody EventFavouritesRequestDTO dto,
+            @AuthenticationPrincipal UserPrincipal user) {
+        Optional.ofNullable(user).ifPresent(usr -> eventService.setFavourite(eventId, usr.getId(), dto.isFavourite()));
     }
 
     @PostMapping
-    public EventDetailDTO store(
+    public DetailWrapperDTO<EventDetailDTO> store(
             @PathVariable("locale") Locale locale,
             @RequestBody EventCreateRequestDTO dto,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal UserPrincipal user) {
         dto.setLocale(locale);
         dto.setUser(user);
-        return eventService.create(dto);
+        return new DetailWrapperDTO<>(eventService.create(dto));
     }
 
     @PutMapping("{id}")
-    public EventDetailDTO update(
+    public DetailWrapperDTO<EventDetailDTO> update(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long eventId,
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal UserPrincipal user,
             @RequestBody EventUpdateRequestDTO dto) {
         dto.setEventId(eventId);
         dto.setLocale(locale);
         dto.setUser(user);
-        return eventService.update(dto);
+        return new DetailWrapperDTO<>(eventService.update(dto));
     }
 
     @DeleteMapping("{id}")

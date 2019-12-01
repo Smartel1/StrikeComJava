@@ -70,23 +70,23 @@ public class EventFiltersDTO extends PostFiltersDTO {
     }
 
     public static class SearchArea {
-        private Double lat;
-        private Double lng;
+        private Float lat;
+        private Float lng;
         private Integer radius;
 
-        public Double getLat() {
+        public Float getLat() {
             return lat;
         }
 
-        public void setLat(Double lat) {
+        public void setLat(Float lat) {
             this.lat = lat;
         }
 
-        public Double getLng() {
+        public Float getLng() {
             return lng;
         }
 
-        public void setLng(Double lng) {
+        public void setLng(Float lng) {
             this.lng = lng;
         }
 

@@ -5,13 +5,17 @@ import ru.smartel.strike.dto.response.post.PostListDTO;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.service.Locale;
 
+import java.time.ZoneOffset;
+import java.util.Optional;
+
 public class EventListDTO extends PostListDTO {
 
-    private double latitude;
-    private double longitude;
+    private float latitude;
+    private float longitude;
     private long conflictId;
     private Long eventStatusId;
     private Long eventTypeId;
+    private Long createdAt;
     private ConflictDetailDTO conflict;
 
     public static EventListDTO of(Event event, Locale locale) {
@@ -22,23 +26,26 @@ public class EventListDTO extends PostListDTO {
         instance.setConflictId(event.getConflict().getId());
         instance.setEventStatusId(null != event.getStatus() ? event.getStatus().getId() : null);
         instance.setEventTypeId(null != event.getType() ? event.getType().getId() : null);
+        instance.setCreatedAt(Optional.ofNullable(event.getCreatedAt())
+                .map(d -> d.toEpochSecond(ZoneOffset.UTC))
+                .orElse(null));
         instance.setConflict(ConflictDetailDTO.of(event.getConflict(), locale));
         return instance;
     }
 
-    public double getLatitude() {
+    public float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(float latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(float longitude) {
         this.longitude = longitude;
     }
 
@@ -64,6 +71,14 @@ public class EventListDTO extends PostListDTO {
 
     public void setEventTypeId(Long eventTypeId) {
         this.eventTypeId = eventTypeId;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public ConflictDetailDTO getConflict() {

@@ -16,6 +16,10 @@ public interface Titles {
 
     void setTitleEs(String titleEs);
 
+    String getTitleDe();
+
+    void setTitleDe(String titleDe);
+
     default String getTitleByLocale(Locale locale) {
         switch (locale) {
             case RU:
@@ -24,6 +28,8 @@ public interface Titles {
                 return getTitleEn();
             case ES:
                 return getTitleEs();
+            case DE:
+                return getTitleDe();
             default:
                 return "";
         }
@@ -39,6 +45,9 @@ public interface Titles {
                 break;
             case ES:
                 setTitleEs(title);
+                break;
+            case DE:
+                setTitleDe(title);
                 break;
         }
     }

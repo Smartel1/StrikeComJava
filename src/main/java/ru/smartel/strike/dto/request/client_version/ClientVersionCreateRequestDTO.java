@@ -14,6 +14,7 @@ public class ClientVersionCreateRequestDTO {
     private String descriptionRu;
     private String descriptionEn;
     private String descriptionEs;
+    private String descriptionDe;
 
     public Locale getLocale() {
         return locale;
@@ -69,5 +70,13 @@ public class ClientVersionCreateRequestDTO {
 
     public void setDescriptionEs(String descriptionEs) {
         this.descriptionEs = descriptionEs;
+    }
+
+    public String getDescriptionDe() {
+        return descriptionDe;
+    }
+
+    public void setDescriptionDe(String descriptionDe) {
+        this.descriptionDe = descriptionDe;
     }
 }

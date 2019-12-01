@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.smartel.strike.dto.request.locality.LocalityCreateRequestDTO;
+import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.reference.locality.LocalityDetailDTO;
 import ru.smartel.strike.service.Locale;
@@ -36,10 +37,10 @@ public class LocalityController {
     }
 
     @PostMapping(consumes = {"application/json"})
-    public LocalityDetailDTO create(
+    public DetailWrapperDTO<LocalityDetailDTO> create(
             @PathVariable("locale") Locale locale,
             @RequestBody LocalityCreateRequestDTO dto) {
         dto.setLocale(locale);
-        return localityService.create(dto);
+        return new DetailWrapperDTO<>(localityService.create(dto));
     }
 }

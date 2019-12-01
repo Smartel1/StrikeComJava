@@ -12,7 +12,7 @@ public class ConflictResult extends EntityWithNames implements NamedReference {
     public ConflictResult() {
     }
 
-    public ConflictResult(String nameRu, String nameEn, String nameEs) {
-        super(nameRu, nameEn, nameEs);
+    public ConflictResult(String nameRu, String nameEn, String nameEs, String nameDe) {
+        super(nameRu, nameEn, nameEs, nameDe);
     }
 }
