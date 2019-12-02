@@ -5,8 +5,8 @@ import java.util.List;
 public class ConflictFiltersDTO {
     private Integer dateFrom;
     private Integer dateTo;
-    private List<Integer> conflictResultIds;
-    private List<Integer> conflictReasonIds;
+    private List<Long> conflictResultIds;
+    private List<Long> conflictReasonIds;
     private Long ancestorsOf;
     private Long childrenOf;
     private SearchArea near;
@@ -27,19 +27,19 @@ public class ConflictFiltersDTO {
         this.dateTo = dateTo;
     }
 
-    public List<Integer> getConflictResultIds() {
+    public List<Long> getConflictResultIds() {
         return conflictResultIds;
     }
 
-    public void setConflictResultIds(List<Integer> conflictResultIds) {
+    public void setConflictResultIds(List<Long> conflictResultIds) {
         this.conflictResultIds = conflictResultIds;
     }
 
-    public List<Integer> getConflictReasonIds() {
+    public List<Long> getConflictReasonIds() {
         return conflictReasonIds;
     }
 
-    public void setConflictReasonIds(List<Integer> conflictReasonIds) {
+    public void setConflictReasonIds(List<Long> conflictReasonIds) {
         this.conflictReasonIds = conflictReasonIds;
     }
 

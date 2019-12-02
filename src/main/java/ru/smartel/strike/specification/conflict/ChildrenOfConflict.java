@@ -21,6 +21,6 @@ public class ChildrenOfConflict implements Specification<Conflict> {
 
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.get("parent").get("id"), parentId);
+        return cb.equal(root.get("parentId"), parentId);
     }
 }

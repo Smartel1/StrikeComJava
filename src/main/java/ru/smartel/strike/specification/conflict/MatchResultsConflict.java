@@ -13,9 +13,9 @@ import java.util.List;
  * Conflicts with results
  */
 public class MatchResultsConflict implements Specification<Conflict> {
-    private List<Integer> resultIds;
+    private List<Long> resultIds;
 
-    public MatchResultsConflict(List<Integer> resultIds) {
+    public MatchResultsConflict(List<Long> resultIds) {
         this.resultIds = resultIds;
     }
 

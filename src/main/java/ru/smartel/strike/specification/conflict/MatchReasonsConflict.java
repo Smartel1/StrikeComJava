@@ -13,9 +13,9 @@ import java.util.List;
  * Conflicts with reasons
  */
 public class MatchReasonsConflict implements Specification<Conflict> {
-    private List<Integer> reasonIds;
+    private List<Long> reasonIds;
 
-    public MatchReasonsConflict(List<Integer> reasonIds) {
+    public MatchReasonsConflict(List<Long> reasonIds) {
         this.reasonIds = reasonIds;
     }
 

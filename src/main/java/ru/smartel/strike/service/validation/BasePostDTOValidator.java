@@ -160,7 +160,7 @@ public class BasePostDTOValidator {
                                 addErrorMessage("videos[" + i + "].url", new Max(500), errors);
                             }
 
-                            if (video.getPreviewUrl().isPresent()) {
+                            if (null != video.getPreviewUrl() && video.getPreviewUrl().isPresent()) {
                                 if (video.getPreviewUrl().get().length() > 500) {
                                     addErrorMessage("videos[" + i + "].previewUrl", new Max(500), errors);
                                 }
