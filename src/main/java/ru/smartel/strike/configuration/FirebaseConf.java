@@ -15,7 +15,7 @@ import java.io.IOException;
 @Configuration
 public class FirebaseConf {
 
-    @Value("${firebase.authentication}")
+    @Value("${firebase.authentication.credentials}")
     private String serviceAccountJson;
 
     @PostConstruct

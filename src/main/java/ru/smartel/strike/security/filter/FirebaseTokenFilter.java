@@ -34,14 +34,23 @@ public class FirebaseTokenFilter implements Filter {
 
     private UserRepository userRepository;
     private ObjectMapper objectMapper;
+    private boolean stub;
 
-    public FirebaseTokenFilter(UserRepository userRepository, ObjectMapper objectMapper) {
+    public FirebaseTokenFilter(UserRepository userRepository, ObjectMapper objectMapper, boolean stub) {
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.stub = stub;
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (stub) {
+            authenticateAsModerator();
+            chain.doFilter(request, response);
+            System.out.println(response);
+            return;
+        }
+
         String bearer = ((HttpServletRequest)request).getHeader("Authorization");
 
         try {
@@ -84,6 +93,14 @@ public class FirebaseTokenFilter implements Filter {
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), token, true)
+        );
+    }
+
+    private void authenticateAsModerator() {
+        User user = userRepository.findFirstByUuid("stub").orElseThrow(
+                () -> new RuntimeException("Expected default moderator to exist"));
+        SecurityContextHolder.getContext().setAuthentication(
+                new UserAuthenticationToken(UserPrincipal.from(user), getUserAuthorities(user), null, true)
         );
     }
 

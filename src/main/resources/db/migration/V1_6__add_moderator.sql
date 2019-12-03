@@ -1,0 +1,1 @@
+INSERT INTO users (uuid, name, roles) VALUES ('stub', 'Moderator', '["MODERATOR"]');

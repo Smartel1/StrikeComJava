@@ -1,0 +1,6 @@
+firebase:
+  authentication:
+    stub: false
+
+push:
+  enabled: true

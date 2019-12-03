@@ -9,17 +9,17 @@ import java.util.Set;
 
 public class UserAuthenticationToken implements Authentication {
 
+    private UserPrincipal user;
+    private Set<GrantedAuthority> authorities;
+    private FirebaseToken credentials;
+    private boolean authenticated;
+
     public UserAuthenticationToken(UserPrincipal user, Set<GrantedAuthority> authorities, FirebaseToken credentials, boolean authenticated) {
         this.user = user;
         this.authorities = authorities;
         this.credentials = credentials;
         this.authenticated = authenticated;
     }
-
-    private UserPrincipal user;
-    private Set<GrantedAuthority> authorities;
-    private FirebaseToken credentials;
-    private boolean authenticated;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
