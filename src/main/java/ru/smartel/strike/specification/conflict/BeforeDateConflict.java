@@ -22,7 +22,7 @@ public class BeforeDateConflict implements Specification<Conflict> {
 
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.lessThanOrEqualTo(root.get("dateTo"),
+        return cb.lessThanOrEqualTo(root.get("dateFrom"),
                 LocalDateTime.ofEpochSecond(dateTo, 0, ZoneOffset.UTC));
     }
 }
