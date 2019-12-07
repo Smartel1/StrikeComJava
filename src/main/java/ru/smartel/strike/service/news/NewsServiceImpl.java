@@ -24,6 +24,7 @@ import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.repository.etc.VideoRepository;
 import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.news.NewsRepository;
+import ru.smartel.strike.rules.OccurredWhenPublish;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -172,6 +173,7 @@ public class NewsServiceImpl implements NewsService {
         news.setAuthor(user);
         fillNewsFields(news, dto, dto.getLocale());
 
+        businessValidationService.validate(new OccurredWhenPublish(news));
         newsRepository.save(news);
 
         //Send push
@@ -220,6 +222,8 @@ public class NewsServiceImpl implements NewsService {
                 .collect(Collectors.toSet());
 
         fillNewsFields(news, dto, dto.getLocale());
+
+        businessValidationService.validate(new OccurredWhenPublish(news));
 
         if (news.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
