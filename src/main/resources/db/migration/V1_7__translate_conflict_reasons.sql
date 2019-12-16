@@ -1,0 +1,10 @@
+UPDATE conflict_reasons SET name_de = 'Lohn bzw. Gehalt' WHERE name_en = 'Salary';
+UPDATE conflict_reasons SET name_de = 'Lohn bzw. Gehaltsverz\u00f6gerung' WHERE name_en = 'Paycheck delay';
+UPDATE conflict_reasons SET name_de = 'Stellenabbau' WHERE name_en = 'Cuts';
+UPDATE conflict_reasons SET name_de = 'Schlie\u00dfung des Unternehmens' WHERE name_en = 'Liquidation of an enterprise';
+UPDATE conflict_reasons SET name_de = 'Andere' WHERE name_en = 'Other';
+UPDATE conflict_reasons SET name_de = 'Entlassung' WHERE name_en = 'Termination';
+UPDATE conflict_reasons SET name_de = 'Managementkurs' WHERE name_en = 'Management policy';
+UPDATE conflict_reasons SET name_de = 'Arbeitsbedingungen' WHERE name_en = 'Working conditions';
+UPDATE conflict_reasons SET name_de = 'Arbeitszeit' WHERE name_en = 'Working hours';
+UPDATE conflict_reasons SET name_de = 'Tarifvertrag' WHERE name_en = 'Collective agreement';
