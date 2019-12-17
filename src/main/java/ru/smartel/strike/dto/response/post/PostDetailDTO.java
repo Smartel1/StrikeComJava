@@ -20,7 +20,7 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
     protected long date;
     protected int views;
     protected String sourceLink;
-    protected List<String> photos;
+    protected List<String> photoUrls;
     protected List<VideoDTO> videos;
     protected List<String> tags;
     protected AuthorDTO author;
@@ -32,7 +32,7 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
         setDate(post.getDate().toEpochSecond(ZoneOffset.UTC));
         setViews(post.getViews());
         setSourceLink(post.getSourceLink());
-        setPhotos(post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList()));
+        setPhotoUrls(post.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList()));
         setVideos(post.getVideos().stream().map(VideoDTO::from).collect(Collectors.toList()));
         setTags(post.getTags().stream().map(Tag::getName).collect(Collectors.toList()));
         setAuthor(Optional.ofNullable(post.getAuthor()).map(AuthorDTO::from).orElse(null));
@@ -78,12 +78,12 @@ public abstract class PostDetailDTO extends TitlesContentExtendableDTO {
         this.sourceLink = sourceLink;
     }
 
-    public List<String> getPhotos() {
-        return photos;
+    public List<String> getPhotoUrls() {
+        return photoUrls;
     }
 
-    public void setPhotos(List<String> photos) {
-        this.photos = photos;
+    public void setPhotoUrls(List<String> photoUrls) {
+        this.photoUrls = photoUrls;
     }
 
     public List<VideoDTO> getVideos() {
