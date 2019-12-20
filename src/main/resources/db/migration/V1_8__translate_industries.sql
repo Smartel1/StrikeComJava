@@ -1,0 +1,12 @@
+UPDATE industries SET name_de = 'Gebäude' WHERE name_en = 'Building';
+UPDATE industries SET name_de = 'Transportieren' WHERE name_en = 'Transport';
+UPDATE industries SET name_de = 'Handelsverkehr' WHERE name_en = 'Trading';
+UPDATE industries SET name_de = 'Herstellung' WHERE name_en = 'Manufacturing industries';
+UPDATE industries SET name_de = 'Staatsdienst' WHERE name_en = 'State service';
+UPDATE industries SET name_de = 'Wohnen und kommunale Dienstleistungen' WHERE name_en = 'Housing and communal services';
+UPDATE industries SET name_de = 'Kultur und Sport' WHERE name_en = 'Culture and sport';
+UPDATE industries SET name_de = 'Landwirtschaft' WHERE name_en = 'Agriculture';
+UPDATE industries SET name_de = 'Bergbau' WHERE name_en = 'Mining industry';
+UPDATE industries SET name_de = 'Energiewirtschaft' WHERE name_en = 'Power industry';
+UPDATE industries SET name_de = 'Gesundheitswesen' WHERE name_en = 'Health care';
+UPDATE industries SET name_de = 'Erleuchtung' WHERE name_en = 'Education and science';
