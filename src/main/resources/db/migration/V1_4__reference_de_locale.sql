@@ -14,7 +14,7 @@ UPDATE public.event_types SET name_de = 'Teilstreik' WHERE name_en = 'Partial st
 UPDATE public.event_types SET name_de = 'Stressensperrung' WHERE name_en = 'Highway overlap';
 UPDATE public.event_types SET name_de = 'Gericht' WHERE name_en = 'Court';
 UPDATE public.event_types SET name_de = 'Ermittlung' WHERE name_en = 'Investigation';
-UPDATE public.event_types SET name_de = 'Ablehnung von Ueberstunden' WHERE name_en = 'Refusal of processing';
+UPDATE public.event_types SET name_de = 'Ablehnung von Überstunden' WHERE name_en = 'Refusal of processing';
 UPDATE public.event_types SET name_de = 'Massenentlassung' WHERE name_en = 'Mass layoff';
 
 UPDATE public.conflict_results SET name_de = 'Zufriedenstellend' WHERE name_en = 'Completely satisfied';
@@ -39,4 +39,4 @@ UPDATE public.countries SET name_de = 'Estland' WHERE name_en = 'Estonia';
 UPDATE public.countries SET name_de = 'Die Republik Korea' WHERE name_en = 'The Republic of Corea';
 UPDATE public.countries SET name_de = 'Kirgisistan' WHERE name_en = 'Kyrgyzstan';
 UPDATE public.countries SET name_de = 'Mongolei' WHERE name_en = 'Mongolia';
-UPDATE public.countries SET name_de = 'Truthahn' WHERE name_en = 'Turkey';
+UPDATE public.countries SET name_de = 'Türkei' WHERE name_en = 'Turkey';
