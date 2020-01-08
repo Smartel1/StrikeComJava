@@ -18,7 +18,6 @@ INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Азербай
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Армения', 'Armenia', 'Armenia');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Беларусь', 'Belarus', 'Bielorrusia');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Казахстан', 'Kazakhstan', 'Kazajistán');
-INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Кыргызстан', 'Kyrgyzstan', 'Kirguistán');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Молдова', 'Moldova', 'Moldavia');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Таджикистан', 'Tajikistan', 'Tadjikistán');
 INSERT INTO public.countries (name_ru, name_en, name_es) VALUES ('Узбекистан', 'Uzbekistan', 'Uzbekistán');
