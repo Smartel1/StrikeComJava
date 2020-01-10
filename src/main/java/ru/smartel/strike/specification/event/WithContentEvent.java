@@ -21,10 +21,10 @@ public class WithContentEvent implements Specification<Event> {
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return cb.or(
-                cb.like(cb.lower(root.get("contentRu")), desiredContent),
-                cb.like(cb.lower(root.get("contentEn")), desiredContent),
-                cb.like(cb.lower(root.get("contentEs")), desiredContent),
-                cb.like(cb.lower(root.get("contentDe")), desiredContent)
+                cb.like(cb.lower(root.get("post").get("contentRu")), desiredContent),
+                cb.like(cb.lower(root.get("post").get("contentEn")), desiredContent),
+                cb.like(cb.lower(root.get("post").get("contentEs")), desiredContent),
+                cb.like(cb.lower(root.get("post").get("contentDe")), desiredContent)
         );
     }
 }
