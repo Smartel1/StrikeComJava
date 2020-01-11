@@ -1,5 +1,6 @@
 package ru.smartel.strike.service.country;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.country.NamePatternCountry;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +31,9 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public ListWrapperDTO<CountryDTO> list(String name, Locale locale) {
-        List<Country> countries = countryRepository.findAll(new NamePatternCountry(name));
+        //find country using name (if name specified)
+        List<Country> countries = countryRepository.findAll(
+                Optional.ofNullable(name).map(NamePatternCountry::new).orElse(null));
 
         return new ListWrapperDTO<>(
                 countries.stream()

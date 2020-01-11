@@ -14,6 +14,7 @@ import ru.smartel.strike.specification.region.NamePatternRegion;
 import ru.smartel.strike.specification.region.RegionOfCountry;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,9 @@ public class RegionServiceImpl implements RegionService {
     @Override
     public ListWrapperDTO<RegionDetailDTO> list(String name, Integer countryId, Locale locale) {
         List<Region> regions = regionRepository.findAll(
-                new NamePatternRegion(name).and(new RegionOfCountry(countryId))
+                new RegionOfCountry(countryId).and(
+                        //name can be null
+                        Optional.ofNullable(name).map(NamePatternRegion::new).orElse(null))
         );
 
         return new ListWrapperDTO<>(

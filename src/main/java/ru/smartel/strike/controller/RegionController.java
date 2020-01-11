@@ -31,7 +31,7 @@ public class RegionController {
     @GetMapping
     public ListWrapperDTO<RegionDetailDTO> list (
             @PathVariable("locale") Locale locale,
-            @RequestParam(value = "name") @Size(min = 2) String name,
+            @RequestParam(value = "name", required = false) @Size(min = 2) String name,
             @RequestParam(value = "countryId", required = false) Integer countryId) {
         return regionService.list(name, countryId, locale);
     }

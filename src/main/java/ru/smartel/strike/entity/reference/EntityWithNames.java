@@ -92,11 +92,12 @@ abstract public class EntityWithNames implements HavingNames {
         return id == that.id &&
                 Objects.equals(nameRu, that.nameRu) &&
                 Objects.equals(nameEn, that.nameEn) &&
-                Objects.equals(nameEs, that.nameEs);
+                Objects.equals(nameEs, that.nameEs) &&
+                Objects.equals(nameDe, that.nameDe);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, nameRu, nameEn, nameEs);
+        return Objects.hash(id, nameRu, nameEn, nameEs, nameDe);
     }
 }

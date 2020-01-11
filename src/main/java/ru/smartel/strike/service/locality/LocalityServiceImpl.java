@@ -14,6 +14,7 @@ import ru.smartel.strike.specification.locality.LocalityOfRegion;
 import ru.smartel.strike.specification.locality.NamePatternLocality;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,9 @@ public class LocalityServiceImpl implements LocalityService {
     @Override
     public ListWrapperDTO<LocalityDetailDTO> list(String name, Integer regionId, Locale locale) {
         List<Locality> localities = localityRepository.findAll(
-                new NamePatternLocality(name).and(new LocalityOfRegion(regionId))
+                new LocalityOfRegion(regionId).and(
+                        //name can be null
+                        Optional.ofNullable(name).map(NamePatternLocality::new).orElse(null))
         );
 
         return new ListWrapperDTO<>(

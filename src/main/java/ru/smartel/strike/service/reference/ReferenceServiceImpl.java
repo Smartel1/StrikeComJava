@@ -9,6 +9,7 @@ import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.ReferenceWithCode;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
+import ru.smartel.strike.repository.etc.CountryRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
 import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
@@ -31,6 +32,7 @@ public class ReferenceServiceImpl implements ReferenceService {
     private EventStatusRepository eventStatusRepository;
     private EventTypeRepository eventTypeRepository;
     private IndustryRepository industryRepository;
+    private CountryRepository countryRepository;
     private VideoTypeRepository videoTypeRepository;
 
     public ReferenceServiceImpl(ConflictReasonRepository conflictReasonRepository,
@@ -38,12 +40,14 @@ public class ReferenceServiceImpl implements ReferenceService {
                                 EventStatusRepository eventStatusRepository,
                                 EventTypeRepository eventTypeRepository,
                                 IndustryRepository industryRepository,
+                                CountryRepository countryRepository,
                                 VideoTypeRepository videoTypeRepository) {
         this.conflictReasonRepository = conflictReasonRepository;
         this.conflictResultRepository = conflictResultRepository;
         this.eventStatusRepository = eventStatusRepository;
         this.eventTypeRepository = eventTypeRepository;
         this.industryRepository = industryRepository;
+        this.countryRepository = countryRepository;
         this.videoTypeRepository = videoTypeRepository;
     }
 
@@ -57,6 +61,7 @@ public class ReferenceServiceImpl implements ReferenceService {
         result.put("eventStatuses", mapReferencesWithNamesToDTOs(eventStatusRepository.findAll(), locale));
         result.put("eventTypes", mapReferencesWithNamesToDTOs(eventTypeRepository.findAll(), locale));
         result.put("industries", mapReferencesWithNamesToDTOs(industryRepository.findAll(), locale));
+        result.put("countries", mapReferencesWithNamesToDTOs(countryRepository.findAll(), locale));
 
         //references with code
         result.put("videoTypes", mapReferencesWithCodeToDTOs(videoTypeRepository.findAll()));
@@ -73,6 +78,7 @@ public class ReferenceServiceImpl implements ReferenceService {
                 eventStatusRepository,
                 eventTypeRepository,
                 industryRepository,
+                countryRepository,
                 videoTypeRepository
         );
 
