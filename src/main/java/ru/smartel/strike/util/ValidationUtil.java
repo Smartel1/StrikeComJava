@@ -2,7 +2,7 @@ package ru.smartel.strike.util;
 
 import ru.smartel.strike.exception.ValidationException;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,9 @@ public class ValidationUtil {
         if (errorsCollection.containsKey(field)) {
             errorsCollection.get(field).add(errorType.toString());
         } else {
-            errorsCollection.put(field, Arrays.asList(errorType.toString()));
+            List<String> errors = new ArrayList<>();
+            errors.add(errorType.toString());
+            errorsCollection.put(field, errors);
         }
     }
 
@@ -40,6 +42,19 @@ public class ValidationUtil {
         @Override
         public String toString() {
             return "must be present";
+        }
+    }
+
+    public static class OneOf<T> implements ErrorMessage {
+        List<T> availableItems;
+
+        public OneOf(List<T> availableItems) {
+            this.availableItems = availableItems;
+        }
+
+        @Override
+        public String toString() {
+            return "must be one of: " + availableItems.toString();
         }
     }
 

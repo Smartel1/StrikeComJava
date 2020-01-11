@@ -6,6 +6,8 @@ import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.util.ValidationUtil;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,23 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             }
             if (null == dto.getFilters().getNear().getRadius()) {
                 addErrorMessage("filters.near.radius", new NotNull(), errors);
+            }
+        }
+
+        if (dto.getSort() != null) {
+            if (dto.getSort().getField() == null) {
+                addErrorMessage("sort.field", new NotNull(), errors);
+            } else {
+                if (!dto.getSort().getField().equals("createdAt")) {
+                    addErrorMessage("sort.field", new OneOf<>(Collections.singletonList("createdAt")), errors);
+                }
+            }
+            if (dto.getSort().getOrder() == null) {
+                addErrorMessage("sort.order", new NotNull(), errors);
+            } else {
+                if (!dto.getSort().getOrder().equals("asc") && !dto.getSort().getOrder().equals("desc")) {
+                    addErrorMessage("sort.order", new OneOf<>(Arrays.asList("asc", "desc")), errors);
+                }
             }
         }
 

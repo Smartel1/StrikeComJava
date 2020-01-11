@@ -10,6 +10,7 @@ public class BaseListRequestDTO {
 
     private int perPage = DEFAULT_PAGE_CAPACITY;
     private int page = DEFAULT_PAGE;
+    private Sort sort;
 
     public int getPerPage() {
         return perPage;
@@ -25,5 +26,34 @@ public class BaseListRequestDTO {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public Sort getSort() {
+        return sort;
+    }
+
+    public void setSort(Sort sort) {
+        this.sort = sort;
+    }
+
+    public static class Sort {
+        private String field;
+        private String order;
+
+        public String getField() {
+            return field;
+        }
+
+        public void setField(String field) {
+            this.field = field;
+        }
+
+        public String getOrder() {
+            return order;
+        }
+
+        public void setOrder(String order) {
+            this.order = order;
+        }
     }
 }

@@ -2,6 +2,7 @@ package ru.smartel.strike.repository.conflict;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
+import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface CustomConflictRepository {
 
     List<Long> findAllByIdGetParentEventId(List<Long> ids);
 
-    List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage);
+    List<Long> findIds(Specification<Conflict> specification, ConflictSortDTO sortDTO, Integer page, Integer perPage);
 
     /**
      * Persist conflict as child of another conflict or as root (if parent == null).

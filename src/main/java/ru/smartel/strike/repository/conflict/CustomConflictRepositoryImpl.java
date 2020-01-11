@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 import pl.exsio.nestedj.NestedNodeRepository;
-import pl.exsio.nestedj.model.Tree;
+import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 
 import javax.persistence.EntityManager;
@@ -13,7 +13,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(rollbackFor = Exception.class)
 public class CustomConflictRepositoryImpl implements CustomConflictRepository {
@@ -33,12 +32,12 @@ public class CustomConflictRepositoryImpl implements CustomConflictRepository {
     }
 
     @Override
-    public List<Long> findIds(Specification<Conflict> specification, Integer page, Integer perPage) {
+    public List<Long> findIds(Specification<Conflict> specification, ConflictSortDTO sortDTO, Integer page, Integer perPage) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> idQuery = cb.createQuery(Long.class);
         Root<Conflict> root = idQuery.from(Conflict.class);
         idQuery.select(root.get("id"));
-
+        idQuery.orderBy(sortDTO.toOrder(cb, root));
         idQuery.where(specification.toPredicate(root, idQuery, cb));
 
         return entityManager.createQuery(idQuery)

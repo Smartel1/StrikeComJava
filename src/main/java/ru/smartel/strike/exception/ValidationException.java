@@ -7,6 +7,7 @@ public class ValidationException extends RuntimeException {
     private Map<String, List<String>> errors;
 
     public ValidationException(Map<String, List<String>> errors) {
+        super("Validation error occurred");
         this.errors = errors;
     }
 

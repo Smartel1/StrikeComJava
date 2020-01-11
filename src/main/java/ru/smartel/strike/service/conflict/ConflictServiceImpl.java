@@ -10,6 +10,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
+import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.reference.ConflictReason;
@@ -82,11 +83,14 @@ public class ConflictServiceImpl implements ConflictService {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
+        ConflictSortDTO sortDTO = ConflictSortDTO.of(dto.getSort());
+
         //Get count of conflicts matching specification. Because pagination and fetching dont work together
-        List<Long> ids = conflictRepository.findIds(specification, dto.getPage(), dto.getPerPage());
+        List<Long> ids = conflictRepository.findIds(specification, sortDTO, dto.getPage(), dto.getPerPage());
 
         List<ConflictListDTO> conflictListDTOS = conflictRepository.findAllById(ids)
                 .stream()
+                .sorted(sortDTO.toComparator())
                 .map(conflict -> ConflictListDTO.of(conflict, dto.getLocale(), dto.isBrief()))
                 .collect(Collectors.toList());
 

@@ -36,7 +36,6 @@ import ru.smartel.strike.specification.news.HasTagNews;
 import ru.smartel.strike.specification.news.PublishedNews;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class FiltersTransformerImpl implements FiltersTransformer {
