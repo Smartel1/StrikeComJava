@@ -15,6 +15,7 @@ import ru.smartel.strike.dto.response.conflict.BriefConflictWithEventsDTO;
 import ru.smartel.strike.dto.response.event.BriefEventDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.service.sort.EventSortDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.Photo;
@@ -139,12 +140,15 @@ public class EventServiceImpl implements EventService {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
-        //Get count of events matching specification. Because pagination and fetching dont work together
-        List<Long> ids = eventRepository.findIdsOrderByDateDesc(specification, dto);
+        EventSortDTO sortDTO = EventSortDTO.of(dto.getSort());
 
-        List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids).stream()
+        //Get count of events matching specification. Because pagination and fetching dont work together
+        List<Long> ids = eventRepository.findIds(specification, sortDTO, dto.getPage(), dto.getPerPage());
+
+        List<EventListDTO> eventListDTOs = eventRepository.findAllById(ids)
+                .stream()
+                .sorted(sortDTO.toComparator())
                 .map(e -> EventListDTO.of(e, dto.getLocale()))
-                .sorted((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(eventListDTOs, responseMeta);

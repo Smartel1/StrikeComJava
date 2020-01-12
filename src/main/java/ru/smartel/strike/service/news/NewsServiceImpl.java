@@ -13,6 +13,8 @@ import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
+import ru.smartel.strike.dto.service.sort.EventSortDTO;
+import ru.smartel.strike.dto.service.sort.NewsSortDTO;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
@@ -38,7 +40,6 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,12 +113,15 @@ public class NewsServiceImpl implements NewsService {
             return new ListWrapperDTO<>(Collections.emptyList(), responseMeta);
         }
 
-        //Get count of news matching specification. Because pagination and fetching dont work together
-        List<Long> ids = newsRepository.findIdsOrderByDateDesc(specification, dto);
+        NewsSortDTO sortDTO = NewsSortDTO.of(dto.getSort());
 
-        List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids).stream()
+        //Get count of news matching specification. Because pagination and fetching dont work together
+        List<Long> ids = newsRepository.findIds(specification, sortDTO, dto.getPage(), dto.getPerPage());
+
+        List<NewsListDTO> newsListDTOs = newsRepository.findAllById(ids)
+                .stream()
+                .sorted(sortDTO.toComparator())
                 .map(e -> NewsListDTO.of(e, dto.getLocale()))
-                .sorted((e1, e2) -> Long.compare(e2.getDate(), e1.getDate()))
                 .collect(Collectors.toList());
 
         return new ListWrapperDTO<>(newsListDTOs, responseMeta);

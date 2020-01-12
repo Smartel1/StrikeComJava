@@ -49,15 +49,17 @@ public class ConflictDTOValidatorImpl implements ConflictDTOValidator {
             if (dto.getSort().getField() == null) {
                 addErrorMessage("sort.field", new NotNull(), errors);
             } else {
-                if (!dto.getSort().getField().equals("createdAt")) {
-                    addErrorMessage("sort.field", new OneOf<>(Collections.singletonList("createdAt")), errors);
+                List<String> availableSortFields = Collections.singletonList("createdAt");
+                if (!availableSortFields.contains(dto.getSort().getField())) {
+                    addErrorMessage("sort.field", new OneOf<>(availableSortFields), errors);
                 }
             }
             if (dto.getSort().getOrder() == null) {
                 addErrorMessage("sort.order", new NotNull(), errors);
             } else {
-                if (!dto.getSort().getOrder().equals("asc") && !dto.getSort().getOrder().equals("desc")) {
-                    addErrorMessage("sort.order", new OneOf<>(Arrays.asList("asc", "desc")), errors);
+                List<String> availableSortOrders = Arrays.asList("asc", "desc");
+                if (!availableSortOrders.contains(dto.getSort().getOrder())) {
+                    addErrorMessage("sort.order", new OneOf<>(availableSortOrders), errors);
                 }
             }
         }

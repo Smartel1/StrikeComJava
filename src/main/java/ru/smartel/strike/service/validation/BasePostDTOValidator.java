@@ -3,7 +3,9 @@ package ru.smartel.strike.service.validation;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
+import ru.smartel.strike.util.ValidationUtil;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,25 @@ public class BasePostDTOValidator {
 
         if (dto.getPerPage() < 1) {
             addErrorMessage("perPage", new Min(1), errors);
+        }
+
+        if (dto.getSort() != null) {
+            if (dto.getSort().getField() == null) {
+                addErrorMessage("sort.field", new NotNull(), errors);
+            } else {
+                List<String> availableSortFields = Arrays.asList("createdAt", "date");
+                if (!availableSortFields.contains(dto.getSort().getField())) {
+                    addErrorMessage("sort.field", new ValidationUtil.OneOf<>(availableSortFields), errors);
+                }
+            }
+            if (dto.getSort().getOrder() == null) {
+                addErrorMessage("sort.order", new NotNull(), errors);
+            } else {
+                List<String> availableSortOrders = Arrays.asList("asc", "desc");
+                if (!availableSortOrders.contains(dto.getSort().getOrder())) {
+                    addErrorMessage("sort.order", new ValidationUtil.OneOf<>(availableSortOrders), errors);
+                }
+            }
         }
 
         return errors;
