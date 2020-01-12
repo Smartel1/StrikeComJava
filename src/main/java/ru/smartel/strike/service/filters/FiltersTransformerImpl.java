@@ -16,6 +16,7 @@ import ru.smartel.strike.specification.conflict.ChildrenOfConflict;
 import ru.smartel.strike.specification.conflict.MatchReasonsConflict;
 import ru.smartel.strike.specification.conflict.MatchResultsConflict;
 import ru.smartel.strike.specification.conflict.NearCoordinateConflict;
+import ru.smartel.strike.specification.conflict.TextMentionConflict;
 import ru.smartel.strike.specification.event.AfterDateEvent;
 import ru.smartel.strike.specification.event.BeforeDateEvent;
 import ru.smartel.strike.specification.event.BelongToConflictsEvent;
@@ -104,6 +105,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
 
         if (null != filters.getDateFrom()) result = result.and(new AfterDateConflict(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateConflict(filters.getDateTo()));
+        if (null != filters.getFulltext()) result = result.and(new TextMentionConflict(filters.getFulltext()));
         if (null != filters.getConflictResultIds()) result = result.and(new MatchResultsConflict(filters.getConflictResultIds()));
         if (null != filters.getConflictReasonIds()) result = result.and(new MatchReasonsConflict(filters.getConflictReasonIds()));
         if (null != filters.getAncestorsOf()) {

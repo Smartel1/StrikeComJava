@@ -5,6 +5,7 @@ import java.util.List;
 public class ConflictFiltersDTO {
     private Integer dateFrom;
     private Integer dateTo;
+    private String fulltext;
     private List<Long> conflictResultIds;
     private List<Long> conflictReasonIds;
     private Long ancestorsOf;
@@ -25,6 +26,14 @@ public class ConflictFiltersDTO {
 
     public void setDateTo(Integer dateTo) {
         this.dateTo = dateTo;
+    }
+
+    public String getFulltext() {
+        return fulltext;
+    }
+
+    public void setFulltext(String fulltext) {
+        this.fulltext = fulltext;
     }
 
     public List<Long> getConflictResultIds() {
