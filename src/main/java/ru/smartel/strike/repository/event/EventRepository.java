@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.smartel.strike.entity.Event;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -15,4 +16,6 @@ public interface EventRepository extends CustomEventRepository, JpaSpecification
     @EntityGraph(attributePaths = {"videos", "photos", "tags", "conflict"})
     @Override
     List<Event> findAllById(Iterable<Long> ids);
+
+    Optional<Event> findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(long conflictId);
 }

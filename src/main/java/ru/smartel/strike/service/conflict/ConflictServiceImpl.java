@@ -10,6 +10,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
+import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
@@ -104,6 +105,17 @@ public class ConflictServiceImpl implements ConflictService {
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
         return ConflictDetailDTO.of(conflict, locale);
+    }
+
+    @Override
+    public ExtendedLocalityDTO getLatestCoordinates(long conflictId, Locale locale) {
+        //We need to check if conflict exist
+        Conflict conflict = conflictRepository.findById(conflictId)
+                .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+
+        return eventRepository.findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(conflictId)
+                .map(event -> ExtendedLocalityDTO.of(event.getLocality(), locale))
+                .orElseThrow(() -> new EntityNotFoundException("У этого конфликта нет событий с указанным нас. пунктом"));
     }
 
     @Override

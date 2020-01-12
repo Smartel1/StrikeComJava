@@ -16,6 +16,7 @@ import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
+import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictService;
@@ -43,6 +44,13 @@ public class ConflictController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
         return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
+    }
+
+    @GetMapping("{id}/latest-coordinates")
+    public DetailWrapperDTO<ExtendedLocalityDTO> latestCoordinates(
+            @PathVariable("locale") Locale locale,
+            @PathVariable("id") long conflictId) {
+        return new DetailWrapperDTO<>(conflictService.getLatestCoordinates(conflictId, locale));
     }
 
     @PostMapping
