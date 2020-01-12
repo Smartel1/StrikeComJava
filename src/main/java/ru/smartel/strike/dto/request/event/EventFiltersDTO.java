@@ -10,7 +10,7 @@ public class EventFiltersDTO extends PostFiltersDTO {
     private List<Long> eventTypeIds;
     private List<Long> countryIds;
     private List<Long> regionIds;
-    private String containsContent;
+    private String fulltext;
     private SearchArea near;
 
     public List<Long> getConflictIds() {
@@ -53,12 +53,12 @@ public class EventFiltersDTO extends PostFiltersDTO {
         this.regionIds = regionIds;
     }
 
-    public String getContainsContent() {
-        return containsContent;
+    public String getFulltext() {
+        return fulltext;
     }
 
-    public void setContainsContent(String containsContent) {
-        this.containsContent = containsContent;
+    public void setFulltext(String fulltext) {
+        this.fulltext = fulltext;
     }
 
     public SearchArea getNear() {

@@ -67,7 +67,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getFavourites() && filters.getFavourites() && null != userId) {
             result = result.and(new FavouriteEvent(userId));
         }
-        if (null != filters.getContainsContent()) result = result.and(new WithContentEvent(filters.getContainsContent()));
+        if (null != filters.getFulltext()) result = result.and(new WithContentEvent(filters.getFulltext()));
         if (null != filters.getCountryIds()) result = result.and(new CountryEvent(filters.getCountryIds()));
         if (null != filters.getRegionIds()) result = result.and(new RegionEvent(filters.getRegionIds()));
         if (null != filters.getNear())
