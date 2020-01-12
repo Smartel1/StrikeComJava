@@ -22,6 +22,7 @@ import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.entity.Video;
+import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
@@ -35,8 +36,8 @@ import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
-import ru.smartel.strike.rules.OccurredWhenPublish;
 import ru.smartel.strike.rules.NotAParentEvent;
+import ru.smartel.strike.rules.OccurredWhenPublish;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -212,6 +213,7 @@ public class EventServiceImpl implements EventService {
 
         businessValidationService.validate(new OccurredWhenPublish(event));
         eventRepository.save(event);
+        updateConflictsEventStatuses(event.getConflict().getId());
 
         //Send push
         if (!event.isPublished()) {
@@ -268,6 +270,8 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toSet());
 
         fillEventFields(event, dto, dto.getLocale());
+        eventRepository.save(event);
+        updateConflictsEventStatuses(event.getConflict().getId());
 
         businessValidationService.validate(new OccurredWhenPublish(event));
 
@@ -314,13 +318,45 @@ public class EventServiceImpl implements EventService {
         }
     }
 
+    public void updateConflictsEventStatuses(long conflictId) {
+        Conflict conflict = conflictRepository.findById(conflictId)
+                .orElseThrow(() -> new IllegalStateException("Cannot update events of unknown conflict"));
+
+        List<Event> events = eventRepository.findAllByConflictId(conflictId).stream()
+                .sorted(Comparator.comparing(PostEntity::getDate))
+                .collect(Collectors.toList());
+
+        if (events.isEmpty()) return;
+        //first event is 'new' event (unless it's final one in the same moment)
+        events.get(0).setStatus(eventStatusRepository.findFirstBySlug(EventStatus.NEW));
+
+        //every 1..n event is 'intermediate'
+        if (events.size() > 1) {
+            EventStatus intermediateStatus = eventStatusRepository.findFirstBySlug(EventStatus.INTERMEDIATE);
+            for (int i = 1; i < events.size(); i++) {
+                events.get(i).setStatus(intermediateStatus);
+            }
+        }
+
+        boolean conflictFinished = conflict.getDateTo() != null;
+
+        if (conflictFinished) {
+            //latest event of finished conflict is 'final' event
+            events.get(events.size() - 1).setStatus(eventStatusRepository.findFirstBySlug(EventStatus.FINAL));
+        }
+    }
+
     private void fillEventFields(Event event, EventCreateRequestDTO dto, Locale locale) {
         //for the sake of PATCH ;)
         if (null != dto.getConflictId()) {
             setConflict(event, dto.getConflictId().orElseThrow());
         }
         if (null != dto.getDate()) {
-            event.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
+            event.setDate(
+                    LocalDateTime.ofEpochSecond(
+                            dto.getDate().orElseThrow(() -> new IllegalStateException("Date cannot be null there!")),
+                            0,
+                            ZoneOffset.UTC));
         }
         if (null != dto.getSourceLink()) {
             event.setSourceLink(dto.getSourceLink().orElse(null));
@@ -361,9 +397,6 @@ public class EventServiceImpl implements EventService {
         if (null != dto.getLocalityId()) {
             setLocality(event, dto.getLocalityId().orElse(null));
         }
-        if (null != dto.getEventStatusId()) {
-            setEventStatus(event, dto.getEventStatusId().orElse(null));
-        }
         if (null != dto.getEventTypeId()) {
             setEventType(event, dto.getEventTypeId().orElse(null));
         }
@@ -403,19 +436,6 @@ public class EventServiceImpl implements EventService {
         }
 
         event.setLocality(locality);
-    }
-
-    /**
-     * Set event's status. If received eventStatusId equals to null, then set to null
-     */
-    private void setEventStatus(Event event, Long eventStatusId) {
-        EventStatus eventStatus = null;
-
-        if (null != eventStatusId) {
-            eventStatus = eventStatusRepository.getOne(eventStatusId);
-        }
-
-        event.setStatus(eventStatus);
     }
 
     /**

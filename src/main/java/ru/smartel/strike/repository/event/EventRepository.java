@@ -17,5 +17,7 @@ public interface EventRepository extends CustomEventRepository, JpaSpecification
     @Override
     List<Event> findAllById(Iterable<Long> ids);
 
+    List<Event> findAllByConflictId(long conflictId);
+
     Optional<Event> findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(long conflictId);
 }

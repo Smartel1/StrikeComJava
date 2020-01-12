@@ -6,4 +6,5 @@ import ru.smartel.strike.entity.reference.EventStatus;
 
 @Repository
 public interface EventStatusRepository extends JpaRepository<EventStatus, Long> {
+    EventStatus findFirstBySlug(String slug);
 }

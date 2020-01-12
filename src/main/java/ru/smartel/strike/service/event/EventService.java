@@ -23,4 +23,11 @@ public interface EventService {
     EventDetailDTO update(EventUpdateRequestDTO dto);
 
     void delete(Long eventId);
+
+    /**
+     * Event statuses are calculated automatically.
+     * This method updates statuses of every event of given conflict.
+     * @param conflictId conflict id
+     */
+    void updateConflictsEventStatuses(long conflictId);
 }

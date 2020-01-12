@@ -20,7 +20,6 @@ public class EventCreateRequestDTO extends PostRequestDTO {
     private Optional<Float> latitude;
     private Optional<Float> longitude;
     private Optional<Long> localityId;
-    private Optional<Long> eventStatusId;
     private Optional<Long> eventTypeId;
 
     public Locale getLocale() {
@@ -69,14 +68,6 @@ public class EventCreateRequestDTO extends PostRequestDTO {
 
     public void setLocalityId(Optional<Long> localityId) {
         this.localityId = localityId;
-    }
-
-    public Optional<Long> getEventStatusId() {
-        return eventStatusId;
-    }
-
-    public void setEventStatusId(Optional<Long> eventStatusId) {
-        this.eventStatusId = eventStatusId;
     }
 
     public Optional<Long> getEventTypeId() {

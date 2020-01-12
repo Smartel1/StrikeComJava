@@ -23,6 +23,7 @@ import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.event.EventService;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.specification.conflict.LocalizedConflict;
 
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,7 @@ public class ConflictServiceImpl implements ConflictService {
     private ConflictResultRepository conflictResultRepository;
     private IndustryRepository industryRepository;
     private EventRepository eventRepository;
+    private EventService eventService;
 
     public ConflictServiceImpl(ConflictDTOValidator dtoValidator,
                                FiltersTransformer filtersTransformer,
@@ -52,7 +55,8 @@ public class ConflictServiceImpl implements ConflictService {
                                ConflictReasonRepository conflictReasonRepository,
                                ConflictResultRepository conflictResultRepository,
                                IndustryRepository industryRepository,
-                               EventRepository eventRepository) {
+                               EventRepository eventRepository,
+                               EventService eventService) {
         this.dtoValidator = dtoValidator;
         this.filtersTransformer = filtersTransformer;
         this.conflictRepository = conflictRepository;
@@ -60,6 +64,7 @@ public class ConflictServiceImpl implements ConflictService {
         this.conflictResultRepository = conflictResultRepository;
         this.industryRepository = industryRepository;
         this.eventRepository = eventRepository;
+        this.eventService = eventService;
     }
 
     @Override
@@ -143,6 +148,8 @@ public class ConflictServiceImpl implements ConflictService {
         Conflict conflict = conflictRepository.findById(dto.getConflictId())
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
+        LocalDateTime dateToBeforeUpdate = conflict.getDateTo();
+
         fillConflictFields(conflict, dto, dto.getLocale());
 
         Conflict parentConflict = Optional.ofNullable(conflict.getParentEvent())
@@ -150,6 +157,11 @@ public class ConflictServiceImpl implements ConflictService {
                 .orElse(null);
 
         conflictRepository.insertAsLastChildOf(conflict, parentConflict);
+
+        // If dateTo going to be changed - update events' statuses
+        if (!Objects.equals(dateToBeforeUpdate, conflict.getDateTo())) {
+            eventService.updateConflictsEventStatuses(conflict.getId());
+        }
 
         return ConflictDetailDTO.of(conflict, dto.getLocale());
     }
@@ -162,7 +174,7 @@ public class ConflictServiceImpl implements ConflictService {
 
         if (conflictRepository.hasChildren(conflict)) {
             throw new IllegalStateException("В текущей реализации нельзя удалять конфликты, у которых есть потомки");
-        };
+        }
 
         conflictRepository.deleteFromTree(conflict);
     }
@@ -194,14 +206,16 @@ public class ConflictServiceImpl implements ConflictService {
             conflict.setCompanyName(dto.getCompanyName().orElse(null));
         }
         if (null != dto.getDateFrom()) {
-            dto.getDateFrom()
-                    .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
-                    .ifPresent(conflict::setDateFrom);
+            conflict.setDateFrom(
+                    dto.getDateFrom()
+                            .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
+                            .orElse(null));
         }
-        if (null != dto.getDateTo()){
-            dto.getDateTo()
-                    .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
-                    .ifPresent(conflict::setDateTo);
+        if (null != dto.getDateTo()) {
+            conflict.setDateTo(
+                    dto.getDateTo()
+                            .map(date -> LocalDateTime.ofEpochSecond(date, 0, ZoneOffset.UTC))
+                            .orElse(null));
         }
 
         if (null != dto.getConflictReasonId()) {
@@ -218,7 +232,7 @@ public class ConflictServiceImpl implements ConflictService {
         }
     }
 
-    private void setReason(Conflict conflict, Long reasonId){
+    private void setReason(Conflict conflict, Long reasonId) {
         ConflictReason conflictReason = null;
 
         if (null != reasonId) {
@@ -228,7 +242,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setReason(conflictReason);
     }
 
-    private void setResult(Conflict conflict, Long resultId){
+    private void setResult(Conflict conflict, Long resultId) {
         ConflictResult conflictResult = null;
 
         if (null != resultId) {
@@ -238,7 +252,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setResult(conflictResult);
     }
 
-    private void setIndustry(Conflict conflict, Long industryId){
+    private void setIndustry(Conflict conflict, Long industryId) {
         Industry industry = null;
 
         if (null != industryId) {
@@ -248,7 +262,7 @@ public class ConflictServiceImpl implements ConflictService {
         conflict.setIndustry(industry);
     }
 
-    private void setParentEvent(Conflict conflict, Long parentEventId){
+    private void setParentEvent(Conflict conflict, Long parentEventId) {
         Event parentEvent = null;
 
         if (null != parentEventId) {
