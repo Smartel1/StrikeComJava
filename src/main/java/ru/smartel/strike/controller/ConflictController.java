@@ -46,7 +46,7 @@ public class ConflictController {
         return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
     }
 
-    @GetMapping("{id}/latest-coordinates")
+    @GetMapping("{id}/latest-locality")
     public DetailWrapperDTO<ExtendedLocalityDTO> latestCoordinates(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {

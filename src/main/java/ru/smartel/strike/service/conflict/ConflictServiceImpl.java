@@ -115,7 +115,7 @@ public class ConflictServiceImpl implements ConflictService {
 
         return eventRepository.findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(conflictId)
                 .map(event -> ExtendedLocalityDTO.of(event.getLocality(), locale))
-                .orElseThrow(() -> new EntityNotFoundException("У этого конфликта нет событий с указанным нас. пунктом"));
+                .orElseThrow(() -> new EntityNotFoundException("У событий запрошенного конфликта не найдено населенных пунктов"));
     }
 
     @Override
