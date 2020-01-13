@@ -50,7 +50,7 @@ public class ConflictController {
     public DetailWrapperDTO<ExtendedLocalityDTO> latestCoordinates(
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
-        return new DetailWrapperDTO<>(conflictService.getLatestCoordinates(conflictId, locale));
+        return new DetailWrapperDTO<>(conflictService.getLatestLocality(conflictId, locale));
     }
 
     @PostMapping

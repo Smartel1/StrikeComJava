@@ -36,6 +36,7 @@ import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
+import ru.smartel.strike.rules.EventBeforeConflictsEnd;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.OccurredWhenPublish;
 import ru.smartel.strike.rules.UserCanModerate;
@@ -211,7 +212,10 @@ public class EventServiceImpl implements EventService {
         event.setAuthor(user);
         fillEventFields(event, dto, dto.getLocale());
 
-        businessValidationService.validate(new OccurredWhenPublish(event));
+        businessValidationService.validate(
+                new OccurredWhenPublish(event),
+                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo())
+        );
         eventRepository.save(event);
         updateConflictsEventStatuses(event.getConflict().getId());
 
@@ -273,7 +277,10 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         updateConflictsEventStatuses(event.getConflict().getId());
 
-        businessValidationService.validate(new OccurredWhenPublish(event));
+        businessValidationService.validate(
+                new OccurredWhenPublish(event),
+                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo())
+        );
 
         if (event.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction

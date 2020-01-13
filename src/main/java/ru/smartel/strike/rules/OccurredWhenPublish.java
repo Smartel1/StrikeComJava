@@ -24,6 +24,6 @@ public class OccurredWhenPublish extends BusinessRule {
 
     @Override
     public String message() {
-        return "Published post must happen in the past";
+        return "Опубликованная запись должна произойти в прошлом";
     }
 }

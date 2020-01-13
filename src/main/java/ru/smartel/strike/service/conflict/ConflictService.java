@@ -15,7 +15,7 @@ public interface ConflictService {
 
     ConflictDetailDTO get(long conflictId, Locale locale);
 
-    ExtendedLocalityDTO getLatestCoordinates(long conflictId, Locale locale);
+    ExtendedLocalityDTO getLatestLocality(long conflictId, Locale locale);
 
     ConflictDetailDTO create(ConflictCreateRequestDTO dto);
 

@@ -17,6 +17,7 @@ import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
 import ru.smartel.strike.entity.reference.Industry;
+import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
@@ -113,9 +114,9 @@ public class ConflictServiceImpl implements ConflictService {
     }
 
     @Override
-    public ExtendedLocalityDTO getLatestCoordinates(long conflictId, Locale locale) {
+    public ExtendedLocalityDTO getLatestLocality(long conflictId, Locale locale) {
         //We need to check if conflict exist
-        Conflict conflict = conflictRepository.findById(conflictId)
+        conflictRepository.findById(conflictId)
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
         return eventRepository.findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(conflictId)
@@ -145,6 +146,18 @@ public class ConflictServiceImpl implements ConflictService {
     public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) {
         dtoValidator.validateUpdateDTO(dto);
 
+        if (dto.getDateTo().isPresent()) {
+            Optional<Event> latestEvent = eventRepository.findFirstByConflictIdOrderByPostDateDesc(dto.getConflictId());
+
+            if (latestEvent.isPresent()) {
+                if (latestEvent.get().getDate().toEpochSecond(ZoneOffset.UTC) > dto.getDateTo().get()) {
+                    throw new ValidationException(Collections.singletonMap(
+                            "date", Collections.singletonList("конфликт не должен кончаться раньше последнего события"))
+                    );
+                }
+            }
+        }
+
         Conflict conflict = conflictRepository.findById(dto.getConflictId())
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
@@ -157,6 +170,8 @@ public class ConflictServiceImpl implements ConflictService {
                 .orElse(null);
 
         conflictRepository.insertAsLastChildOf(conflict, parentConflict);
+
+
 
         // If dateTo going to be changed - update events' statuses
         if (!Objects.equals(dateToBeforeUpdate, conflict.getDateTo())) {
