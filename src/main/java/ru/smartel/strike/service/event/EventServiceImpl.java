@@ -313,7 +313,9 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new EntityNotFoundException("Событие не найдено")
         );
+        long conflictId = event.getConflict().getId();
         eventRepository.delete(event);
+        updateConflictsEventStatuses(conflictId);
 
         //If event was not published - notify its' author about rejection
         if (!event.isPublished() && null != event.getAuthor()) {
