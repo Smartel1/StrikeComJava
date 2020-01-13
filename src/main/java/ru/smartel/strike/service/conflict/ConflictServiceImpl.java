@@ -152,7 +152,19 @@ public class ConflictServiceImpl implements ConflictService {
             if (latestEvent.isPresent()) {
                 if (latestEvent.get().getDate().toEpochSecond(ZoneOffset.UTC) > dto.getDateTo().get()) {
                     throw new ValidationException(Collections.singletonMap(
-                            "date", Collections.singletonList("конфликт не должен кончаться раньше последнего события"))
+                            "dateTo", Collections.singletonList("конфликт не должен кончаться раньше последнего события"))
+                    );
+                }
+            }
+        }
+
+        if (dto.getDateFrom().isPresent()) {
+            Optional<Event> latestEvent = eventRepository.findFirstByConflictIdOrderByPostDateDesc(dto.getConflictId());
+
+            if (latestEvent.isPresent()) {
+                if (latestEvent.get().getDate().toEpochSecond(ZoneOffset.UTC) < dto.getDateFrom().get()) {
+                    throw new ValidationException(Collections.singletonMap(
+                            "dateFrom", Collections.singletonList("конфликт не должен начинаться позже первого события"))
                     );
                 }
             }

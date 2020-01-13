@@ -36,6 +36,7 @@ import ru.smartel.strike.repository.etc.VideoTypeRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
+import ru.smartel.strike.rules.EventAfterConflictsStart;
 import ru.smartel.strike.rules.EventBeforeConflictsEnd;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.OccurredWhenPublish;
@@ -214,7 +215,8 @@ public class EventServiceImpl implements EventService {
 
         businessValidationService.validate(
                 new OccurredWhenPublish(event),
-                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo())
+                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo()),
+                new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
         eventRepository.save(event);
         updateConflictsEventStatuses(event.getConflict().getId());
@@ -279,7 +281,8 @@ public class EventServiceImpl implements EventService {
 
         businessValidationService.validate(
                 new OccurredWhenPublish(event),
-                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo())
+                new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo()),
+                new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
 
         if (event.isPublished()) { //after update
