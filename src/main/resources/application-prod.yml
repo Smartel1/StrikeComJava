@@ -11,4 +11,3 @@ push:
 
 logging:
   file: ${LOG_PATH}/daily-log.log
-  level: info
