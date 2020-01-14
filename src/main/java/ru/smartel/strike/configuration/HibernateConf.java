@@ -27,6 +27,8 @@ public class HibernateConf {
     private String password;
     @Value("${spring.jpa.database-platform}")
     private String dialect;
+    @Value("${spring.jpa.show-sql}")
+    private boolean showSql;
 
     @Bean
     public DataSource dataSource() {
@@ -51,7 +53,7 @@ public class HibernateConf {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setGenerateDdl(false);
-        vendorAdapter.setShowSql(true);
+        vendorAdapter.setShowSql(showSql);
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);

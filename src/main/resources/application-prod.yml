@@ -1,6 +1,14 @@
+spring:
+  jpa:
+    show-sql: false
+
 firebase:
   authentication:
     stub: false
 
 push:
   enabled: true
+
+logging:
+  file: ${LOG_PATH}/daily-log.log
+  level: info

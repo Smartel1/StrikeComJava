@@ -27,7 +27,7 @@ public class Handler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public ApiErrorDTO processJsonSchemaValidationException(ValidationException ex) {
-        logger.warn("ValidationException occurred", ex);
+        logger.info("ValidationException occurred: {}", ex.getErrors());
         return new ApiErrorDTO("Validation failed", ex.getErrors().entrySet().stream()
                 .map((entry)-> entry.getKey() + ": " + String.join(",", entry.getValue()))
                 .collect(Collectors.toList()));
@@ -37,7 +37,7 @@ public class Handler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     public ApiErrorDTO processEntityNotFoundException(EntityNotFoundException ex) {
-        logger.warn("EntityNotFoundException occurred", ex);
+        logger.info("EntityNotFoundException occurred: {}", ex.getMessage());
         return new ApiErrorDTO("Entity not found", ex.getMessage());
     }
 
@@ -60,8 +60,8 @@ public class Handler {
                 return new ApiErrorDTO("Constraint violated", message);
             }
         }
-        logger.warn("Exception occurred", ex);
-        return new ApiErrorDTO("Server error (sorry)", Collections.emptyList());
+        logger.warn("Data violation exception occurred: {}", ex.getMessage());
+        return new ApiErrorDTO("Data violation exception", ex.getMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -76,8 +76,8 @@ public class Handler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public ApiErrorDTO processMethodNotSupportedException(InvalidNodesHierarchyException ex) {
-        logger.warn("Conflicts hierarchy error", ex);
-        return new ApiErrorDTO("Request method not supported", ex.getMessage());
+        logger.warn("Nodes hierarchy error: {}", ex.getMessage());
+        return new ApiErrorDTO("Nodes hierarchy error", ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
