@@ -2,6 +2,7 @@ package ru.smartel.strike.security.authorization;
 
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
@@ -9,6 +10,7 @@ import ru.smartel.strike.entity.User;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.news.NewsRepository;
+import ru.smartel.strike.security.token.UserPrincipal;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -35,18 +37,20 @@ public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot i
     }
 
     public boolean isEventAuthor(Long eventId) {
+        if (!(getPrincipal() instanceof UserPrincipal)) return false;
         return eventRepository.findById(eventId)
                 .map(PostEntity::getAuthor)
                 .map(User::getId)
-                .map(authorId -> authorId.equals(((User)getAuthentication().getPrincipal()).getId()))
+                .map(authorId -> authorId.equals(((UserPrincipal)getPrincipal()).getId()))
                 .orElse(Boolean.FALSE);
     }
 
     public boolean isNewsAuthor(Long newsId) {
+        if (!(getPrincipal() instanceof UserPrincipal)) return false;
         return newsRepository.findById(newsId)
                 .map(PostEntity::getAuthor)
                 .map(User::getId)
-                .map(authorId -> authorId.equals(((User)getAuthentication().getPrincipal()).getId()))
+                .map(authorId -> authorId.equals(((UserPrincipal)getPrincipal()).getId()))
                 .orElse(Boolean.FALSE);
     }
 

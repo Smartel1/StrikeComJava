@@ -16,7 +16,7 @@ apiUrl: ${API_URL}
 
 firebase:
   authentication:
-    stub: true
+    stub: ${AUTH_STUB:#{false}}
     credentials: ${FB_AUTH_JSON} # base64-decoded service-account json credentials
 
 push:
