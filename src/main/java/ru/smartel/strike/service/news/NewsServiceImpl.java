@@ -323,12 +323,10 @@ public class NewsServiceImpl implements NewsService {
      */
     private void syncPhotos(News news, List<String> photoURLs) {
         photoRepository.deleteAll(news.getPhotos());
-        news.getPhotos().clear();
-        news.getPhotos().addAll(
-                photoURLs
-                        .stream()
-                        .map(Photo::new)
-                        .collect(Collectors.toList())
+        news.setPhotos(photoURLs.stream()
+                .map(Photo::new)
+                .peek(photoRepository::save)
+                .collect(Collectors.toSet())
         );
     }
 
@@ -337,20 +335,18 @@ public class NewsServiceImpl implements NewsService {
      */
     private void syncVideos(News news, List<VideoDTO> videos) {
         videoRepository.deleteAll(news.getVideos());
-        news.getVideos().clear();
-        news.getVideos().addAll(
-                videos
-                        .stream()
-                        .map(videoDTO -> {
-                            Video video = new Video();
-                            video.setUrl(videoDTO.getUrl());
-                            if (null != videoDTO.getPreviewUrl()) {
-                                video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
-                            }
-                            video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
-                            return video;
-                        })
-                        .collect(Collectors.toList())
+        news.setVideos(videos.stream()
+                .map(videoDTO -> {
+                    Video video = new Video();
+                    video.setUrl(videoDTO.getUrl());
+                    if (null != videoDTO.getPreviewUrl()) {
+                        video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
+                    }
+                    video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
+                    return video;
+                })
+                .peek(videoRepository::save)
+                .collect(Collectors.toSet())
         );
     }
 

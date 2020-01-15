@@ -464,38 +464,33 @@ public class EventServiceImpl implements EventService {
     }
 
     /**
-     * If client has sent photos, then remove old ones and save received
+     * Remove old photos and save received
      */
     private void syncPhotos(Event event, List<String> photoURLs) {
         photoRepository.deleteAll(event.getPhotos());
-        event.getPhotos().clear();
-        event.getPhotos().addAll(
-                photoURLs
-                        .stream()
-                        .map(Photo::new)
-                        .collect(Collectors.toList())
-        );
+        event.setPhotos(photoURLs.stream()
+                .map(Photo::new)
+                .peek(photoRepository::save)
+                .collect(Collectors.toSet()));
     }
 
     /**
-     * If client has sent videos, then remove old ones and save received
+     * Remove old videos and save received
      */
     private void syncVideos(Event event, List<VideoDTO> videos) {
         videoRepository.deleteAll(event.getVideos());
-        event.getVideos().clear();
-        event.getVideos().addAll(
-                videos
-                        .stream()
-                        .map(videoDTO -> {
-                            Video video = new Video();
-                            video.setUrl(videoDTO.getUrl());
-                            if (null != videoDTO.getPreviewUrl()) {
-                                video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
-                            }
-                            video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
-                            return video;
-                        })
-                        .collect(Collectors.toList())
+        event.setVideos(videos.stream()
+                .map(videoDTO -> {
+                    Video video = new Video();
+                    video.setUrl(videoDTO.getUrl());
+                    if (null != videoDTO.getPreviewUrl()) {
+                        video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
+                    }
+                    video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
+                    return video;
+                })
+                .peek(videoRepository::save)
+                .collect(Collectors.toSet())
         );
     }
 
