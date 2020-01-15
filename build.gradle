@@ -8,13 +8,12 @@ plugins {
 repositories {
     mavenLocal()
     maven {
-        url = 'http://repo.maven.apache.org/maven2'
+        url = 'https://repo.maven.apache.org/maven2'
     }
     maven {
         url = 'https://jitpack.io'
     }
 }
-
 dependencies {
     // spring dependencies
     compile platform("org.springframework.boot:spring-boot-dependencies:$spring_boot_version")
