@@ -146,7 +146,7 @@ public class ConflictServiceImpl implements ConflictService {
     public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) {
         dtoValidator.validateUpdateDTO(dto);
 
-        if (dto.getDateTo().isPresent()) {
+        if (dto.getDateTo() != null && dto.getDateTo().isPresent()) {
             Optional<Event> latestEvent = eventRepository.findFirstByConflictIdOrderByPostDateDesc(dto.getConflictId());
 
             if (latestEvent.isPresent()) {
@@ -158,7 +158,7 @@ public class ConflictServiceImpl implements ConflictService {
             }
         }
 
-        if (dto.getDateFrom().isPresent()) {
+        if (dto.getDateFrom() != null && dto.getDateFrom().isPresent()) {
             Optional<Event> latestEvent = eventRepository.findFirstByConflictIdOrderByPostDateDesc(dto.getConflictId());
 
             if (latestEvent.isPresent()) {
