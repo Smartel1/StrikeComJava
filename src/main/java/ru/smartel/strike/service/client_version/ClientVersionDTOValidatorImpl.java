@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.Max;
 import static ru.smartel.strike.util.ValidationUtil.NotNull;
 import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
 import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
@@ -54,26 +53,18 @@ public class ClientVersionDTOValidatorImpl implements ClientVersionDTOValidator 
 
         if (null == dto.getDescriptionRu()) {
             addErrorMessage("descriptionRu", new NotNull(), errors);
-        } else if (dto.getDescriptionRu().length() > 500){
-            addErrorMessage("descriptionRu", new Max(500), errors);
         }
 
         if (null == dto.getDescriptionEn()) {
             addErrorMessage("descriptionEn", new NotNull(), errors);
-        } else if (dto.getDescriptionEn().length() > 500){
-            addErrorMessage("descriptionEn", new Max(500), errors);
         }
 
         if (null == dto.getDescriptionEs()) {
             addErrorMessage("descriptionEs", new NotNull(), errors);
-        } else if (dto.getDescriptionEs().length() > 500){
-            addErrorMessage("descriptionEs", new Max(500), errors);
         }
 
         if (null == dto.getDescriptionDe()) {
             addErrorMessage("descriptionDe", new NotNull(), errors);
-        } else if (dto.getDescriptionDe().length() > 500){
-            addErrorMessage("descriptionDe", new Max(500), errors);
         }
 
         throwIfErrorsExist(errors);
