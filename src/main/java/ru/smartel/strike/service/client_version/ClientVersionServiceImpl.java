@@ -31,14 +31,20 @@ public class ClientVersionServiceImpl implements ClientVersionService {
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
-        ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
-                .orElseThrow(() -> new ValidationException(
-                        Collections.singletonMap("error", Collections.singletonList("Нет такой версии"))));
+        List<ClientVersion> clientVersions;
 
-        List<ClientVersionDTO> newVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
-                        currentVersion.getId(), dto.getClientId()
-                )
-                .stream()
+        if (dto.getCurrentVersion() != null) {
+            ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
+                    .orElseThrow(() -> new ValidationException(
+                            Collections.singletonMap("error", Collections.singletonList("Нет такой версии"))));
+
+            clientVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
+                    currentVersion.getId(), dto.getClientId());
+        } else {
+            clientVersions = clientVersionRepository.findAllByClientId(dto.getClientId());
+        }
+
+        List<ClientVersionDTO> newVersions = clientVersions.stream()
                 .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
                 .collect(Collectors.toList());
 

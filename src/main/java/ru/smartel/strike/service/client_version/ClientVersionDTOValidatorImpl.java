@@ -27,10 +27,6 @@ public class ClientVersionDTOValidatorImpl implements ClientVersionDTOValidator 
             addErrorMessage("clientId", new NotNull(), errors);
         }
 
-        if (null == dto.getCurrentVersion()) {
-            addErrorMessage("currentVersion", new NotNull(), errors);
-        }
-
         throwIfErrorsExist(errors);
     }
 
