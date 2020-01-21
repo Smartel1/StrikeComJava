@@ -24,7 +24,7 @@ public interface PushService {
     void newsPublished(
             Long newsId,
             Long authorId,
-            Map<String, Locale> titlesByLocales,
+            Map<Locale, String> titlesByLocales,
             String authorFCM,
             boolean notifyAuthor
     );
@@ -36,7 +36,7 @@ public interface PushService {
             Long eventId,
             Long authorId,
             Float lng, Float lat,
-            Map<String, Locale> titlesByLocales,
+            Map<Locale, String> titlesByLocales,
             String authorFCM,
             boolean notifyAuthor
     );

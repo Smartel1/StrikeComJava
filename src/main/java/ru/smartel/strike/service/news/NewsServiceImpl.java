@@ -186,10 +186,10 @@ public class NewsServiceImpl implements NewsService {
             pushService.newsCreatedByUser(news.getId(), news.getAuthor().getId(), news.getAuthor().getName());
         } else {
             //if news published - notify subscribers
-            Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
+            Map<Locale, String> titlesByLocales = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(loc -> null != news.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(news::getTitleByLocale, Function.identity()));
+                    .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             pushService.newsPublished(
                     news.getId(),
@@ -231,11 +231,11 @@ public class NewsServiceImpl implements NewsService {
 
         if (news.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
-            Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
+            Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != news.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(news::getTitleByLocale, Function.identity()));
+                    .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             pushService.newsPublished(
                     dto.getNewsId(),

@@ -227,10 +227,10 @@ public class EventServiceImpl implements EventService {
             pushService.eventCreatedByUser(event.getId(), event.getAuthor().getId(), event.getAuthor().getName());
         } else {
             //if event published - notify subscribers
-            Map<String, Locale> titlesByLocales = Stream.of(Locale.values())
+            Map<Locale, String> titlesByLocales = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(loc -> null != event.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(event::getTitleByLocale, Function.identity()));
+                    .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             pushService.eventPublished(
                     event.getId(),
@@ -287,11 +287,11 @@ public class EventServiceImpl implements EventService {
 
         if (event.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
-            Map<String, Locale> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
+            Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != event.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(event::getTitleByLocale, Function.identity()));
+                    .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             pushService.eventPublished(
                     dto.getEventId(),

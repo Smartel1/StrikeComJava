@@ -21,12 +21,12 @@ public class NullPushServiceImpl implements PushService {
     }
 
     @Override
-    public void newsPublished(Long newsId, Long authorId, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void newsPublished(Long newsId, Long authorId, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
 
     }
 
     @Override
-    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
 
     }
 

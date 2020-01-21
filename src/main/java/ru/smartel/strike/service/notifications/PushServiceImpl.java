@@ -65,9 +65,9 @@ public class PushServiceImpl implements PushService {
     }
 
     @Override
-    public void newsPublished(Long newsId, Long authorId, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
-        for (Map.Entry<String, Locale> titleByLocale : titlesByLocales.entrySet()) {
-            newsPublishedByLocale(newsId, authorId, titleByLocale.getKey(), titleByLocale.getValue());
+    public void newsPublished(Long newsId, Long authorId, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+        for (Map.Entry<Locale, String> titleByLocale : titlesByLocales.entrySet()) {
+            newsPublishedByLocale(newsId, authorId, titleByLocale.getValue(), titleByLocale.getKey());
         }
 
         if (notifyAuthor) {
@@ -76,9 +76,9 @@ public class PushServiceImpl implements PushService {
     }
 
     @Override
-    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<String, Locale> titlesByLocales, String authorFCM, boolean notifyAuthor) {
-        for (Map.Entry<String, Locale> titleByLocale : titlesByLocales.entrySet()) {
-            eventPublishedByLocale(eventId, authorId, lng, lat, titleByLocale.getKey(), titleByLocale.getValue());
+    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+        for (Map.Entry<Locale, String> titleByLocale : titlesByLocales.entrySet()) {
+            eventPublishedByLocale(eventId, authorId, lng, lat, titleByLocale.getValue(), titleByLocale.getKey());
         }
 
         if (notifyAuthor) {
