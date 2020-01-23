@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.reference.ReferenceCodeDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesDTO;
+import ru.smartel.strike.dto.response.reference.ReferenceNamesSlugDTO;
 import ru.smartel.strike.entity.reference.EntityWithNames;
+import ru.smartel.strike.entity.reference.EntityWithNamesAndSlug;
 import ru.smartel.strike.entity.reference.ReferenceWithCode;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
@@ -58,11 +60,11 @@ public class ReferenceServiceImpl implements ReferenceService {
         //references with names
         result.put("conflictReasons", mapReferencesWithNamesToDTOs(conflictReasonRepository.findAll(), locale));
         result.put("conflictResults", mapReferencesWithNamesToDTOs(conflictResultRepository.findAll(), locale));
-        result.put("eventStatuses", mapReferencesWithNamesToDTOs(eventStatusRepository.findAll(), locale));
         result.put("eventTypes", mapReferencesWithNamesToDTOs(eventTypeRepository.findAll(), locale));
         result.put("industries", mapReferencesWithNamesToDTOs(industryRepository.findAll(), locale));
         result.put("countries", mapReferencesWithNamesToDTOs(countryRepository.findAll(), locale));
-
+        //references with names and slug
+        result.put("eventStatuses", mapReferencesWithNamesAndSlugToDTOs(eventStatusRepository.findAll(), locale));
         //references with code
         result.put("videoTypes", mapReferencesWithCodeToDTOs(videoTypeRepository.findAll()));
 
@@ -97,6 +99,12 @@ public class ReferenceServiceImpl implements ReferenceService {
     private List<ReferenceNamesDTO> mapReferencesWithNamesToDTOs(List<? extends EntityWithNames> references, Locale locale) {
         return references.stream()
                 .map(ref -> ReferenceNamesDTO.of(ref, locale))
+                .collect(toList());
+    }
+
+    private List<ReferenceNamesSlugDTO> mapReferencesWithNamesAndSlugToDTOs(List<? extends EntityWithNamesAndSlug> references, Locale locale) {
+        return references.stream()
+                .map(ref -> ReferenceNamesSlugDTO.of(ref, locale))
                 .collect(toList());
     }
 
