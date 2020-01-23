@@ -1,7 +1,7 @@
-package ru.smartel.strike.specification.event;
+package ru.smartel.strike.specification.news;
 
 import org.springframework.data.jpa.domain.Specification;
-import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.News;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -9,17 +9,17 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 /**
- * Events with specified content part
+ * News with specified content part
  */
-public class WithContentEvent implements Specification<Event> {
+public class WithContentNews implements Specification<News> {
     private String desiredContent;
 
-    public WithContentEvent(String desiredContent) {
+    public WithContentNews(String desiredContent) {
         this.desiredContent = "%" + desiredContent.toLowerCase() + "%";
     }
 
     @Override
-    public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    public Predicate toPredicate(Root<News> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         return cb.or(
                 cb.like(cb.lower(root.get("post").get("titleRu")), desiredContent),
                 cb.like(cb.lower(root.get("post").get("titleEn")), desiredContent),

@@ -9,6 +9,7 @@ public class PostFiltersDTO {
     private Integer dateTo;
     private Boolean favourites;
     private Boolean published;
+    private String fulltext;
 
     public Integer getTagId() {
         return tagId;
@@ -48,5 +49,13 @@ public class PostFiltersDTO {
 
     public void setPublished(Boolean published) {
         this.published = published;
+    }
+
+    public String getFulltext() {
+        return fulltext;
+    }
+
+    public void setFulltext(String fulltext) {
+        this.fulltext = fulltext;
     }
 }
