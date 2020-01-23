@@ -4,6 +4,7 @@ import ru.smartel.strike.entity.interfaces.HavingSlug;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import java.util.Objects;
 
 @MappedSuperclass
 public abstract class EntityWithNamesAndSlug extends EntityWithNames implements HavingSlug {
@@ -25,5 +26,19 @@ public abstract class EntityWithNamesAndSlug extends EntityWithNames implements 
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        EntityWithNamesAndSlug that = (EntityWithNamesAndSlug) o;
+        return Objects.equals(slug, that.slug);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), slug);
     }
 }
