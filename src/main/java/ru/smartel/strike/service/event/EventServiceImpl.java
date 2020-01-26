@@ -39,7 +39,6 @@ import ru.smartel.strike.repository.event.EventTypeRepository;
 import ru.smartel.strike.rules.EventAfterConflictsStart;
 import ru.smartel.strike.rules.EventBeforeConflictsEnd;
 import ru.smartel.strike.rules.NotAParentEvent;
-import ru.smartel.strike.rules.OccurredWhenPublish;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -214,7 +213,6 @@ public class EventServiceImpl implements EventService {
         fillEventFields(event, dto, dto.getLocale());
 
         businessValidationService.validate(
-                new OccurredWhenPublish(event),
                 new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo()),
                 new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
@@ -280,7 +278,6 @@ public class EventServiceImpl implements EventService {
         updateConflictsEventStatuses(event.getConflict().getId());
 
         businessValidationService.validate(
-                new OccurredWhenPublish(event),
                 new EventBeforeConflictsEnd(event.getDate(), event.getConflict().getDateTo()),
                 new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
