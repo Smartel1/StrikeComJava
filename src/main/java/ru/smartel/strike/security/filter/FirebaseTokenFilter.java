@@ -27,6 +27,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -110,7 +111,7 @@ public class FirebaseTokenFilter implements Filter {
         userRecord = FirebaseAuth.getInstance().getUser(uuid);
 
         user.setUuid(userRecord.getUid());
-        user.setName(userRecord.getDisplayName());
+        user.setName(Optional.ofNullable(userRecord.getDisplayName()).orElse("unnamed user"));
         user.setEmail(userRecord.getEmail());
         user.setImageUrl(userRecord.getPhotoUrl());
 
