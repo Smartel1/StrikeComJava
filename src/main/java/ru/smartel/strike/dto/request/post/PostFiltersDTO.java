@@ -2,21 +2,23 @@ package ru.smartel.strike.dto.request.post;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PostFiltersDTO {
-    private Integer tagId;
+    private List<String> tags;
     private Integer dateFrom;
     private Integer dateTo;
     private Boolean favourites;
     private Boolean published;
     private String fulltext;
 
-    public Integer getTagId() {
-        return tagId;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setTagId(Integer tagId) {
-        this.tagId = tagId;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public Integer getDateFrom() {

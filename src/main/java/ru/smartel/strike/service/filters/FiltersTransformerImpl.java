@@ -22,7 +22,7 @@ import ru.smartel.strike.specification.event.BeforeDateEvent;
 import ru.smartel.strike.specification.event.BelongToConflictsEvent;
 import ru.smartel.strike.specification.event.CountryEvent;
 import ru.smartel.strike.specification.event.FavouriteEvent;
-import ru.smartel.strike.specification.event.HasTagEvent;
+import ru.smartel.strike.specification.event.EventsWithAnyTags;
 import ru.smartel.strike.specification.event.MatchStatusesEvent;
 import ru.smartel.strike.specification.event.MatchTypesEvent;
 import ru.smartel.strike.specification.event.NearCoordinateEvent;
@@ -33,7 +33,7 @@ import ru.smartel.strike.specification.event.WithIdsEvents;
 import ru.smartel.strike.specification.news.AfterDateNews;
 import ru.smartel.strike.specification.news.BeforeDateNews;
 import ru.smartel.strike.specification.news.FavouriteNews;
-import ru.smartel.strike.specification.news.HasTagNews;
+import ru.smartel.strike.specification.news.NewsWithAnyTags;
 import ru.smartel.strike.specification.news.PublishedNews;
 import ru.smartel.strike.specification.news.WithContentNews;
 
@@ -59,7 +59,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getDateTo()) result = result.and(new BeforeDateEvent(filters.getDateTo()));
         if (null != filters.getEventStatusIds()) result = result.and(new MatchStatusesEvent(filters.getEventStatusIds()));
         if (null != filters.getEventTypeIds()) result = result.and(new MatchTypesEvent(filters.getEventTypeIds()));
-        if (null != filters.getTagId()) result = result.and(new HasTagEvent(filters.getTagId()));
+        if (null != filters.getTags()) result = result.and(new EventsWithAnyTags(filters.getTags()));
         if (null != filters.getConflictIds()) {
             //additional query to find ids of parent events of conflicts with given ids
             List<Long> parentEventIds = conflictRepository.findAllByIdGetParentEventId(filters.getConflictIds());
@@ -93,7 +93,7 @@ public class FiltersTransformerImpl implements FiltersTransformer {
         if (null != filters.getDateFrom()) result = result.and(new AfterDateNews(filters.getDateFrom()));
         if (null != filters.getDateTo()) result = result.and(new BeforeDateNews(filters.getDateTo()));
         if (null != filters.getFavourites() && filters.getFavourites() && null != userId) result = result.and(new FavouriteNews(userId));
-        if (null != filters.getTagId()) result = result.and(new HasTagNews(filters.getTagId()));
+        if (null != filters.getTags()) result = result.and(new NewsWithAnyTags(filters.getTags()));
         if (null != filters.getFulltext()) result = result.and(new WithContentNews(filters.getFulltext()));
 
         return result;

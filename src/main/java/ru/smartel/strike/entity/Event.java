@@ -76,7 +76,7 @@ public class Event implements PostEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Video> videos = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "event_tag",
             joinColumns = {@JoinColumn(name = "event_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}

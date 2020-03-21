@@ -62,7 +62,7 @@ public class News implements PostEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Video> videos = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "news_tag",
             joinColumns = {@JoinColumn(name = "news_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "tag_id", referencedColumnName = "id")}

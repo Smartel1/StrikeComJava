@@ -8,18 +8,22 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-/**
- * Events with tag
- */
-public class HasTagEvent implements Specification<Event> {
-    private int tagId;
+import java.util.List;
 
-    public HasTagEvent(int tagId) {
-        this.tagId = tagId;
+/**
+ * Events with tags
+ */
+public class EventsWithAnyTags implements Specification<Event> {
+    private List<String> tags;
+
+    public EventsWithAnyTags(List<String> tags) {
+        this.tags = tags;
     }
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.join("tags").get("id"), tagId);
+        var in = cb.in(root.join("tags").get("name"));
+        tags.forEach(in::value);
+        return in;
     }
 }

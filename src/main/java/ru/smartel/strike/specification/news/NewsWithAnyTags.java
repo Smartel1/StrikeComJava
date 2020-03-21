@@ -7,19 +7,22 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.List;
 
 /**
- * News with tag
+ * News with tags
  */
-public class HasTagNews implements Specification<News> {
-    private int tagId;
+public class NewsWithAnyTags implements Specification<News> {
+    private List<String> tags;
 
-    public HasTagNews(int tagId) {
-        this.tagId = tagId;
+    public NewsWithAnyTags(List<String> tags) {
+        this.tags = tags;
     }
 
     @Override
     public Predicate toPredicate(Root<News> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.equal(root.join("tags").get("id"), tagId);
+        var in = cb.in(root.join("tags").get("name"));
+        tags.forEach(in::value);
+        return in;
     }
 }
