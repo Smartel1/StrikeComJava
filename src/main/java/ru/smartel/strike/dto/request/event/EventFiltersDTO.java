@@ -1,5 +1,6 @@
 package ru.smartel.strike.dto.request.event;
 
+import io.swagger.annotations.ApiParam;
 import ru.smartel.strike.dto.request.post.PostFiltersDTO;
 
 import java.util.List;
@@ -61,8 +62,11 @@ public class EventFiltersDTO extends PostFiltersDTO {
     }
 
     public static class SearchArea {
+        @ApiParam(value = "Широта центра поиска")
         private Float lat;
+        @ApiParam(value = "Долгота центра поиска")
         private Float lng;
+        @ApiParam(value = "Радиус поиска в километрах")
         private Integer radius;
 
         public Float getLat() {

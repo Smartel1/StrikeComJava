@@ -1,6 +1,7 @@
 package ru.smartel.strike.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiParam;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BaseListRequestDTO {
@@ -37,7 +38,9 @@ public class BaseListRequestDTO {
     }
 
     public static class Sort {
+        @ApiParam(value = "Поле для сортировки (для конфликтов доступно: createdAt, для новостей и событий: createdAt, date)")
         private String field;
+        @ApiParam(value = "Порядок сортировки", allowableValues = "desc, asc")
         private String order;
 
         public String getField() {

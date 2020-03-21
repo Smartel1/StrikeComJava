@@ -1,12 +1,7 @@
 package ru.smartel.strike.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
 import ru.smartel.strike.dto.response.DetailWrapperDTO;
@@ -25,11 +20,13 @@ public class ClientVersionController {
         this.clientVersionService = clientVersionService;
     }
 
+    @ApiOperation(value = "Получить список новых версий")
     @GetMapping
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         return clientVersionService.getNewVersions(dto);
     }
 
+    @ApiOperation(value = "Создать запись о версии приложения. clientId - уникальный идентификатор для приложения")
     @PostMapping(consumes = {"application/json"})
     public DetailWrapperDTO<ClientVersionDTO> store(
             @PathVariable("locale") Locale locale,

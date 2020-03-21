@@ -1,13 +1,9 @@
 package ru.smartel.strike.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.user.UserUpdateRequestDTO;
 import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.user.UserDetailDTO;
@@ -16,6 +12,7 @@ import ru.smartel.strike.service.user.UserService;
 
 @RestController
 @RequestMapping("/api/v2/{locale}/me")
+
 public class UserController {
 
     private UserService userService;
@@ -30,6 +27,7 @@ public class UserController {
         return new DetailWrapperDTO<>(userService.get(user.getId()));
     }
 
+    @ApiOperation("Обновление информации о пользователе (не только себя, модераторы могут менять других пользователей)")
     @PutMapping
     @PreAuthorize("isFullyAuthenticated()")
     public DetailWrapperDTO<UserDetailDTO> update(

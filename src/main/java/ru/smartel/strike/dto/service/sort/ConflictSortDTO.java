@@ -7,7 +7,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
-import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.function.BiFunction;
 import java.util.function.Function;

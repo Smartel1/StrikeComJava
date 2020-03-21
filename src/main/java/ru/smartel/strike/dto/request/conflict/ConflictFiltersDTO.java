@@ -1,14 +1,23 @@
 package ru.smartel.strike.dto.request.conflict;
 
+import io.swagger.annotations.ApiParam;
+
 import java.util.List;
 
 public class ConflictFiltersDTO {
+    @ApiParam(value = "Фильтр отсекает те конфликты, которые закончились строго ранее этой даты")
     private Integer dateFrom;
+    @ApiParam(value = "Фильтр отсекает те конфликты, которые начались строго позже этой даты")
     private Integer dateTo;
+    @ApiParam(value = "Полнотекстовый поиск. В выбору попадут конфликты, в названии которых содержится заданный текст, а также если текст содержится в заголовках или описаниях событий (на всех языках)")
     private String fulltext;
+    @ApiParam(value = "Id результата конфликта (из справочника)")
     private List<Long> conflictResultIds;
+    @ApiParam(value = "Id причины конфликта (из справочника)")
     private List<Long> conflictReasonIds;
+    @ApiParam(value = "Id конфликта. Фильтр выводит только те конфликты, которые являются родителями (не только прямыми) переданного конфликта")
     private Long ancestorsOf;
+    @ApiParam(value = "Id конфликта. Фильтр выводит только те конфликты, которые являются прямыми потомками переданного конфликта")
     private Long childrenOf;
     private SearchArea near;
 
@@ -77,8 +86,11 @@ public class ConflictFiltersDTO {
     }
 
     public static class SearchArea {
+        @ApiParam(value = "Широта центра поиска")
         private Float lat;
+        @ApiParam(value = "Долгота центра поиска")
         private Float lng;
+        @ApiParam(value = "Радиус поиска в километрах")
         private Integer radius;
 
         public Float getLat() {

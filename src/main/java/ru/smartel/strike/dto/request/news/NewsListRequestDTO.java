@@ -5,7 +5,6 @@ import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 
 public class NewsListRequestDTO extends BaseListRequestDTO {
-
     private Locale locale;
     private UserPrincipal user;
     private NewsFiltersDTO filters = new NewsFiltersDTO();

@@ -1,5 +1,6 @@
 package ru.smartel.strike.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ public class ReferenceController {
         return new DetailWrapperDTO<>(referenceService.getAllReferences(locale));
     }
 
+    @ApiOperation(value = "Хэш-сумма справочников. Используется для того, чтобы отслеживать изменения и обновлять справочники в клиентском кэше только при необходимости")
     @GetMapping("references-checksum")
     public DetailWrapperDTO<ReferenceChecksumDTO> checksum() {
         return new DetailWrapperDTO<>(new ReferenceChecksumDTO(referenceService.getChecksum()));

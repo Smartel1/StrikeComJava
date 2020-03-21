@@ -1,12 +1,16 @@
 package ru.smartel.strike.security.token;
 
+import io.swagger.annotations.ApiParam;
 import ru.smartel.strike.entity.User;
 
 import java.util.List;
 
 public class UserPrincipal {
+    @ApiParam(hidden = true)
     private long id;
+    @ApiParam(hidden = true)
     private String name;
+    @ApiParam(hidden = true)
     private List<String> roles;
     //private cuz we are using static factory method
     private UserPrincipal() {
