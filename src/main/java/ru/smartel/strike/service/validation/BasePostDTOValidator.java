@@ -25,6 +25,10 @@ public class BasePostDTOValidator {
             addErrorMessage("perPage", new Min(1), errors);
         }
 
+        if (dto.getPerPage() > 50) {
+            addErrorMessage("perPage", new Max(50), errors);
+        }
+
         if (dto.getSort() != null) {
             if (dto.getSort().getField() == null) {
                 addErrorMessage("sort.field", new NotNull(), errors);
