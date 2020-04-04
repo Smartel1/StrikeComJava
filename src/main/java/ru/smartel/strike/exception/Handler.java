@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +18,8 @@ import ru.smartel.strike.dto.exception.ApiErrorDTO;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @ControllerAdvice
 public class Handler {
@@ -30,7 +32,7 @@ public class Handler {
         logger.info("ValidationException occurred: {}", ex.getErrors());
         return new ApiErrorDTO("Validation failed", ex.getErrors().entrySet().stream()
                 .map((entry)-> entry.getKey() + ": " + String.join(",", entry.getValue()))
-                .collect(Collectors.toList()));
+                .collect(toList()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -41,11 +43,22 @@ public class Handler {
         return new ApiErrorDTO("Entity not found", ex.getMessage());
     }
 
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ApiErrorDTO processBindException(BindException ex) {
+        logger.warn("BindException occurred: {}", ex.getMessage());
+        return new ApiErrorDTO("Binding failed",
+                ex.getBindingResult().getFieldErrors().stream()
+                        .map(err -> "binding to '" + err.getField() + "' failed, rejected value: " + err.getRejectedValue())
+                        .collect(toList()));
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
     public ApiErrorDTO processException(AccessDeniedException ex) {
-        logger.warn("AccessDeniedException occurred", ex);
+        logger.warn("AccessDeniedException occurred");
         return new ApiErrorDTO("Forbidden", ex.getMessage());
     }
 
