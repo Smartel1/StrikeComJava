@@ -6,6 +6,11 @@
       "description": "enabling or disabling push notifications."
     },
     {
+      "name": "push.topics.admin",
+      "type": "java.lang.String",
+      "description": "topic to notify admins/moderators."
+    },
+    {
       "name": "push.topics.news.ru",
       "type": "java.lang.String",
       "description": "topic to notify about news (RU)."
