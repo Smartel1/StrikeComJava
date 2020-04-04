@@ -8,6 +8,18 @@ firebase:
 
 push:
   enabled: true
+  topics:
+    admin: admin
+    news:
+      ru: news_ru
+      en: news_en
+      es: news_es
+      de: news_de
+    events:
+      ru: events_ru
+      en: events_en
+      es: events_es
+      de: events_de
 
 logging:
   file: ${LOG_PATH}/daily-log.log

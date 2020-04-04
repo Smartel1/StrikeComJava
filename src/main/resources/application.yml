@@ -20,4 +20,16 @@ firebase:
     credentials: ${FB_AUTH_JSON} # base64-decoded service-account json credentials
 
 push:
-  enabled: false
+  enabled: true
+  topics:
+    admin: admin_test
+    news:
+      ru: news_ru_test
+      en: news_en_test
+      es: news_es_test
+      de: news_de_test
+    events:
+      ru: events_ru_test
+      en: events_en_test
+      es: events_es_test
+      de: events_de_test

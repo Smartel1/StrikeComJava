@@ -1,0 +1,49 @@
+{
+  "properties": [
+    {
+      "name": "push.enabled",
+      "type": "java.lang.Boolean",
+      "description": "enabling or disabling push notifications."
+    },
+    {
+      "name": "push.topics.news.ru",
+      "type": "java.lang.String",
+      "description": "topic to notify about news (RU)."
+    },
+    {
+      "name": "push.topics.news.en",
+      "type": "java.lang.String",
+      "description": "topic to notify about news (EN)."
+    },
+    {
+      "name": "push.topics.news.es",
+      "type": "java.lang.String",
+      "description": "topic to notify about news (ES)."
+    },
+    {
+      "name": "push.topics.news.de",
+      "type": "java.lang.String",
+      "description": "topic to notify about news (DE)."
+    },
+    {
+      "name": "push.topics.events.ru",
+      "type": "java.lang.String",
+      "description": "topic to notify about events (RU)."
+    },
+    {
+      "name": "push.topics.events.en",
+      "type": "java.lang.String",
+      "description": "topic to notify about events (EN)."
+    },
+    {
+      "name": "push.topics.events.es",
+      "type": "java.lang.String",
+      "description": "topic to notify about events (ES)."
+    },
+    {
+      "name": "push.topics.events.de",
+      "type": "java.lang.String",
+      "description": "topic to notify about events (DE)."
+    }
+  ]
+}
