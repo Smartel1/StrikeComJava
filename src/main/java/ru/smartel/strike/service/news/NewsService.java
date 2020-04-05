@@ -29,6 +29,7 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
+import ru.smartel.strike.service.publish.TelegramService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.news.ByRolesNews;
 import ru.smartel.strike.specification.news.LocalizedNews;
@@ -59,6 +60,7 @@ public class NewsService {
     private VideoTypeRepository videoTypeRepository;
     private TagRepository tagRepository;
     private VideoRepository videoRepository;
+    private TelegramService telegramService;
 
     public NewsService(NewsDTOValidator validator,
                        FiltersTransformer filtersTransformer,
@@ -69,7 +71,7 @@ public class NewsService {
                        PhotoRepository photoRepository,
                        VideoTypeRepository videoTypeRepository,
                        TagRepository tagRepository,
-                       VideoRepository videoRepository) {
+                       VideoRepository videoRepository, TelegramService telegramService) {
         this.validator = validator;
         this.filtersTransformer = filtersTransformer;
         this.newsRepository = newsRepository;
@@ -80,6 +82,7 @@ public class NewsService {
         this.videoTypeRepository = videoTypeRepository;
         this.tagRepository = tagRepository;
         this.videoRepository = videoRepository;
+        this.telegramService = telegramService;
     }
 
     public Long getNonPublishedCount() {
@@ -183,6 +186,10 @@ public class NewsService {
                     .filter(loc -> null != news.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
+            if (titlesByLocales.containsKey(Locale.RU)) {
+                telegramService.sendToChannel(news);
+            }
+
             pushService.newsPublished(
                     news.getId(),
                     news.getAuthor().getId(),
@@ -225,6 +232,10 @@ public class NewsService {
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != news.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
+
+            if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
+                telegramService.sendToChannel(news);
+            }
 
             pushService.newsPublished(
                     dto.getNewsId(),

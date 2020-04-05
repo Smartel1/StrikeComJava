@@ -170,7 +170,6 @@ public class EventService {
         if (dto.isWithRelatives()) {
             result.add("relatives", getRelatives(event, dto.getLocale()));
         }
-        telegramService.sendToChannel(event);
 
         return result;
     }
@@ -229,7 +228,10 @@ public class EventService {
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
-            telegramService.sendToChannel(event);
+            if (titlesByLocales.containsKey(Locale.RU)) {
+                telegramService.sendToChannel(event);
+            }
+
             pushService.eventPublished(
                     event.getId(),
                     event.getAuthor().getId(),
@@ -288,6 +290,10 @@ public class EventService {
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
+
+            if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
+                telegramService.sendToChannel(event);
+            }
 
             pushService.eventPublished(
                     dto.getEventId(),
