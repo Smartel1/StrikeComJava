@@ -43,6 +43,7 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
+import ru.smartel.strike.service.publish.TelegramService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
@@ -80,6 +81,7 @@ public class EventService {
     private FiltersTransformer filtersTransformer;
     private EventDTOValidator validator;
     private PushService pushService;
+    private TelegramService telegramService;
 
     public EventService(
             TagRepository tagRepository,
@@ -95,8 +97,8 @@ public class EventService {
             UserRepository userRepository,
             FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
-            PushService pushService
-    ) {
+            PushService pushService,
+            TelegramService telegramService) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -111,6 +113,7 @@ public class EventService {
         this.filtersTransformer = filtersTransformer;
         this.validator = validator;
         this.pushService = pushService;
+        this.telegramService = telegramService;
     }
 
     public Long getNonPublishedCount() {
@@ -167,6 +170,7 @@ public class EventService {
         if (dto.isWithRelatives()) {
             result.add("relatives", getRelatives(event, dto.getLocale()));
         }
+        telegramService.sendToChannel(event);
 
         return result;
     }
@@ -225,6 +229,7 @@ public class EventService {
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
+            telegramService.sendToChannel(event);
             pushService.eventPublished(
                     event.getId(),
                     event.getAuthor().getId(),

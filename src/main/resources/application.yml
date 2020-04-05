@@ -33,3 +33,9 @@ push:
       en: events_en_test
       es: events_es_test
       de: events_de_test
+
+publications:
+  telegram:
+    chat_id:
+    bot_id:
+    bot_token:
