@@ -60,7 +60,7 @@ public class TelegramService {
         }
 
         Map<String, String> payload = new HashMap<>();
-        payload.put("chat_id", "@" + properties.getChatId());
+        payload.put("chat_id", properties.getChatId());
         payload.put("text", text);
 
         restTemplate.postForLocation(
