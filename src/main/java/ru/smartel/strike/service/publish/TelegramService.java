@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.smartel.strike.configuration.properties.TelegramProperties;
 import ru.smartel.strike.entity.Photo;
@@ -63,8 +64,12 @@ public class TelegramService {
         payload.put("chat_id", properties.getChatId());
         payload.put("text", text);
 
-        restTemplate.postForLocation(
-                String.format(SEND_MESSAGE_URL, properties.getBotId(), properties.getBotToken()),
-                payload);
+        try {
+            restTemplate.postForLocation(
+                    String.format(SEND_MESSAGE_URL, properties.getBotId(), properties.getBotToken()),
+                    payload);
+        } catch (RestClientException ex) {
+            logger.error("Sending to telegram channel failed: {}", ex.getMessage());
+        }
     }
 }
