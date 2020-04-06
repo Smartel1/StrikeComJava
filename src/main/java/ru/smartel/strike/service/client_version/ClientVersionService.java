@@ -36,7 +36,7 @@ public class ClientVersionService {
             ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
                     .orElseThrow(() -> new ValidationException(
                             Collections.singletonMap("error", Collections.singletonList(
-                                    "Нет такой версии: " + dto.getClientId() + dto.getCurrentVersion()))));
+                                    "Нет такой версии: " + dto.getClientId() + ":" + dto.getCurrentVersion()))));
 
             clientVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
                     currentVersion.getId(), dto.getClientId());
