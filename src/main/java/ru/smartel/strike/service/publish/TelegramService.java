@@ -40,11 +40,6 @@ public class TelegramService {
         logger.info("Sending post {} with id {} to telegram", post.getClass().getSimpleName(), post.getId());
 
         String text = post.getContentRu();
-        if (!post.getPhotos().isEmpty()) {
-            text = text + post.getPhotos().stream()
-                    .map(Photo::getUrl)
-                    .collect(Collectors.joining("\n", "\n\n", ""));
-        }
         if (!post.getVideos().isEmpty()) {
             text = text + post.getVideos().stream()
                     .map(video -> {
@@ -57,11 +52,12 @@ public class TelegramService {
                     .collect(Collectors.joining("\n", "\n\n", ""));
         }
         if (nonNull(post.getSourceLink())) {
-            text = text + "\n\n" + post.getSourceLink();
+            text = text + "\n\n<i><a href='" + post.getSourceLink() + "'>Источник</a></i>";
         }
 
         Map<String, String> payload = new HashMap<>();
         payload.put("chat_id", properties.getChatId());
+        payload.put("parse_mode", "HTML");
         payload.put("text", text);
 
         try {
