@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.smartel.strike.configuration.properties.TelegramProperties;
 import ru.smartel.strike.entity.Photo;
+import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 
 import java.util.HashMap;
@@ -42,13 +43,7 @@ public class TelegramService {
         String text = post.getContentRu();
         if (!post.getVideos().isEmpty()) {
             text = text + post.getVideos().stream()
-                    .map(video -> {
-                        String url = video.getUrl();
-                        if (video.getVideoType().getCode().equals("youtube_link")) {
-                            url = "https://www.youtube.com/watch?v=" + url;
-                        }
-                        return url;
-                    })
+                    .map(Video::getUrl)
                     .collect(Collectors.joining("\n", "\n\n", ""));
         }
         if (nonNull(post.getSourceLink())) {
