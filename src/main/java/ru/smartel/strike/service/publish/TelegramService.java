@@ -44,7 +44,8 @@ public class TelegramService {
         if (!post.getVideos().isEmpty()) {
             text = text + post.getVideos().stream()
                     .map(Video::getUrl)
-                    .collect(Collectors.joining("\n", "\n\n", ""));
+                    .map(url -> "<i><a href='" + url + "'>видео</a></i>")
+                    .collect(Collectors.joining(", ", "\n\n", ""));
         }
         if (nonNull(post.getSourceLink())) {
             text = text + "\n\n<i><a href='" + post.getSourceLink() + "'>Источник</a></i>";
