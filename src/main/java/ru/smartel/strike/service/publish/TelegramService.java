@@ -48,7 +48,11 @@ public class TelegramService {
                     .collect(Collectors.joining(", ", "\n\n", ""));
         }
         if (nonNull(post.getSourceLink())) {
-            text = text + "\n\n<i><a href='" + post.getSourceLink() + "'>Источник</a></i>";
+            if (post.getVideos().isEmpty()) {
+                text = text + "\n\n<i><a href='" + post.getSourceLink() + "'>источник</a></i>";
+            } else {
+                text = text + "; <i><a href='" + post.getSourceLink() + "'>источник</a></i>";
+            }
         }
 
         Map<String, String> payload = new HashMap<>();
@@ -56,12 +60,13 @@ public class TelegramService {
         payload.put("parse_mode", "HTML");
         payload.put("text", text);
 
+        String sendUrl = String.format(SEND_MESSAGE_URL, properties.getBotId(), properties.getBotToken());
         try {
             restTemplate.postForLocation(
-                    String.format(SEND_MESSAGE_URL, properties.getBotId(), properties.getBotToken()),
+                    sendUrl,
                     payload);
         } catch (RestClientException ex) {
-            logger.error("Sending to telegram channel failed: {}", ex.getMessage());
+            logger.error("Sending {} to telegram channel failed: {}", sendUrl, ex.getMessage());
         }
     }
 }
