@@ -1,5 +1,7 @@
 package ru.smartel.strike.configuration.properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,6 +10,7 @@ import javax.annotation.PostConstruct;
 @Configuration
 @ConfigurationProperties(prefix = "publications.telegram")
 public class TelegramProperties {
+    public static final Logger logger = LoggerFactory.getLogger(TelegramProperties.class);
     private String chatId;
     private String botId;
     private String botToken;
@@ -15,6 +18,7 @@ public class TelegramProperties {
 
     @PostConstruct
     public void setSpecified() {
+        logger.debug("Telegram properties: chatId: {}, botId: {}, botToken: {}", chatId, botId, botToken);
         specified = !chatId.isBlank() && !botId.isBlank() && !botToken.isBlank();
     }
 
