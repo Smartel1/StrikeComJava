@@ -32,10 +32,6 @@ public class ConflictDTOValidator {
             addErrorMessage("perPage", new ValidationUtil.Min(1), errors);
         }
 
-        if (dto.getPerPage() > 50) {
-            addErrorMessage("perPage", new ValidationUtil.Max(50), errors);
-        }
-
         if (null != dto.getFilters() && null != dto.getFilters().getNear()) {
             if (null == dto.getFilters().getNear().getLat()) {
                 addErrorMessage("filters.near.lat", new NotNull(), errors);
