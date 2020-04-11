@@ -7,6 +7,8 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,10 +34,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FirebaseTokenFilter implements Filter {
+    private static Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
 
-    private UserRepository userRepository;
-    private ObjectMapper objectMapper;
-    private boolean stub;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
+    private final boolean stub;
 
     public FirebaseTokenFilter(UserRepository userRepository, ObjectMapper objectMapper, boolean stub) {
         this.userRepository = userRepository;
@@ -48,7 +51,6 @@ public class FirebaseTokenFilter implements Filter {
         if (stub) {
             authenticateAsModerator();
             chain.doFilter(request, response);
-            System.out.println(response);
             return;
         }
 
@@ -56,7 +58,7 @@ public class FirebaseTokenFilter implements Filter {
 
         try {
             if (bearer != null) {
-                System.out.println("User uses bearer: " + bearer);
+                logger.info("User uses bearer: " + bearer);
                 if (!bearer.startsWith("Bearer ")) {
                     throw new BadCredentialsException("Некорректный заголовок Authorization (должен начинаться с 'bearer')");
                 }

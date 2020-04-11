@@ -14,6 +14,7 @@ import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
 import ru.smartel.strike.dto.service.sort.NewsSortDTO;
+import ru.smartel.strike.dto.service.sort.network.Networks;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Tag;
@@ -50,17 +51,17 @@ import java.util.stream.Stream;
 @Transactional(rollbackFor = Exception.class)
 public class NewsService {
 
-    private NewsDTOValidator validator;
-    private FiltersTransformer filtersTransformer;
-    private NewsRepository newsRepository;
-    private UserRepository userRepository;
-    private BusinessValidationService businessValidationService;
-    private PushService pushService;
-    private PhotoRepository photoRepository;
-    private VideoTypeRepository videoTypeRepository;
-    private TagRepository tagRepository;
-    private VideoRepository videoRepository;
-    private TelegramService telegramService;
+    private final NewsDTOValidator validator;
+    private final FiltersTransformer filtersTransformer;
+    private final NewsRepository newsRepository;
+    private final UserRepository userRepository;
+    private final BusinessValidationService businessValidationService;
+    private final PushService pushService;
+    private final PhotoRepository photoRepository;
+    private final VideoTypeRepository videoTypeRepository;
+    private final TagRepository tagRepository;
+    private final VideoRepository videoRepository;
+    private final TelegramService telegramService;
 
     public NewsService(NewsDTOValidator validator,
                        FiltersTransformer filtersTransformer,
@@ -187,7 +188,9 @@ public class NewsService {
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             if (titlesByLocales.containsKey(Locale.RU)) {
-                telegramService.sendToChannel(news);
+                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
+                    telegramService.sendToChannel(news);
+                }
             }
 
             pushService.newsPublished(
@@ -234,7 +237,9 @@ public class NewsService {
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
-                telegramService.sendToChannel(news);
+                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
+                    telegramService.sendToChannel(news);
+                }
             }
 
             pushService.newsPublished(

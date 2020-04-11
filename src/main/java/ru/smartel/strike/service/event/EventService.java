@@ -16,23 +16,14 @@ import ru.smartel.strike.dto.response.event.BriefEventDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.service.sort.EventSortDTO;
-import ru.smartel.strike.entity.Conflict;
-import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.Photo;
-import ru.smartel.strike.entity.Tag;
-import ru.smartel.strike.entity.User;
-import ru.smartel.strike.entity.Video;
+import ru.smartel.strike.dto.service.sort.network.Networks;
+import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
-import ru.smartel.strike.repository.etc.LocalityRepository;
-import ru.smartel.strike.repository.etc.PhotoRepository;
-import ru.smartel.strike.repository.etc.TagRepository;
-import ru.smartel.strike.repository.etc.UserRepository;
-import ru.smartel.strike.repository.etc.VideoRepository;
-import ru.smartel.strike.repository.etc.VideoTypeRepository;
+import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventStatusRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
@@ -52,13 +43,7 @@ import ru.smartel.strike.specification.event.PublishedEvent;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,21 +52,21 @@ import java.util.stream.Stream;
 @Transactional(rollbackFor = Exception.class)
 public class EventService {
 
-    private TagRepository tagRepository;
-    private BusinessValidationService businessValidationService;
-    private EventRepository eventRepository;
-    private ConflictRepository conflictRepository;
-    private PhotoRepository photoRepository;
-    private VideoRepository videoRepository;
-    private VideoTypeRepository videoTypeRepository;
-    private LocalityRepository localityRepository;
-    private EventTypeRepository eventTypeRepository;
-    private EventStatusRepository eventStatusRepository;
-    private UserRepository userRepository;
-    private FiltersTransformer filtersTransformer;
-    private EventDTOValidator validator;
-    private PushService pushService;
-    private TelegramService telegramService;
+    private final TagRepository tagRepository;
+    private final BusinessValidationService businessValidationService;
+    private final EventRepository eventRepository;
+    private final ConflictRepository conflictRepository;
+    private final PhotoRepository photoRepository;
+    private final VideoRepository videoRepository;
+    private final VideoTypeRepository videoTypeRepository;
+    private final LocalityRepository localityRepository;
+    private final EventTypeRepository eventTypeRepository;
+    private final EventStatusRepository eventStatusRepository;
+    private final UserRepository userRepository;
+    private final FiltersTransformer filtersTransformer;
+    private final EventDTOValidator validator;
+    private final PushService pushService;
+    private final TelegramService telegramService;
 
     public EventService(
             TagRepository tagRepository,
@@ -229,7 +214,9 @@ public class EventService {
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             if (titlesByLocales.containsKey(Locale.RU)) {
-                telegramService.sendToChannel(event);
+                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
+                    telegramService.sendToChannel(event);
+                }
             }
 
             pushService.eventPublished(
@@ -292,7 +279,9 @@ public class EventService {
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
-                telegramService.sendToChannel(event);
+                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
+                    telegramService.sendToChannel(event);
+                }
             }
 
             pushService.eventPublished(

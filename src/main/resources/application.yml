@@ -12,8 +12,6 @@ spring:
 server:
   port: 8000
 
-apiUrl: ${API_URL}
-
 firebase:
   authentication:
     stub: ${AUTH_STUB:#{false}}

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.reference.ReferenceCodeDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesSlugDTO;
+import ru.smartel.strike.dto.service.sort.network.Networks;
 import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EntityWithNamesAndSlug;
 import ru.smartel.strike.entity.reference.ReferenceWithCode;
@@ -29,13 +30,13 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class ReferenceService {
 
-    private ConflictReasonRepository conflictReasonRepository;
-    private ConflictResultRepository conflictResultRepository;
-    private EventStatusRepository eventStatusRepository;
-    private EventTypeRepository eventTypeRepository;
-    private IndustryRepository industryRepository;
-    private CountryRepository countryRepository;
-    private VideoTypeRepository videoTypeRepository;
+    private final ConflictReasonRepository conflictReasonRepository;
+    private final ConflictResultRepository conflictResultRepository;
+    private final EventStatusRepository eventStatusRepository;
+    private final EventTypeRepository eventTypeRepository;
+    private final IndustryRepository industryRepository;
+    private final CountryRepository countryRepository;
+    private final VideoTypeRepository videoTypeRepository;
 
     public ReferenceService(ConflictReasonRepository conflictReasonRepository,
                             ConflictResultRepository conflictResultRepository,
@@ -66,13 +67,16 @@ public class ReferenceService {
         result.put("eventStatuses", mapReferencesWithNamesAndSlugToDTOs(eventStatusRepository.findAll(), locale));
         //references with code
         result.put("videoTypes", mapReferencesWithCodeToDTOs(videoTypeRepository.findAll()));
+        result.put("networks", Stream.of(Networks.values())
+                .map(n -> ReferenceCodeDTO.of(n.getId(), n.getSlug()))
+                .collect(toList()));
 
         return result;
     }
 
     public String getChecksum() {
         //stream of reference JPA repositories
-        Stream<JpaRepository> repositories = Stream.of(
+        Stream<JpaRepository<?, ?>> repositories = Stream.of(
                 conflictReasonRepository,
                 conflictResultRepository,
                 eventStatusRepository,

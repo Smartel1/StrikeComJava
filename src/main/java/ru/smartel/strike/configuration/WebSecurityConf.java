@@ -17,12 +17,15 @@ import ru.smartel.strike.security.filter.FirebaseTokenFilter;
 @Order(SecurityProperties.BASIC_AUTH_ORDER - 10)
 public class WebSecurityConf extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    ObjectMapper objectMapper;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
     @Value("${firebase.authentication.stub}")
     boolean authStub;
+
+    public WebSecurityConf(UserRepository userRepository, ObjectMapper objectMapper) {
+        this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

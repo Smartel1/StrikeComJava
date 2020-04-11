@@ -3,9 +3,14 @@ package ru.smartel.strike.dto.request.post;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.smartel.strike.dto.request.video.VideoDTO;
+import ru.smartel.strike.dto.service.sort.network.Networks;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * dto for creating/updating requests
@@ -28,6 +33,7 @@ public abstract class PostRequestDTO {
     private Optional<List<String>> tags;
     private Optional<List<String>> photoUrls;
     private Optional<List<VideoDTO>> videos;
+    private Set<Long> publishTo = Stream.of(Networks.values()).map(Networks::getId).collect(toSet());
 
     public Optional<Boolean> getPublished() {
         return published;
@@ -155,5 +161,13 @@ public abstract class PostRequestDTO {
 
     public void setVideos(Optional<List<VideoDTO>> videos) {
         this.videos = videos;
+    }
+
+    public Set<Long> getPublishTo() {
+        return publishTo;
+    }
+
+    public void setPublishTo(Set<Long> publishTo) {
+        this.publishTo = publishTo;
     }
 }
