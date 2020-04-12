@@ -155,7 +155,6 @@ public class EventService {
         event.setViews(event.getViews() + 1);
 
         EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
-vkService.sendToChannel(event);
 
         if (dto.isWithRelatives()) {
             result.add("relatives", getRelatives(event, dto.getLocale()));
