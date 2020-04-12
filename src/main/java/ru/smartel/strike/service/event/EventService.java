@@ -35,6 +35,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
 import ru.smartel.strike.service.publish.TelegramService;
+import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
@@ -67,6 +68,7 @@ public class EventService {
     private final EventDTOValidator validator;
     private final PushService pushService;
     private final TelegramService telegramService;
+    private final VkService vkService;
 
     public EventService(
             TagRepository tagRepository,
@@ -83,7 +85,8 @@ public class EventService {
             FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
             PushService pushService,
-            TelegramService telegramService) {
+            TelegramService telegramService,
+            VkService vkService) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -99,6 +102,7 @@ public class EventService {
         this.validator = validator;
         this.pushService = pushService;
         this.telegramService = telegramService;
+        this.vkService = vkService;
     }
 
     public Long getNonPublishedCount() {
@@ -151,6 +155,7 @@ public class EventService {
         event.setViews(event.getViews() + 1);
 
         EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
+vkService.sendToChannel(event);
 
         if (dto.isWithRelatives()) {
             result.add("relatives", getRelatives(event, dto.getLocale()));
@@ -216,6 +221,7 @@ public class EventService {
             if (titlesByLocales.containsKey(Locale.RU)) {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(event);
+                    vkService.sendToChannel(event);
                 }
             }
 
@@ -281,6 +287,7 @@ public class EventService {
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(event);
+                    vkService.sendToChannel(event);
                 }
             }
 

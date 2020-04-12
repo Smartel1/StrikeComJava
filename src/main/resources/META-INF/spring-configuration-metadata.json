@@ -49,6 +49,31 @@
       "name": "push.topics.events.de",
       "type": "java.lang.String",
       "description": "topic to notify about events (DE)."
+    },
+    {
+      "name": "publications.vk.group_id",
+      "type": "java.lang.String",
+      "description": "Id of vk group to post to its wall."
+    },
+    {
+      "name": "publications.vk.access_token",
+      "type": "java.lang.String",
+      "description": "standalone-application's token."
+    },
+    {
+      "name": "publications.telegram.chat_id",
+      "type": "java.lang.String",
+      "description": "Identity of chat (for example @zabastcom)."
+    },
+    {
+      "name": "publications.telegram.bot_id",
+      "type": "java.lang.String",
+      "description": "Bot identity."
+    },
+    {
+      "name": "publications.telegram.bot_token",
+      "type": "java.lang.String",
+      "description": "Bot secret token."
     }
   ]
 }

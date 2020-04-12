@@ -31,6 +31,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
 import ru.smartel.strike.service.publish.TelegramService;
+import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.news.ByRolesNews;
 import ru.smartel.strike.specification.news.LocalizedNews;
@@ -62,6 +63,7 @@ public class NewsService {
     private final TagRepository tagRepository;
     private final VideoRepository videoRepository;
     private final TelegramService telegramService;
+    private final VkService vkService;
 
     public NewsService(NewsDTOValidator validator,
                        FiltersTransformer filtersTransformer,
@@ -72,7 +74,9 @@ public class NewsService {
                        PhotoRepository photoRepository,
                        VideoTypeRepository videoTypeRepository,
                        TagRepository tagRepository,
-                       VideoRepository videoRepository, TelegramService telegramService) {
+                       VideoRepository videoRepository,
+                       TelegramService telegramService,
+                       VkService vkService) {
         this.validator = validator;
         this.filtersTransformer = filtersTransformer;
         this.newsRepository = newsRepository;
@@ -84,6 +88,7 @@ public class NewsService {
         this.tagRepository = tagRepository;
         this.videoRepository = videoRepository;
         this.telegramService = telegramService;
+        this.vkService = vkService;
     }
 
     public Long getNonPublishedCount() {
@@ -190,6 +195,7 @@ public class NewsService {
             if (titlesByLocales.containsKey(Locale.RU)) {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(news);
+                    vkService.sendToChannel(news);
                 }
             }
 
@@ -239,6 +245,7 @@ public class NewsService {
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(news);
+                    vkService.sendToChannel(news);
                 }
             }
 

@@ -37,3 +37,6 @@ publications:
     chat_id:
     bot_id:
     bot_token:
+  vk:
+    group_id:
+    access_token:

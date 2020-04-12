@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.smartel.strike.configuration.properties.TelegramProperties;
-import ru.smartel.strike.entity.Photo;
 import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 
@@ -21,8 +20,8 @@ import static java.util.Objects.nonNull;
 public class TelegramService {
     private static final Logger logger = LoggerFactory.getLogger(TelegramService.class);
     public static final String SEND_MESSAGE_URL = "https://api.telegram.org/bot%s:%s/sendMessage";
-    private RestTemplate restTemplate;
-    private TelegramProperties properties;
+    private final RestTemplate restTemplate;
+    private final TelegramProperties properties;
 
     public TelegramService(RestTemplate restTemplate, TelegramProperties properties) {
         this.restTemplate = restTemplate;

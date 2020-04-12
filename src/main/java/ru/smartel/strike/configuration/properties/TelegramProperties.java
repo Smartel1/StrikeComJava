@@ -18,8 +18,12 @@ public class TelegramProperties {
 
     @PostConstruct
     public void setSpecified() {
-        logger.debug("Telegram properties: chatId: {}, botId: {}, botToken: {}", chatId, botId, botToken);
         specified = !chatId.isBlank() && !botId.isBlank() && !botToken.isBlank();
+        if (specified) {
+            logger.debug("Telegram properties: chatId: {}, botId: {}, botToken: {}", chatId, botId, botToken);
+        } else {
+            logger.debug("Telegram properties not specified");
+        }
     }
 
     public boolean isSpecified() {
