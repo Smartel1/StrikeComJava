@@ -30,6 +30,7 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
+import ru.smartel.strike.service.publish.OkService;
 import ru.smartel.strike.service.publish.TelegramService;
 import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
@@ -64,6 +65,7 @@ public class NewsService {
     private final VideoRepository videoRepository;
     private final TelegramService telegramService;
     private final VkService vkService;
+    private final OkService okService;
 
     public NewsService(NewsDTOValidator validator,
                        FiltersTransformer filtersTransformer,
@@ -76,7 +78,8 @@ public class NewsService {
                        TagRepository tagRepository,
                        VideoRepository videoRepository,
                        TelegramService telegramService,
-                       VkService vkService) {
+                       VkService vkService,
+                       OkService okService) {
         this.validator = validator;
         this.filtersTransformer = filtersTransformer;
         this.newsRepository = newsRepository;
@@ -89,6 +92,7 @@ public class NewsService {
         this.videoRepository = videoRepository;
         this.telegramService = telegramService;
         this.vkService = vkService;
+        this.okService = okService;
     }
 
     public Long getNonPublishedCount() {
@@ -196,6 +200,7 @@ public class NewsService {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(news);
                     vkService.sendToChannel(news);
+                    okService.sendToGroup(news);
                 }
             }
 
@@ -246,6 +251,7 @@ public class NewsService {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(news);
                     vkService.sendToChannel(news);
+                    okService.sendToGroup(news);
                 }
             }
 

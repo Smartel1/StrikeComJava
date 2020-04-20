@@ -11,7 +11,13 @@ import javax.annotation.PostConstruct;
 @ConfigurationProperties(prefix = "publications.vk")
 public class VkProperties {
     public static final Logger logger = LoggerFactory.getLogger(VkProperties.class);
+    /**
+     * VK group id (numeric)
+     */
     private String groupId;
+    /**
+     * Application access token
+     */
     private String accessToken;
     private boolean specified = false;
 

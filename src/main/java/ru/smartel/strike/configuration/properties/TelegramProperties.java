@@ -11,8 +11,17 @@ import javax.annotation.PostConstruct;
 @ConfigurationProperties(prefix = "publications.telegram")
 public class TelegramProperties {
     public static final Logger logger = LoggerFactory.getLogger(TelegramProperties.class);
+    /**
+     * Chat or channel id (with '@' or '-' prefix)
+     */
     private String chatId;
+    /**
+     * Bot identity
+     */
     private String botId;
+    /**
+     * Bot secret token
+     */
     private String botToken;
     private boolean specified = false;
 

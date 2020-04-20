@@ -34,6 +34,7 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
+import ru.smartel.strike.service.publish.OkService;
 import ru.smartel.strike.service.publish.TelegramService;
 import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
@@ -69,6 +70,7 @@ public class EventService {
     private final PushService pushService;
     private final TelegramService telegramService;
     private final VkService vkService;
+    private final OkService okService;
 
     public EventService(
             TagRepository tagRepository,
@@ -86,7 +88,8 @@ public class EventService {
             EventDTOValidator validator,
             PushService pushService,
             TelegramService telegramService,
-            VkService vkService) {
+            VkService vkService,
+            OkService okService) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -103,6 +106,7 @@ public class EventService {
         this.pushService = pushService;
         this.telegramService = telegramService;
         this.vkService = vkService;
+        this.okService = okService;
     }
 
     public Long getNonPublishedCount() {
@@ -221,6 +225,7 @@ public class EventService {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(event);
                     vkService.sendToChannel(event);
+                    okService.sendToGroup(event);
                 }
             }
 
@@ -287,6 +292,7 @@ public class EventService {
                 if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
                     telegramService.sendToChannel(event);
                     vkService.sendToChannel(event);
+                    okService.sendToGroup(event);
                 }
             }
 

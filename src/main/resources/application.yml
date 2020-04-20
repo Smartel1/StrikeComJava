@@ -40,3 +40,8 @@ publications:
   vk:
     group_id:
     access_token:
+  ok:
+    access_token:
+    app_secret:
+    app_key:
+    gid:
