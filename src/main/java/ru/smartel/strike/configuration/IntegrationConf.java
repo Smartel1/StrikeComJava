@@ -18,6 +18,7 @@ import static ru.smartel.strike.integration.PublicationGateway.PUBLICATION_CHANN
 import static ru.smartel.strike.service.publish.InstagramService.INSTAGRAM_CHANNEL;
 import static ru.smartel.strike.service.publish.OkService.OK_CHANNEL;
 import static ru.smartel.strike.service.publish.TelegramService.TELEGRAM_CHANNEL;
+import static ru.smartel.strike.service.publish.TwitterService.TWITTER_CHANNEL;
 import static ru.smartel.strike.service.publish.VkService.VK_CHANNEL;
 
 @Configuration
@@ -39,7 +40,7 @@ public class IntegrationConf {
                         .channelMapping(Network.TELEGRAM.getId(), TELEGRAM_CHANNEL)
                         .channelMapping(Network.VK.getId(), VK_CHANNEL)
                         .channelMapping(Network.OK.getId(), OK_CHANNEL)
-                        .channelMapping(Network.TWITTER.getId(), TELEGRAM_CHANNEL)
+                        .channelMapping(Network.TWITTER.getId(), TWITTER_CHANNEL)
                         .channelMapping(Network.INSTAGRAM.getId(), INSTAGRAM_CHANNEL))
                 .get();
     }
