@@ -3,6 +3,7 @@ package ru.smartel.strike.util;
 import ru.smartel.strike.exception.ValidationException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +47,9 @@ public class ValidationUtil {
     }
 
     public static class OneOf<T> implements ErrorMessage {
-        List<T> availableItems;
+        Collection<T> availableItems;
 
-        public OneOf(List<T> availableItems) {
+        public OneOf(Collection<T> availableItems) {
             this.availableItems = availableItems;
         }
 

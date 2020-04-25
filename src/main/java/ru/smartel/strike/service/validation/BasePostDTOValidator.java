@@ -3,12 +3,11 @@ package ru.smartel.strike.service.validation;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
+import ru.smartel.strike.dto.service.sort.network.Network;
 import ru.smartel.strike.util.ValidationUtil;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.smartel.strike.util.ValidationUtil.*;
 
@@ -56,6 +55,15 @@ public class BasePostDTOValidator {
             addErrorMessage("date", new NotNull(), errors);
         }
 
+        if (null == dto.getPublishTo()) {
+            addErrorMessage("publishTo", new NotNull(), errors);
+        } else {
+            Set<Long> availableNetworkIds = EnumSet.allOf(Network.class).stream().map(Network::getId).collect(Collectors.toSet());
+            if (dto.getPublishTo().stream().anyMatch(networkId -> !availableNetworkIds.contains(networkId))) {
+                addErrorMessage("publishTo", new OneOf<>(availableNetworkIds), errors);
+            }
+        }
+
         validateCommon(dto, errors);
 
         return errors;
@@ -66,6 +74,15 @@ public class BasePostDTOValidator {
 
         if (null != dto.getDate() && dto.getDate().isEmpty()) {
             addErrorMessage("date", new NotNull(), errors);
+        }
+
+        if (null == dto.getPublishTo()) {
+            addErrorMessage("publishTo", new NotNull(), errors);
+        } else {
+            Set<Long> availableNetworkIds = EnumSet.allOf(Network.class).stream().map(Network::getId).collect(Collectors.toSet());
+            if (dto.getPublishTo().stream().anyMatch(networkId -> !availableNetworkIds.contains(networkId))) {
+                addErrorMessage("publishTo", new OneOf<>(availableNetworkIds), errors);
+            }
         }
 
         validateCommon(dto, errors);
@@ -150,12 +167,12 @@ public class BasePostDTOValidator {
 
         if (null != dto.getPhotoUrls()) {
             dto.getPhotoUrls().ifPresent((photoUrls) -> {
-                    int i = 0;
-                    for (String photoUrl : photoUrls) {
-                        if (photoUrl.length() > 500) addErrorMessage("photoUrls[" + i + "]", new Max(500), errors);
-                        i++;
+                        int i = 0;
+                        for (String photoUrl : photoUrls) {
+                            if (photoUrl.length() > 500) addErrorMessage("photoUrls[" + i + "]", new Max(500), errors);
+                            i++;
+                        }
                     }
-                }
             );
         }
 

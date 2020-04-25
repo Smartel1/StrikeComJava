@@ -5,15 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.smartel.strike.configuration.properties.VkProperties;
-import ru.smartel.strike.entity.Video;
-import ru.smartel.strike.entity.interfaces.PostEntity;
+import ru.smartel.strike.dto.publication.PublishDTO;
 
 import java.util.stream.Collectors;
 
@@ -24,6 +23,8 @@ public class VkService {
     private static final Logger logger = LoggerFactory.getLogger(VkService.class);
     public static final String SEND_MESSAGE_URL = "https://api.vk.com/method/wall.post";
     public static final String API_VERSION = "5.68";
+    public static final String VK_CHANNEL = "vkPubChannel";
+
     private final RestTemplate restTemplate;
     private final VkProperties properties;
 
@@ -34,14 +35,13 @@ public class VkService {
 
     /**
      * Send post content and links to vk group
-     * @param post post to publish
      */
-    @Async
-    public void sendToChannel(PostEntity post) {
+    @ServiceActivator(inputChannel = VK_CHANNEL)
+    public void sendToChannel(PublishDTO data) {
         if (!properties.isSpecified()) {
             return;
         }
-        logger.info("Sending post {} with id {} to vk", post.getClass().getSimpleName(), post.getId());
+        logger.info("Sending post to vk");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -52,19 +52,19 @@ public class VkService {
         payload.add("v", API_VERSION);
         payload.add("from_group", "1");
 
-        String text = post.getContentRu();
-        if (!post.getVideos().isEmpty()) {
-            text = text + post.getVideos().stream()
-                    .map(Video::getUrl)
+        String text = data.getText();
+        if (!data.getVideoUrls().isEmpty()) {
+            text = text + data.getVideoUrls().stream()
                     .collect(Collectors.joining("\n", "\n\n", ""));
-            payload.add("attachments", post.getVideos().stream().findFirst().map(Video::getUrl).orElse(null));
+            payload.add("attachments", data.getVideoUrls().stream().findFirst().orElse(null));
         }
-        if (nonNull(post.getSourceLink())) {
-            if (post.getVideos().isEmpty()) {
-                payload.add("attachments", post.getSourceLink());
+        //dont expose source link if one of the videos is the same URL
+        if (nonNull(data.getSourceUrl()) && !data.getVideoUrls().contains(data.getSourceUrl())) {
+            if (data.getVideoUrls().isEmpty()) {
+                payload.add("attachments", data.getSourceUrl());
                 text = text + "\n";
             }
-            text = text + "\n" + post.getSourceLink();
+            text = text + "\n" + data.getSourceUrl();
         }
         payload.add("message", text);
 

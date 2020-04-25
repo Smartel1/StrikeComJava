@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequestMapping("/api/v2/{locale}/events")
 public class EventController {
 
-    private EventService eventService;
+    private final EventService eventService;
 
     public EventController(EventService eventService) {
         this.eventService = eventService;

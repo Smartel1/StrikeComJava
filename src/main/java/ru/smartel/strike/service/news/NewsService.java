@@ -5,6 +5,8 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.smartel.strike.dto.publication.PublishDTO;
+import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
 import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsShowDetailRequestDTO;
@@ -14,25 +16,14 @@ import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
 import ru.smartel.strike.dto.service.sort.NewsSortDTO;
-import ru.smartel.strike.dto.service.sort.network.Networks;
-import ru.smartel.strike.entity.News;
-import ru.smartel.strike.entity.Photo;
-import ru.smartel.strike.entity.Tag;
-import ru.smartel.strike.entity.User;
-import ru.smartel.strike.entity.Video;
-import ru.smartel.strike.repository.etc.PhotoRepository;
-import ru.smartel.strike.repository.etc.TagRepository;
-import ru.smartel.strike.repository.etc.UserRepository;
-import ru.smartel.strike.repository.etc.VideoRepository;
-import ru.smartel.strike.repository.etc.VideoTypeRepository;
+import ru.smartel.strike.entity.*;
+import ru.smartel.strike.integration.PublicationGateway;
+import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.news.NewsRepository;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
-import ru.smartel.strike.service.publish.OkService;
-import ru.smartel.strike.service.publish.TelegramService;
-import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.news.ByRolesNews;
 import ru.smartel.strike.specification.news.LocalizedNews;
@@ -63,9 +54,7 @@ public class NewsService {
     private final VideoTypeRepository videoTypeRepository;
     private final TagRepository tagRepository;
     private final VideoRepository videoRepository;
-    private final TelegramService telegramService;
-    private final VkService vkService;
-    private final OkService okService;
+    private final PublicationGateway publicationGateway;
 
     public NewsService(NewsDTOValidator validator,
                        FiltersTransformer filtersTransformer,
@@ -76,10 +65,7 @@ public class NewsService {
                        PhotoRepository photoRepository,
                        VideoTypeRepository videoTypeRepository,
                        TagRepository tagRepository,
-                       VideoRepository videoRepository,
-                       TelegramService telegramService,
-                       VkService vkService,
-                       OkService okService) {
+                       VideoRepository videoRepository, PublicationGateway publicationGateway) {
         this.validator = validator;
         this.filtersTransformer = filtersTransformer;
         this.newsRepository = newsRepository;
@@ -90,9 +76,7 @@ public class NewsService {
         this.videoTypeRepository = videoTypeRepository;
         this.tagRepository = tagRepository;
         this.videoRepository = videoRepository;
-        this.telegramService = telegramService;
-        this.vkService = vkService;
-        this.okService = okService;
+        this.publicationGateway = publicationGateway;
     }
 
     public Long getNonPublishedCount() {
@@ -197,11 +181,9 @@ public class NewsService {
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             if (titlesByLocales.containsKey(Locale.RU)) {
-                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
-                    telegramService.sendToChannel(news);
-                    vkService.sendToChannel(news);
-                    okService.sendToGroup(news);
-                }
+                publicationGateway.publish(new PublishDTOWithNetworks(
+                        new PublishDTO(news.getContentRu(), news.getSourceLink(), news.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
+                        dto.getPublishTo()));
             }
 
             pushService.newsPublished(
@@ -248,11 +230,9 @@ public class NewsService {
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
-                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
-                    telegramService.sendToChannel(news);
-                    vkService.sendToChannel(news);
-                    okService.sendToGroup(news);
-                }
+                publicationGateway.publish(new PublishDTOWithNetworks(
+                        new PublishDTO(news.getContentRu(), news.getSourceLink(), news.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
+                        dto.getPublishTo()));
             }
 
             pushService.newsPublished(

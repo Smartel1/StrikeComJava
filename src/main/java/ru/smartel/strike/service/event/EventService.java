@@ -5,6 +5,8 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.smartel.strike.dto.publication.PublishDTO;
+import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
@@ -16,12 +18,12 @@ import ru.smartel.strike.dto.response.event.BriefEventDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.service.sort.EventSortDTO;
-import ru.smartel.strike.dto.service.sort.network.Networks;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
+import ru.smartel.strike.integration.PublicationGateway;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.event.EventRepository;
@@ -68,9 +70,7 @@ public class EventService {
     private final FiltersTransformer filtersTransformer;
     private final EventDTOValidator validator;
     private final PushService pushService;
-    private final TelegramService telegramService;
-    private final VkService vkService;
-    private final OkService okService;
+    private final PublicationGateway publicationGateway;
 
     public EventService(
             TagRepository tagRepository,
@@ -89,7 +89,7 @@ public class EventService {
             PushService pushService,
             TelegramService telegramService,
             VkService vkService,
-            OkService okService) {
+            OkService okService, PublicationGateway publicationGateway) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -104,9 +104,7 @@ public class EventService {
         this.filtersTransformer = filtersTransformer;
         this.validator = validator;
         this.pushService = pushService;
-        this.telegramService = telegramService;
-        this.vkService = vkService;
-        this.okService = okService;
+        this.publicationGateway = publicationGateway;
     }
 
     public Long getNonPublishedCount() {
@@ -222,11 +220,9 @@ public class EventService {
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             if (titlesByLocales.containsKey(Locale.RU)) {
-                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
-                    telegramService.sendToChannel(event);
-                    vkService.sendToChannel(event);
-                    okService.sendToGroup(event);
-                }
+                publicationGateway.publish(new PublishDTOWithNetworks(
+                        new PublishDTO(event.getContentRu(), event.getSourceLink(), event.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
+                        dto.getPublishTo()));
             }
 
             pushService.eventPublished(
@@ -289,11 +285,9 @@ public class EventService {
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
             if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
-                if (dto.getPublishTo().contains(Networks.TELEGRAM.getId())) {
-                    telegramService.sendToChannel(event);
-                    vkService.sendToChannel(event);
-                    okService.sendToGroup(event);
-                }
+                publicationGateway.publish(new PublishDTOWithNetworks(
+                        new PublishDTO(event.getContentRu(), event.getSourceLink(), event.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
+                        dto.getPublishTo()));
             }
 
             pushService.eventPublished(
@@ -514,6 +508,7 @@ public class EventService {
     /**
      * Get related events grouped by containing conflicts.
      * Related means they belongs to same root conflict
+     *
      * @param event
      * @param locale
      * @return
@@ -553,4 +548,11 @@ public class EventService {
                 })
                 .collect(Collectors.toList());
     }
+
+//    @Autowired
+//    PublishingGateway gateway;
+//    @PostConstruct
+//    public void call() {
+//        gateway.publish(new PublishDTO("1", "1", Collections.emptyList()));
+//    }
 }

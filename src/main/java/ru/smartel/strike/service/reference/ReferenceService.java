@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.reference.ReferenceCodeDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesSlugDTO;
-import ru.smartel.strike.dto.service.sort.network.Networks;
+import ru.smartel.strike.dto.service.sort.network.Network;
 import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EntityWithNamesAndSlug;
 import ru.smartel.strike.entity.reference.ReferenceWithCode;
@@ -67,7 +67,7 @@ public class ReferenceService {
         result.put("eventStatuses", mapReferencesWithNamesAndSlugToDTOs(eventStatusRepository.findAll(), locale));
         //references with code
         result.put("videoTypes", mapReferencesWithCodeToDTOs(videoTypeRepository.findAll()));
-        result.put("networks", Stream.of(Networks.values())
+        result.put("networks", Stream.of(Network.values())
                 .map(n -> ReferenceCodeDTO.of(n.getId(), n.getSlug()))
                 .collect(toList()));
 
@@ -87,7 +87,7 @@ public class ReferenceService {
         );
 
         //Result hash should not depend on database order
-        Sort sortByIdAsc = new Sort(Sort.Direction.ASC, "id");
+        Sort sortByIdAsc = Sort.by(Sort.Direction.ASC, "id");
 
         //checksum is superposition of hashCodes of reference lists
         int referencesHash =

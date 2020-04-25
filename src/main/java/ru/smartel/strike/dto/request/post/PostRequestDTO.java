@@ -3,7 +3,7 @@ package ru.smartel.strike.dto.request.post;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.smartel.strike.dto.request.video.VideoDTO;
-import ru.smartel.strike.dto.service.sort.network.Networks;
+import ru.smartel.strike.dto.service.sort.network.Network;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ public abstract class PostRequestDTO {
     private Optional<List<String>> tags;
     private Optional<List<String>> photoUrls;
     private Optional<List<VideoDTO>> videos;
-    private Set<Long> publishTo = Stream.of(Networks.values()).map(Networks::getId).collect(toSet());
+    private Set<Long> publishTo = Stream.of(Network.values()).map(Network::getId).collect(toSet());
 
     public Optional<Boolean> getPublished() {
         return published;

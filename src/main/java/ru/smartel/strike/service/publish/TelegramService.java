@@ -2,13 +2,12 @@ package ru.smartel.strike.service.publish;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.smartel.strike.configuration.properties.TelegramProperties;
-import ru.smartel.strike.entity.Video;
-import ru.smartel.strike.entity.interfaces.PostEntity;
+import ru.smartel.strike.dto.publication.PublishDTO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,8 @@ import static java.util.Objects.nonNull;
 public class TelegramService {
     private static final Logger logger = LoggerFactory.getLogger(TelegramService.class);
     public static final String SEND_MESSAGE_URL = "https://api.telegram.org/bot%s:%s/sendMessage";
+    public static final String TELEGRAM_CHANNEL = "telegramPubChannel";
+
     private final RestTemplate restTemplate;
     private final TelegramProperties properties;
 
@@ -30,27 +31,25 @@ public class TelegramService {
 
     /**
      * Send post content and links to telegram channel
-     * @param post post to publish
      */
-    @Async
-    public void sendToChannel(PostEntity post) {
+    @ServiceActivator(inputChannel = TELEGRAM_CHANNEL)
+    public void sendToChannel(PublishDTO data) {
         if (!properties.isSpecified()) {
             return;
         }
-        logger.info("Sending post {} with id {} to telegram", post.getClass().getSimpleName(), post.getId());
+        logger.info("Sending post to telegram");
 
-        String text = post.getContentRu();
-        if (!post.getVideos().isEmpty()) {
-            text = text + post.getVideos().stream()
-                    .map(Video::getUrl)
+        String text = data.getText();
+        if (!data.getVideoUrls().isEmpty()) {
+            text = text + data.getVideoUrls().stream()
                     .map(url -> "<i><a href='" + url + "'>видео</a></i>")
                     .collect(Collectors.joining(", ", "\n\n", ""));
         }
-        if (nonNull(post.getSourceLink())) {
-            if (post.getVideos().isEmpty()) {
-                text = text + "\n\n<i><a href='" + post.getSourceLink() + "'>источник</a></i>";
-            } else {
-                text = text + "; <i><a href='" + post.getSourceLink() + "'>источник</a></i>";
+        if (nonNull(data.getSourceUrl())) {
+            if (data.getVideoUrls().isEmpty()) {
+                text = text + "\n\n<i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
+            } else if (!data.getVideoUrls().contains(data.getSourceUrl())){ //dont expose source link if one of the videos is the same URL
+                text = text + "; <i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
             }
         }
 
