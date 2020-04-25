@@ -1,61 +1,47 @@
 plugins {
     id 'java'
-    id 'maven-publish'
     id 'org.springframework.boot' version "$spring_boot_version"
     id "org.flywaydb.flyway" version "6.0.4"
 }
 
 repositories {
+    mavenCentral()
     mavenLocal()
-    maven {
-        url = 'https://repo.maven.apache.org/maven2'
-    }
     maven {
         url = 'https://jitpack.io'
     }
 }
 dependencies {
     // spring dependencies
-    compile platform("org.springframework.boot:spring-boot-dependencies:$spring_boot_version")
-//    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    implementation platform("org.springframework.boot:spring-boot-dependencies:$spring_boot_version")
 
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-security'
-    compile 'org.springframework.boot:spring-boot-starter-integration'
-    compile 'org.springframework:spring-orm'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:$spring_boot_version"
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-integration'
+    implementation 'org.springframework:spring-orm'
 
-    compile 'org.postgresql:postgresql:42.2.5'
-    compile 'org.hibernate:hibernate-core:5.4.2.Final'
-    compile 'org.apache.tomcat:tomcat-dbcp:9.0.1'
-    compile 'com.vladmihalcea:hibernate-types-52:2.5.1'
-    compile 'com.google.firebase:firebase-admin:6.8.1'
-    compile 'com.github.java-json-tools:json-schema-validator:2.2.10'
-    compile 'org.flywaydb:flyway-core:5.2.4'
-    compile 'io.springfox:springfox-swagger2:2.9.2'
-    compile 'io.springfox:springfox-swagger-ui:2.9.2'
-    compile 'com.github.eXsio:nestedj:4.1.1'
+    implementation 'org.postgresql:postgresql:42.2.5'
+    implementation 'com.vladmihalcea:hibernate-types-52:2.5.1'
+    implementation 'com.google.firebase:firebase-admin:6.8.1'
+    implementation 'org.flywaydb:flyway-core:5.2.4'
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+    implementation 'com.github.eXsio:nestedj:4.1.1'
 
     // test dependencies
-    testCompile('org.springframework.boot:spring-boot-starter-test') {
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
     }
-    testCompile "org.junit.jupiter:junit-jupiter:$junit_version"
-    testCompile "org.junit.jupiter:junit-jupiter-params:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
 }
 
 group = 'ru.smartel'
 version = '0.0.1-SNAPSHOT'
 description = 'strike'
 sourceCompatibility = '11'
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
