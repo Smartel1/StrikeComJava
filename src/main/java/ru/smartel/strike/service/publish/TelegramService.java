@@ -48,7 +48,7 @@ public class TelegramService {
         if (nonNull(data.getSourceUrl())) {
             if (data.getVideoUrls().isEmpty()) {
                 text = text + "\n\n<i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
-            } else if (!data.getVideoUrls().contains(data.getSourceUrl())){ //dont expose source link if one of the videos is the same URL
+            } else {
                 text = text + "; <i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
             }
         }

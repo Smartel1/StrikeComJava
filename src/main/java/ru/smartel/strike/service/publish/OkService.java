@@ -52,8 +52,7 @@ public class OkService {
                     .map(url -> "{\"type\":\"link\",\"url\":\"" + url + "\"}")
                     .collect(Collectors.joining(", ", ",", ""));
         }
-        //dont expose source link if one of the videos is the same URL
-        if (nonNull(data.getSourceUrl()) && !data.getVideoUrls().contains(data.getSourceUrl())) {
+        if (nonNull(data.getSourceUrl())) {
             attachment = attachment + "," + "{\"type\":\"link\",\"url\":\"" + data.getSourceUrl() + "\"}";
         }
 

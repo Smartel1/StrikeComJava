@@ -8,6 +8,7 @@ import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.splitter.AbstractMessageSplitter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import ru.smartel.strike.dto.publication.PublishDTO;
 import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
 import ru.smartel.strike.dto.service.sort.network.Network;
 
@@ -29,6 +30,11 @@ public class IntegrationConf {
                 .from(MessageChannels.direct(PUBLICATION_CHANNEL))
                 .<PublishDTOWithNetworks>filter(data -> !data.getPublishTo().isEmpty())
                 .split(splitter())
+                .<PublishDTO, PublishDTO>transform(data -> {
+                    //if videos contain sourceUrl -> remove this url from videos
+                    data.getVideoUrls().remove(data.getSourceUrl());
+                    return data;
+                })
                 .route("headers." + NETWORK_HEADER, r -> r
                         .channelMapping(Network.TELEGRAM.getId(), TELEGRAM_CHANNEL)
                         .channelMapping(Network.VK.getId(), VK_CHANNEL)

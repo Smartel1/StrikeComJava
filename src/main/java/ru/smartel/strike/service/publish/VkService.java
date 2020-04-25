@@ -58,8 +58,7 @@ public class VkService {
                     .collect(Collectors.joining("\n", "\n\n", ""));
             payload.add("attachments", data.getVideoUrls().stream().findFirst().orElse(null));
         }
-        //dont expose source link if one of the videos is the same URL
-        if (nonNull(data.getSourceUrl()) && !data.getVideoUrls().contains(data.getSourceUrl())) {
+        if (nonNull(data.getSourceUrl())) {
             if (data.getVideoUrls().isEmpty()) {
                 payload.add("attachments", data.getSourceUrl());
                 text = text + "\n";
