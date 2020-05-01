@@ -63,7 +63,7 @@ public class OkService {
                 properties.getAccessToken(), properties.getAppSecret());
 
         try {
-            System.out.println(restTemplate.getForObject(
+            logger.info("OK response: {}", restTemplate.getForObject(
                     new UriTemplate(SEND_MESSAGE_URL).expand(
                             properties.getAppKey(), attachment, properties.getGid(), signature, properties.getAccessToken()),
                     String.class));
