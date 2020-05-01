@@ -2,10 +2,8 @@ package ru.smartel.strike.util;
 
 import ru.smartel.strike.exception.ValidationException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import javax.validation.ConstraintViolation;
+import java.util.*;
 
 public class ValidationUtil {
 
@@ -26,6 +24,21 @@ public class ValidationUtil {
         if (!errorsCollection.isEmpty()) {
             throw new ValidationException(errorsCollection);
         }
+    }
+
+    public static void throwIfErrorsExist(Set<ConstraintViolation<Object>> validates) throws ValidationException {
+        throwIfErrorsExist(convertSetErrorsToMap(validates));
+    }
+
+    private static <T> Map<String, List<String>> convertSetErrorsToMap(Set<ConstraintViolation<T>> validates) {
+        Map<String, List<String>> result = new HashMap<>();
+
+        validates.forEach(error -> result.put(
+                error.getPropertyPath().toString(),
+                Arrays.asList(error.getMessage())
+        ));
+
+        return result;
     }
 
     public interface ErrorMessage {
