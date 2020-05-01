@@ -5,8 +5,6 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.smartel.strike.dto.publication.PublishDTO;
-import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
 import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventShowDetailRequestDTO;
@@ -20,10 +18,10 @@ import ru.smartel.strike.dto.response.event.EventListDTO;
 import ru.smartel.strike.dto.service.sort.EventSortDTO;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
+import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EventStatus;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Locality;
-import ru.smartel.strike.integration.PublicationGateway;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.event.EventRepository;
@@ -36,6 +34,7 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
+import ru.smartel.strike.service.publish.PostPublicationService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
@@ -67,7 +66,7 @@ public class EventService {
     private final FiltersTransformer filtersTransformer;
     private final EventDTOValidator validator;
     private final PushService pushService;
-    private final PublicationGateway publicationGateway;
+    private final PostPublicationService postPublicationService;
 
     public EventService(
             TagRepository tagRepository,
@@ -84,7 +83,7 @@ public class EventService {
             FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
             PushService pushService,
-            PublicationGateway publicationGateway) {
+            PostPublicationService postPublicationService) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -99,7 +98,7 @@ public class EventService {
         this.filtersTransformer = filtersTransformer;
         this.validator = validator;
         this.pushService = pushService;
-        this.publicationGateway = publicationGateway;
+        this.postPublicationService = postPublicationService;
     }
 
     public Long getNonPublishedCount() {
@@ -205,27 +204,23 @@ public class EventService {
 
         //Send push
         if (!event.isPublished()) {
-            //if event is creating non published - notify moderators
+            //if event is created non published - notify moderators
             pushService.eventCreatedByUser(event.getId(), event.getAuthor().getId(), event.getAuthor().getName());
         } else {
-            //if event published - notify subscribers
+            //if event published - notify subscribers and send to networks
+            postPublicationService.publishAndSetFlags(event, dto.getPublishTo());
+
             Map<Locale, String> titlesByLocales = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
-
-            if (titlesByLocales.containsKey(Locale.RU)) {
-                publicationGateway.publish(new PublishDTOWithNetworks(
-                        new PublishDTO(event.getContentRu(), event.getSourceLink(), event.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
-                        dto.getPublishTo()));
-            }
 
             pushService.eventPublished(
                     event.getId(),
                     event.getAuthor().getId(),
                     event.getLongitude(),
                     event.getLatitude(),
-                    event.getType().getId(),
+                    Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
                     titlesByLocales,
                     null, //do not send push to author cuz he's moderator
                     false
@@ -273,25 +268,22 @@ public class EventService {
         );
 
         if (event.isPublished()) { //after update
+            postPublicationService.publishAndSetFlags(event, dto.getPublishTo());
+
             // titles which was not localized earlier and have been localized in this transaction
+            // todo save to database
             Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
                     .filter(loc -> !loc.equals(Locale.ALL))
                     .filter(nonLocalizedTitlesBeforeUpdate::contains)
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
-            if (titlesLocalizedDuringThisUpdate.containsKey(Locale.RU)) {
-                publicationGateway.publish(new PublishDTOWithNetworks(
-                        new PublishDTO(event.getContentRu(), event.getSourceLink(), event.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
-                        dto.getPublishTo()));
-            }
-
             pushService.eventPublished(
                     dto.getEventId(),
                     null != event.getAuthor() ? event.getAuthor().getId() : null,
                     event.getLongitude(),
                     event.getLatitude(),
-                    event.getType().getId(),
+                    Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
                     titlesLocalizedDuringThisUpdate,
                     null != event.getAuthor() ? event.getAuthor().getFcm() : null,
                     changingPublicationStatus //whether notify event's author or not
@@ -545,11 +537,4 @@ public class EventService {
                 })
                 .collect(Collectors.toList());
     }
-
-//    @Autowired
-//    PublishingGateway gateway;
-//    @PostConstruct
-//    public void call() {
-//        gateway.publish(new PublishDTO("1", "1", Collections.emptyList()));
-//    }
 }

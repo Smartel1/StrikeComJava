@@ -1,6 +1,7 @@
 /target/
 /out
 !.mvn/wrapper/maven-wrapper.jar
+daily-log.log*
 
 ### STS ###
 .apt_generated

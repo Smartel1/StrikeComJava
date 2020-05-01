@@ -135,6 +135,46 @@ public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
         getPost().setAuthor(author);
     }
 
+    default boolean getSentToOk() {
+        return getPost().isSentToOk();
+    }
+
+    default void setSentToOk(boolean value) {
+        getPost().setSentToOk(value);
+    }
+
+    default boolean getSentToVk() {
+        return getPost().isSentToVk();
+    }
+
+    default void setSentToVk(boolean value) {
+        getPost().setSentToVk(value);
+    }
+
+    default boolean getSentToTelegram() {
+        return getPost().isSentToTelegram();
+    }
+
+    default void setSentToTelegram(boolean value) {
+        getPost().setSentToTelegram(value);
+    }
+
+    default boolean getSentToTwitter() {
+        return getPost().isSentToTwitter();
+    }
+
+    default void setSentToTwitter(boolean value) {
+        getPost().setSentToTwitter(value);
+    }
+
+    default boolean getSentToInstagram() {
+        return getPost().isSentToInstagram();
+    }
+
+    default void setSentToInstagram(boolean value) {
+        getPost().setSentToInstagram(value);
+    }
+
     Set<Photo> getPhotos();
 
     void setPhotos(Set<Photo> photos);

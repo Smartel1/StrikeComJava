@@ -3,8 +3,6 @@ package ru.smartel.strike.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.splitter.AbstractMessageSplitter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -14,7 +12,6 @@ import ru.smartel.strike.dto.service.sort.network.Network;
 
 import java.util.stream.Collectors;
 
-import static ru.smartel.strike.integration.PublicationGateway.PUBLICATION_CHANNEL;
 import static ru.smartel.strike.service.publish.InstagramService.INSTAGRAM_CHANNEL;
 import static ru.smartel.strike.service.publish.OkService.OK_CHANNEL;
 import static ru.smartel.strike.service.publish.TelegramService.TELEGRAM_CHANNEL;
@@ -27,8 +24,7 @@ public class IntegrationConf {
 
     @Bean
     public IntegrationFlow publicationFlow() {
-        return IntegrationFlows
-                .from(MessageChannels.direct(PUBLICATION_CHANNEL))
+        return f -> f
                 .<PublishDTOWithNetworks>filter(data -> !data.getPublishTo().isEmpty())
                 .split(splitter())
                 .<PublishDTO, PublishDTO>transform(data -> {
@@ -41,8 +37,7 @@ public class IntegrationConf {
                         .channelMapping(Network.VK.getId(), VK_CHANNEL)
                         .channelMapping(Network.OK.getId(), OK_CHANNEL)
                         .channelMapping(Network.TWITTER.getId(), TWITTER_CHANNEL)
-                        .channelMapping(Network.INSTAGRAM.getId(), INSTAGRAM_CHANNEL))
-                .get();
+                        .channelMapping(Network.INSTAGRAM.getId(), INSTAGRAM_CHANNEL));
     }
 
     /**

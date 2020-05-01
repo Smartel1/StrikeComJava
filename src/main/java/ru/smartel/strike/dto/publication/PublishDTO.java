@@ -3,9 +3,9 @@ package ru.smartel.strike.dto.publication;
 import java.util.List;
 
 public class PublishDTO {
-    private String text;
-    private String sourceUrl;
-    private List<String> videoUrls;
+    private final String text;
+    private final String sourceUrl;
+    private final List<String> videoUrls;
 
     public PublishDTO(String text, String sourceUrl, List<String> videoUrls) {
         this.text = text;

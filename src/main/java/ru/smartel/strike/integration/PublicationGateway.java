@@ -13,7 +13,7 @@ import static ru.smartel.strike.integration.PublicationGateway.PUBLICATION_CHANN
 @Component
 @MessagingGateway(defaultRequestChannel = PUBLICATION_CHANNEL)
 public interface PublicationGateway {
-    String PUBLICATION_CHANNEL = "publicationChannel";
+    String PUBLICATION_CHANNEL = "publicationFlow.input";
 
     /**
      * Publish post to networks
