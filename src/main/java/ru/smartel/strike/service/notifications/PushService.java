@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.configuration.properties.PushProperties;
 import ru.smartel.strike.service.Locale;
@@ -14,20 +15,21 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class PushService {
-    private static Logger logger = LoggerFactory.getLogger(PushService.class);
+    private final static Logger logger = LoggerFactory.getLogger(PushService.class);
 
-    private FirebaseMessaging firebaseMessaging;
-    private PushProperties pushProperties;
+    private final FirebaseMessaging firebaseMessaging;
+    private final PushProperties pushProperties;
 
-    public PushService(FirebaseMessaging firebaseMessaging, PushProperties pushProperties) {
+    public PushService(@Nullable FirebaseMessaging firebaseMessaging, PushProperties pushProperties) {
         this.firebaseMessaging = firebaseMessaging;
         this.pushProperties = pushProperties;
     }
 
     public void newsCreatedByUser(Long newsId, Long authorId, String authorName) {
-
         sendAsyncIfEnabled(() -> {
             logger.info("sending notification about news {} proposed by user {}", newsId, authorName);
             return Message.builder()
@@ -42,7 +44,6 @@ public class PushService {
     }
 
     public void eventCreatedByUser(Long eventId, Long authorId, String authorName) {
-
         sendAsyncIfEnabled(() -> {
             logger.info("sending notification about event {} proposed by user {}", eventId, authorName);
             return Message.builder()
@@ -66,9 +67,9 @@ public class PushService {
         }
     }
 
-    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
         for (Map.Entry<Locale, String> titleByLocale : titlesByLocales.entrySet()) {
-            eventPublishedByLocale(eventId, authorId, lng, lat, titleByLocale.getValue(), titleByLocale.getKey());
+            eventPublishedByLocale(eventId, authorId, lng, lat, eventTypeId, titleByLocale.getValue(), titleByLocale.getKey());
         }
 
         if (notifyAuthor) {
@@ -181,7 +182,7 @@ public class PushService {
      * @param title    event title by locale
      * @param locale   locale
      */
-    private void eventPublishedByLocale(Long eventId, Long authorId, Float lng, Float lat, String title, Locale locale) {
+    private void eventPublishedByLocale(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, String title, Locale locale) {
         sendAsyncIfEnabled(() -> {
             logger.info("sending notification about event publishing to {} topic. Title: {}", locale, title);
 
@@ -225,6 +226,7 @@ public class PushService {
                     .putData("lng", String.valueOf(lng))
                     .putData("creatorId", String.valueOf(authorId))
                     .putData("title", title)
+                    .putData("eventTypeId", String.valueOf(eventTypeId))
                     .putData("type", "news") // wth is that?
                     .build();
         });
@@ -296,7 +298,7 @@ public class PushService {
      * @param messageSupplier message supplier
      */
     private void sendAsyncIfEnabled(Supplier<Message> messageSupplier) {
-        if (!pushProperties.getEnabled()) {
+        if (isNull(firebaseMessaging) || !pushProperties.getEnabled()) {
             return;
         }
         CompletableFuture.runAsync(() -> {

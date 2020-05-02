@@ -33,14 +33,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FirebaseTokenFilter implements Filter {
-    private static Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
+import static java.util.Objects.isNull;
 
+public class FirebaseTokenFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
+
+    private final FirebaseAuth firebaseAuth;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final boolean stub;
 
-    public FirebaseTokenFilter(UserRepository userRepository, ObjectMapper objectMapper, boolean stub) {
+    public FirebaseTokenFilter(FirebaseAuth firebaseAuth,
+                               UserRepository userRepository,
+                               ObjectMapper objectMapper,
+                               boolean stub) {
+        this.firebaseAuth = firebaseAuth;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
         this.stub = stub;
@@ -51,6 +58,10 @@ public class FirebaseTokenFilter implements Filter {
         if (stub) {
             authenticateAsModerator();
             chain.doFilter(request, response);
+            return;
+        }
+        if (isNull(firebaseAuth)) {
+            writeErrorToResponse((HttpServletResponse) response, "Не сконфигурирован firebase");
             return;
         }
 
@@ -65,8 +76,7 @@ public class FirebaseTokenFilter implements Filter {
                 authenticate(bearer.substring(7));
             }
         } catch (AuthenticationException ex) {
-            //we should handle exceptions here
-            handleException((HttpServletResponse) response, ex);
+            writeErrorToResponse((HttpServletResponse) response, ex.getLocalizedMessage());
             return;
         }
 
@@ -77,7 +87,7 @@ public class FirebaseTokenFilter implements Filter {
         FirebaseToken token;
 
         try {
-            token = FirebaseAuth.getInstance().verifyIdToken(bearer);
+            token = firebaseAuth.verifyIdToken(bearer);
         } catch (FirebaseAuthException e) {
             throw new FirebaseAuthenticationException(e.getMessage());
         }
@@ -110,7 +120,7 @@ public class FirebaseTokenFilter implements Filter {
     private void updateUserFields(User user, String uuid) throws FirebaseAuthException {
         UserRecord userRecord;
 
-        userRecord = FirebaseAuth.getInstance().getUser(uuid);
+        userRecord = firebaseAuth.getUser(uuid);
 
         user.setUuid(userRecord.getUid());
         user.setName(Optional.ofNullable(userRecord.getDisplayName()).orElse("unnamed user"));
@@ -130,13 +140,10 @@ public class FirebaseTokenFilter implements Filter {
     /**
      * Write exception DTO to response
      */
-    private void handleException(HttpServletResponse response, AuthenticationException ex) throws IOException {
+    private void writeErrorToResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
         response.setContentType(ContentType.APPLICATION_JSON.toString());
-        String errorMessageJson = objectMapper.writeValueAsString(
-                new ApiErrorDTO(
-                        "Проблемы при аутентификации",
-                        ex.getLocalizedMessage()));
+        String errorMessageJson = objectMapper.writeValueAsString(new ApiErrorDTO("Проблемы при аутентификации", message));
         response.getWriter().write(errorMessageJson);
     }
 }

@@ -2,10 +2,6 @@ spring:
   jpa:
     show-sql: false
 
-firebase:
-  authentication:
-    stub: false
-
 push:
   enabled: true
   topics:
@@ -22,4 +18,5 @@ push:
       de: events_de
 
 logging:
-  file: ${LOG_PATH}/daily-log.log
+  file:
+    name: ${LOG_PATH}/daily-log.log

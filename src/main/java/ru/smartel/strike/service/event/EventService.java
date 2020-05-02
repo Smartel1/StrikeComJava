@@ -230,6 +230,7 @@ public class EventService {
                     event.getAuthor().getId(),
                     event.getLongitude(),
                     event.getLatitude(),
+                    event.getType().getId(),
                     titlesByLocales,
                     null, //do not send push to author cuz he's moderator
                     false
@@ -295,6 +296,7 @@ public class EventService {
                     null != event.getAuthor() ? event.getAuthor().getId() : null,
                     event.getLongitude(),
                     event.getLatitude(),
+                    event.getType().getId(),
                     titlesLocalizedDuringThisUpdate,
                     null != event.getAuthor() ? event.getAuthor().getFcm() : null,
                     changingPublicationStatus //whether notify event's author or not

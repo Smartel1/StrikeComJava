@@ -13,9 +13,8 @@ server:
   port: 8000
 
 firebase:
-  authentication:
-    stub: ${AUTH_STUB:#{false}}
-    credentials: ${FB_AUTH_JSON} # base64-decoded service-account json credentials
+  auth_stub: false
+  credentials:
 
 push:
   enabled: true
