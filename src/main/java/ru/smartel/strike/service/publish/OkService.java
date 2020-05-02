@@ -1,5 +1,7 @@
 package ru.smartel.strike.service.publish;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,8 @@ import org.springframework.web.util.UriTemplate;
 import ru.smartel.strike.configuration.properties.OkProperties;
 import ru.smartel.strike.dto.publication.PublishDTO;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Objects.nonNull;
 
@@ -30,10 +33,12 @@ public class OkService {
 
     private final RestTemplate restTemplate;
     private final OkProperties properties;
+    private final ObjectMapper objectMapper;
 
-    public OkService(RestTemplate restTemplate, OkProperties properties) {
+    public OkService(RestTemplate restTemplate, OkProperties properties, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.properties = properties;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -46,26 +51,31 @@ public class OkService {
         }
         logger.info("Sending post to OK");
 
-        String attachment = "{\"type\":\"text\",\"text\":\"" + data.getText() + "\"}";
+        AttachmentDto attachmentDto = new AttachmentDto();
+        attachmentDto.media.add(new TextMedia(data.getText().replace("\r", " ")));
+
         if (!data.getVideoUrls().isEmpty()) {
-            attachment = attachment + data.getVideoUrls().stream()
-                    .map(url -> "{\"type\":\"link\",\"url\":\"" + url + "\"}")
-                    .collect(Collectors.joining(", ", ",", ""));
+            data.getVideoUrls().forEach(url -> attachmentDto.media.add(new LinkMedia(url)));
         }
         if (nonNull(data.getSourceUrl())) {
-            attachment = attachment + "," + "{\"type\":\"link\",\"url\":\"" + data.getSourceUrl() + "\"}";
+            attachmentDto.media.add(new LinkMedia(data.getSourceUrl()));
         }
 
-        attachment = "{\"media\":[" + attachment + "]}";
-        attachment = attachment.replace("\r", " ");
-
-        String signature = getSig(properties.getAppKey(), attachment, properties.getGid(),
+        String attachmentJson;
+        try {
+            attachmentJson = objectMapper.writeValueAsString(attachmentDto);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
+        String signature = getSig(properties.getAppKey(), attachmentJson, properties.getGid(),
                 properties.getAccessToken(), properties.getAppSecret());
 
         try {
             logger.info("OK response: {}", restTemplate.getForObject(
                     new UriTemplate(SEND_MESSAGE_URL).expand(
-                            properties.getAppKey(), attachment, properties.getGid(), signature, properties.getAccessToken()),
+                            properties.getAppKey(), attachmentJson,
+                            properties.getGid(), signature, properties.getAccessToken()),
                     String.class));
         } catch (RestClientException ex) {
             logger.error("Sending to OK group failed: {}", ex.getMessage());
@@ -83,5 +93,69 @@ public class OkService {
                 "method=mediatopic.post" +
                 "type=GROUP_THEME" +
                 DigestUtils.md5Hex(accessToken + appSecret));
+    }
+
+    private static class AttachmentDto {
+        List<Media> media = new ArrayList<>();
+
+        public List<Media> getMedia() {
+            return media;
+        }
+
+        public void setMedia(List<Media> media) {
+            this.media = media;
+        }
+    }
+
+    private interface Media {}
+
+    private static class TextMedia implements Media {
+        String type = "text";
+        String text;
+
+        public TextMedia(String text) {
+            this.text = text;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+    }
+
+    private static class LinkMedia implements Media {
+        String type = "link";
+        String url;
+
+        public LinkMedia(String url) {
+            this.url = url;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
     }
 }
