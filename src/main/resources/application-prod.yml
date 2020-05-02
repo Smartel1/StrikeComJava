@@ -19,4 +19,4 @@ push:
 
 logging:
   file:
-    name: ${LOG_PATH}/daily-log.log
+    name: daily-log.log
