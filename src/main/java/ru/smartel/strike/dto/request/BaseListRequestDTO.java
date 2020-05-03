@@ -9,7 +9,9 @@ public class BaseListRequestDTO {
     private static final int DEFAULT_PAGE_CAPACITY = 20;
     private static final int DEFAULT_PAGE = 1;
 
+    @ApiParam(value = "Количество элементов на странице ответа (неменьше 1)")
     private int perPage = DEFAULT_PAGE_CAPACITY;
+    @ApiParam(value = "Номер страницы ответа (неменьше 1)")
     private int page = DEFAULT_PAGE;
     private Sort sort;
 

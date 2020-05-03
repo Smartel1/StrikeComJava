@@ -17,19 +17,7 @@ import ru.smartel.strike.specification.conflict.MatchReasonsConflict;
 import ru.smartel.strike.specification.conflict.MatchResultsConflict;
 import ru.smartel.strike.specification.conflict.NearCoordinateConflict;
 import ru.smartel.strike.specification.conflict.TextMentionConflict;
-import ru.smartel.strike.specification.event.AfterDateEvent;
-import ru.smartel.strike.specification.event.BeforeDateEvent;
-import ru.smartel.strike.specification.event.BelongToConflictsEvent;
-import ru.smartel.strike.specification.event.CountryEvent;
-import ru.smartel.strike.specification.event.FavouriteEvent;
-import ru.smartel.strike.specification.event.EventsWithAnyTags;
-import ru.smartel.strike.specification.event.MatchStatusesEvent;
-import ru.smartel.strike.specification.event.MatchTypesEvent;
-import ru.smartel.strike.specification.event.NearCoordinateEvent;
-import ru.smartel.strike.specification.event.PublishedEvent;
-import ru.smartel.strike.specification.event.RegionEvent;
-import ru.smartel.strike.specification.event.WithContentEvent;
-import ru.smartel.strike.specification.event.WithIdsEvents;
+import ru.smartel.strike.specification.event.*;
 import ru.smartel.strike.specification.news.AfterDateNews;
 import ru.smartel.strike.specification.news.BeforeDateNews;
 import ru.smartel.strike.specification.news.FavouriteNews;
@@ -58,6 +46,7 @@ public class FiltersTransformer {
         if (null != filters.getDateTo()) result = result.and(new BeforeDateEvent(filters.getDateTo()));
         if (null != filters.getEventStatusIds()) result = result.and(new MatchStatusesEvent(filters.getEventStatusIds()));
         if (null != filters.getEventTypeIds()) result = result.and(new MatchTypesEvent(filters.getEventTypeIds()));
+        if (null != filters.getIndustryIds()) result = result.and(new MatchIndustriesEvent(filters.getIndustryIds()));
         if (null != filters.getTags()) result = result.and(new EventsWithAnyTags(filters.getTags()));
         if (null != filters.getConflictIds()) {
             //additional query to find ids of parent events of conflicts with given ids

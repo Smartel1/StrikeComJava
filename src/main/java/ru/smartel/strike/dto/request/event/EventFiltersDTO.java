@@ -6,11 +6,18 @@ import ru.smartel.strike.dto.request.post.PostFiltersDTO;
 import java.util.List;
 
 public class EventFiltersDTO extends PostFiltersDTO {
+    @ApiParam(value = "Идентификаторы конфликтов")
     private List<Long> conflictIds;
+    @ApiParam(value = "Идентификаторы статусов событий")
     private List<Long> eventStatusIds;
+    @ApiParam(value = "Идентификаторы типов событий")
     private List<Long> eventTypeIds;
+    @ApiParam(value = "Идентификаторы стран")
     private List<Long> countryIds;
+    @ApiParam(value = "Идентификаторы регионов")
     private List<Long> regionIds;
+    @ApiParam(value = "Идентификаторы отраслей конфликтов")
+    private List<Long> industryIds;
     private SearchArea near;
 
     public List<Long> getConflictIds() {
@@ -51,6 +58,14 @@ public class EventFiltersDTO extends PostFiltersDTO {
 
     public void setRegionIds(List<Long> regionIds) {
         this.regionIds = regionIds;
+    }
+
+    public List<Long> getIndustryIds() {
+        return industryIds;
+    }
+
+    public void setIndustryIds(List<Long> industryIds) {
+        this.industryIds = industryIds;
     }
 
     public SearchArea getNear() {

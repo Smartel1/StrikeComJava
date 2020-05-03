@@ -36,9 +36,6 @@ import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
-import ru.smartel.strike.service.publish.OkService;
-import ru.smartel.strike.service.publish.TelegramService;
-import ru.smartel.strike.service.publish.VkService;
 import ru.smartel.strike.service.validation.BusinessValidationService;
 import ru.smartel.strike.specification.event.ByRolesEvent;
 import ru.smartel.strike.specification.event.LocalizedEvent;
@@ -87,9 +84,7 @@ public class EventService {
             FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
             PushService pushService,
-            TelegramService telegramService,
-            VkService vkService,
-            OkService okService, PublicationGateway publicationGateway) {
+            PublicationGateway publicationGateway) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
