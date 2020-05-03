@@ -50,7 +50,7 @@ public class User {
     private LocalDateTime updatedAt;
 
     @Column(unique = true)
-    private String uuid;
+    private String uid;
 
     @Column
     private String name;
@@ -125,12 +125,12 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setUid(String uuid) {
+        this.uid = uuid;
     }
 
     public String getName() {

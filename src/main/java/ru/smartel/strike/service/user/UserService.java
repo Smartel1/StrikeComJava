@@ -15,8 +15,8 @@ import java.util.Optional;
 @Transactional(rollbackFor = Exception.class)
 public class UserService {
 
-    private UserRepository userRepository;
-    private UserDTOValidator validator;
+    private final UserRepository userRepository;
+    private final UserDTOValidator validator;
 
     public UserService(UserRepository userRepository, UserDTOValidator validator) {
         this.userRepository = userRepository;
@@ -31,6 +31,10 @@ public class UserService {
         return UserDetailDTO.from(user);
     }
 
+    public Optional<User> get(String uid) {
+        return userRepository.findFirstByUid(uid);
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #dto.userId and null == #dto.roles")
     public UserDetailDTO update(UserUpdateRequestDTO dto) {
         validator.validateUpdateDTO(dto);
@@ -42,8 +46,15 @@ public class UserService {
         Optional.ofNullable(dto.getFcm()).ifPresent(user::setFcm);
         Optional.ofNullable(dto.getRoles()).ifPresent(user::setRoles);
 
-
         return UserDetailDTO.from(user);
+    }
+
+    public void update(String uid, String name, String email, String imageUrl) {
+        User user = userRepository.findFirstByUid(uid).orElseThrow(
+                () -> new EntityNotFoundException("User with uid [" + uid + "] not found"));
+        user.setName(name);
+        user.setEmail(email);
+        user.setImageUrl(imageUrl);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId")

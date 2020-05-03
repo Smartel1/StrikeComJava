@@ -24,7 +24,7 @@ public class UserDetailDTO {
         instance.setId(user.getId());
         instance.setName(user.getName());
         instance.setEmail(user.getEmail());
-        instance.setUuid(user.getUuid());
+        instance.setUuid(user.getUid());
         instance.setFcm(user.getFcm());
         instance.setRoles(user.getRolesAsList());
         instance.setImageUrl(user.getImageUrl());
