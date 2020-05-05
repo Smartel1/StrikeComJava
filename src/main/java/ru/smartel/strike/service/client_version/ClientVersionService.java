@@ -30,6 +30,17 @@ public class ClientVersionService {
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
+        List<ClientVersionDTO> newVersions = getClientVersions(dto).stream()
+                .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
+                .collect(Collectors.toList());
+
+        return new ListWrapperDTO<>(
+                newVersions,
+                null
+        );
+    }
+
+    private List<ClientVersion> getClientVersions(ClientVersionGetNewRequestDTO dto) {
         List<ClientVersion> clientVersions;
 
         if (dto.getCurrentVersion() != null) {
@@ -44,14 +55,7 @@ public class ClientVersionService {
             clientVersions = clientVersionRepository.findAllByClientId(dto.getClientId());
         }
 
-        List<ClientVersionDTO> newVersions = clientVersions.stream()
-                .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
-                .collect(Collectors.toList());
-
-        return new ListWrapperDTO<>(
-                newVersions,
-                null
-        );
+        return clientVersions;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
