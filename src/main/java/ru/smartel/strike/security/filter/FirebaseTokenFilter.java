@@ -99,7 +99,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
         User user = userService.get(uid).orElse(null);
         if (null == user) {
             user = new User();
-            updateUserFields(uid);
+            createOrUpdateUser(uid);
         }
 
         LocalDateTime tokenIssuedAt = LocalDateTime.ofEpochSecond(
@@ -109,7 +109,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         // If token was issued before user was updated last time, then update user fields (async)
         if (user.getUpdatedAt().compareTo(tokenIssuedAt) < 0) {
-            CompletableFuture.runAsync(() -> updateUserFields(uid));
+            CompletableFuture.runAsync(() -> createOrUpdateUser(uid));
         }
 
         SecurityContextHolder.getContext().setAuthentication(
@@ -125,7 +125,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                         UserPrincipal.from(user), getUserAuthorities(user), null, true));
     }
 
-    private void updateUserFields(String uid) {
+    private void createOrUpdateUser(String uid) {
         try {
             firebaseService.updateUserFields(uid);
         } catch (FirebaseAuthException e) {

@@ -45,7 +45,7 @@ public class FirebaseService {
 
     public void updateUserFields(String uid) throws FirebaseAuthException {
         var userRecord = getUser(uid);
-        userService.update(userRecord.getUid(),
+        userService.updateOrCreate(userRecord.getUid(),
                 Optional.ofNullable(userRecord.getDisplayName()).orElse("unnamed user"),
                 userRecord.getEmail(),
                 userRecord.getPhotoUrl());

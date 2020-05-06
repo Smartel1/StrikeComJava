@@ -11,6 +11,8 @@ import ru.smartel.strike.repository.etc.UserRepository;
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UserService {
@@ -36,7 +38,7 @@ public class UserService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #dto.userId and null == #dto.roles")
-    public UserDetailDTO update(UserUpdateRequestDTO dto) {
+    public UserDetailDTO updateOrCreate(UserUpdateRequestDTO dto) {
         validator.validateUpdateDTO(dto);
 
         User user = userRepository.findById(dto.getUserId()).orElseThrow(
@@ -49,12 +51,16 @@ public class UserService {
         return UserDetailDTO.from(user);
     }
 
-    public void update(String uid, String name, String email, String imageUrl) {
-        User user = userRepository.findFirstByUid(uid).orElseThrow(
-                () -> new EntityNotFoundException("User with uid [" + uid + "] not found"));
+    public void updateOrCreate(String uid, String name, String email, String imageUrl) {
+        User user = userRepository.findFirstByUid(uid).orElse(null);
+        if (isNull(user)) {
+            user = new User();
+            user.setUid(uid);
+        }
         user.setName(name);
         user.setEmail(email);
         user.setImageUrl(imageUrl);
+        userRepository.save(user);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId")
