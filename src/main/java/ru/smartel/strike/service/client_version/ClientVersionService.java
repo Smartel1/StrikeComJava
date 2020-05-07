@@ -30,32 +30,24 @@ public class ClientVersionService {
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
-        List<ClientVersionDTO> newVersions = getClientVersions(dto).stream()
+        List<ClientVersionDTO> newVersions = Optional.ofNullable(dto.getCurrentVersion())
+                // Если указана версия - находим более поздние версии клиентского приложения
+                .map(v -> {
+                    ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(v, dto.getClientId())
+                            .orElseThrow(() -> new ValidationException(
+                                    Collections.singletonMap("error", Collections.singletonList(
+                                            "Нет такой версии: " + dto.getClientId() + ":" + v))));
+
+                    return clientVersionRepository.findAllByIdGreaterThanAndClientId(
+                            currentVersion.getId(), dto.getClientId());
+                })
+                // Если версия не указана - находим все версии клиентского приложения
+                .orElse(clientVersionRepository.findAllByClientId(dto.getClientId()))
+                .stream()
                 .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
                 .collect(Collectors.toList());
 
-        return new ListWrapperDTO<>(
-                newVersions,
-                null
-        );
-    }
-
-    private List<ClientVersion> getClientVersions(ClientVersionGetNewRequestDTO dto) {
-        List<ClientVersion> clientVersions;
-
-        if (dto.getCurrentVersion() != null) {
-            ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
-                    .orElseThrow(() -> new ValidationException(
-                            Collections.singletonMap("error", Collections.singletonList(
-                                    "Нет такой версии: " + dto.getClientId() + ":" + dto.getCurrentVersion()))));
-
-            clientVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
-                    currentVersion.getId(), dto.getClientId());
-        } else {
-            clientVersions = clientVersionRepository.findAllByClientId(dto.getClientId());
-        }
-
-        return clientVersions;
+        return new ListWrapperDTO<>(newVersions, null);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
