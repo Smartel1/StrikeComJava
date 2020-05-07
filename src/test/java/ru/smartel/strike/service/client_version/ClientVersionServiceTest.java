@@ -1,10 +1,12 @@
 package ru.smartel.strike.service.client_version;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.smartel.strike.dto.request.client_version.ClientVersionCreateRequestDTO;
 import ru.smartel.strike.dto.request.client_version.ClientVersionGetNewRequestDTO;
@@ -17,10 +19,14 @@ import ru.smartel.strike.service.Locale;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,112 +41,134 @@ class ClientVersionServiceTest {
     @Mock
     private ClientVersionDTOValidator dtoValidator;
 
-    private ClientVersionCreateRequestDTO requestDto;
-
-    private ClientVersionDTO clientVersionDTO;
-
-    private final long ID = 1;
+    private final long ID = 0;
     private final String VERSION = "version";
     private final String DESCRIPTION_DE = "descriptionDe";
     private final String DESCRIPTION_RU = "descriptionRu";
     private final String DESCRIPTION_EN = "descriptionEn";
     private final String DESCRIPTION_ES = "descriptionEs";
+    private final boolean isRequired = false;
 
-    @BeforeEach
-    void setUp() {
-        // todo: (убрать после ревью) - насколько критично здесь инициализировать объекты, которые не для всех тестов общие (для меня не критично)
-        requestDto = new ClientVersionCreateRequestDTO();
-        requestDto.setClientId("id");
-        requestDto.setDescriptionDe(DESCRIPTION_DE);
-        requestDto.setDescriptionEn(DESCRIPTION_EN);
-        requestDto.setDescriptionEs(DESCRIPTION_ES);
-        requestDto.setDescriptionRu(DESCRIPTION_RU);
-        requestDto.setLocale(Locale.RU);
-        requestDto.setVersion(VERSION);
-        requestDto.setRequired(false);
+    private ClientVersionCreateRequestDTO getCreateRequestDto() {
+        return new ClientVersionCreateRequestDTO.Builder()
+                .clientId("id")
+                .required(isRequired)
+                .locale(Locale.RU)
+                .version(VERSION)
+                .descriptionDe(DESCRIPTION_DE)
+                .descriptionEn(DESCRIPTION_EN)
+                .descriptionEs(DESCRIPTION_ES)
+                .descriptionRu(DESCRIPTION_RU)
+                .build();
+    }
 
-        clientVersionDTO = new ClientVersionDTO();
-        clientVersionDTO.setId(ID);
-        clientVersionDTO.setRequired(true);
-        clientVersionDTO.setVersion(VERSION);
+    private ClientVersionDTO getClientVersionDTO() {
+        return new ClientVersionDTO.Builder()
+                .id(ID)
+                .isRequired(isRequired)
+                .version(VERSION)
+                .build();
     }
 
     // Проверка на выкидывание ValidationException
     @Test
     void whenGetNewVersionsShouldThrowValidationException() {
-        var getNewRequestDto = new ClientVersionGetNewRequestDTO();
-        getNewRequestDto.setClientId(VERSION);
-        getNewRequestDto.setCurrentVersion("CURRENT_" + VERSION);
-        getNewRequestDto.setLocale(Locale.RU);
+        var getNewRequestDto = new ClientVersionGetNewRequestDTO.Builder()
+                .clientId(VERSION)
+                .currentVersion("CURRENT_" + VERSION)
+                .locale(Locale.RU)
+                .build();
 
-        when(repository.getByVersionAndClientId(any(String.class), any(String.class))).thenReturn(Optional.empty());
+        when(repository.getByVersionAndClientId(getNewRequestDto.getCurrentVersion(), getNewRequestDto.getClientId())).thenReturn(Optional.empty());
 
-        assertThrows(ValidationException.class, () -> service.getNewVersions(getNewRequestDto));
+        ValidationException exception = assertThrows(ValidationException.class, () -> service.getNewVersions(getNewRequestDto));
+
+        String actual = exception.getMessage() + exception.getErrors().toString();
+
+        String expected = "Validation error occurred" + Collections.singletonMap("error", Collections.singletonList(
+                "Нет такой версии: " + getNewRequestDto.getClientId() + ":" + getNewRequestDto.getCurrentVersion())).toString();
+
+        assertTrue(actual.contains(expected));
     }
 
     @Test
     void whenGetNewVersionsShouldReturnListWrapperDto() {
-        var getNewRequestDto = new ClientVersionGetNewRequestDTO();
-        getNewRequestDto.setClientId(VERSION);
-        getNewRequestDto.setLocale(Locale.RU);
+        var getNewRequestDto = new ClientVersionGetNewRequestDTO.Builder()
+                .clientId(VERSION)
+                .locale(Locale.RU)
+                .build();
 
         var clientVersion = new ClientVersion();
         clientVersion.setVersion(VERSION);
 
         when(repository.findAllByClientId(any(String.class))).thenReturn(Arrays.asList(clientVersion));
-
         ListWrapperDTO<ClientVersionDTO> versions = service.getNewVersions(getNewRequestDto);
 
-        assertSame(VERSION, versions.getData().get(0).getVersion());
+        var actual = versions.getData().get(0);
+        var expected = new ClientVersionDTO.Builder()
+                .version(getNewRequestDto.getClientId())
+                .build();
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     // Проверка кейса с Locale.RU
-    @Test
-    void whenCreateAndSameVersionIsNotPresetItShouldReturnClientVersionDTO() {
-        when(repository.getByVersionAndClientId(any(String.class), any(String.class)))
-                .thenReturn(Optional.empty());
+    @ParameterizedTest
+    @EnumSource(value = Locale.class, names = {"ALL", "RU"})
+    void whenCreateAndSameVersionIsNotPresetItShouldReturnClientVersionDTO(Locale locale) {
+        var requestDto = getCreateRequestDto();
+        requestDto.setLocale(locale);
 
-        when(repository.save(any(ClientVersion.class))).thenReturn(new ClientVersion());
+        when(repository.getByVersionAndClientId(requestDto.getVersion(), requestDto.getClientId())).thenReturn(Optional.empty());
 
-        ClientVersionDTO version = service.create(requestDto);
+        var actual = service.create(requestDto);
+        //todo: здесь не понял, как надо. Понятно, что мы хотим проверить, что repository.save() вызывалось,
+        // но какой объект надо передать в save я не смог выявить, если передать что-то конкретное, то идет конфликт
+        // Actual invocations have different arguments: repository.getByVersionAndClientId
+        // Или всё-таки достаточно оставить как есть, т.е Mockito.any() ?
+        verify(repository).save(Mockito.any());
 
-        assertSame(requestDto.getVersion(), version.getVersion());
-        assertSame(requestDto.getDescriptionRu(), version.getOptionalFields().get("description"));
+        var expected = getClientVersionDTO();
+        expected.add("description", requestDto.getDescriptionRu());
 
-        assertNull(version.getOptionalFields().get(DESCRIPTION_RU));
-        assertNull(version.getOptionalFields().get(DESCRIPTION_DE));
-        assertNull(version.getOptionalFields().get(DESCRIPTION_EN));
-        assertNull(version.getOptionalFields().get(DESCRIPTION_RU));
-    }
-
-    // Проверка кейса с Locale.ALL
-    @Test
-    void whenCreateAndSameVersionIsNotPresetAndLocaleIsAllItShouldReturnClientVersionDTO() {
-        requestDto.setLocale(Locale.ALL);
-
-        ClientVersionDTO version = service.create(requestDto);
-
-        assertSame(requestDto.getDescriptionRu(), version.getOptionalFields().get(DESCRIPTION_RU));
-        assertSame(requestDto.getDescriptionDe(), version.getOptionalFields().get(DESCRIPTION_DE));
-        assertSame(requestDto.getDescriptionEn(), version.getOptionalFields().get(DESCRIPTION_EN));
-        assertSame(requestDto.getDescriptionRu(), version.getOptionalFields().get(DESCRIPTION_RU));
-
-        assertNull(version.getOptionalFields().get("description"));
+        // Переопределил hashCode и equals в ClientVersionDTO, иначе не работало
+        assertThat(actual).isEqualTo(expected);
     }
 
     // Проверка на выкидывание ValidationException
     @Test
     void whenCreateAndSameVersionIsPresetItShouldThrowValidationException() {
-        when(repository.getByVersionAndClientId(any(String.class), any(String.class)))
-                .thenReturn(java.util.Optional.of(new ClientVersion()));
+        var requestDto = getCreateRequestDto();
+        when(repository.getByVersionAndClientId(requestDto.getVersion(), requestDto.getClientId()))
+                .thenReturn(Optional.of(new ClientVersion()));
 
-        assertThrows(ValidationException.class, () -> service.create(requestDto));
+        ValidationException exception = assertThrows(ValidationException.class, () -> service.create(requestDto));
+
+        String actual = exception.getMessage() + exception.getErrors().toString();
+        String expected = Collections.singletonMap("error", Collections.singletonList("Такая версия уже существует")).toString();
+
+        assertTrue(actual.contains(expected));
     }
 
     // Проверка на выкидывание EntityNotFoundException
     @Test
     void whenDeleteIsAbsentClientShouldThrowEntityNotFoundException() {
-        assertThrows(EntityNotFoundException.class, () -> service.delete(ID));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> service.delete(ID));
+
+        String actual = exception.getMessage();
+        String expected = "Версия клиента не найдена";
+
+        assertTrue(actual.contains(expected));
+    }
+
+    @Test
+    void whenDeleteShouldTrue() {
+        var clientVersion = Optional.of(new ClientVersion());
+
+        when(repository.findById(ID)).thenReturn(clientVersion);
+
+        service.delete(ID);
+        verify(repository).delete(clientVersion.get());
     }
 
 }
