@@ -2,7 +2,6 @@ package ru.smartel.strike.dto.request.client_version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.annotations.ApiParam;
 import ru.smartel.strike.service.Locale;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
