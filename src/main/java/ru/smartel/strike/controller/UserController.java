@@ -34,7 +34,7 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal user,
             @RequestBody UserUpdateRequestDTO dto) {
         dto.setUserId(user.getId());
-        return new DetailWrapperDTO<>(userService.update(dto));
+        return new DetailWrapperDTO<>(userService.updateOrCreate(dto));
     }
 
     @DeleteMapping
