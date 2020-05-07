@@ -4,6 +4,8 @@ import ru.smartel.strike.dto.response.ExtendableDTO;
 import ru.smartel.strike.entity.ClientVersion;
 import ru.smartel.strike.service.Locale;
 
+import java.util.Objects;
+
 public class ClientVersionDTO extends ExtendableDTO {
     private long id;
     private String version;
@@ -24,6 +26,8 @@ public class ClientVersionDTO extends ExtendableDTO {
         }
         return instance;
     }
+
+    public ClientVersionDTO() {}
 
     public long getId() {
         return id;
@@ -47,5 +51,52 @@ public class ClientVersionDTO extends ExtendableDTO {
 
     public void setRequired(boolean required) {
         isRequired = required;
+    }
+
+    public static class Builder {
+
+        private long id;
+        private String version;
+        private boolean isRequired;
+
+        public Builder id(long anId) {
+            id = anId;
+            return this;
+        }
+
+        public Builder version(String version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder isRequired(boolean isRequired) {
+            this.isRequired = isRequired;
+            return this;
+        }
+
+        public ClientVersionDTO build() {
+            return new ClientVersionDTO(this);
+        }
+    }
+
+    private ClientVersionDTO(Builder b) {
+        version = b.version;
+        id = b.id;
+        isRequired = b.isRequired;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClientVersionDTO that = (ClientVersionDTO) o;
+        return id == that.id &&
+                isRequired == that.isRequired &&
+                Objects.equals(version, that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, version, isRequired);
     }
 }

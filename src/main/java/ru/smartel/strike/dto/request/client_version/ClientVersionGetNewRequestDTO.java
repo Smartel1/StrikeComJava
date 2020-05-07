@@ -33,4 +33,37 @@ public class ClientVersionGetNewRequestDTO {
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
+
+    public ClientVersionGetNewRequestDTO() {};
+
+    public static class Builder {
+        private Locale locale;
+        private String currentVersion;
+        private String clientId;
+
+        public Builder locale(Locale locale) {
+            this.locale = locale;
+            return this;
+        }
+
+        public Builder currentVersion(String currentVersion) {
+            this.currentVersion = currentVersion;
+            return this;
+        }
+
+        public Builder clientId(String clientId) {
+            this.clientId = clientId;
+            return this;
+        }
+
+        public ClientVersionGetNewRequestDTO build() {
+            return new ClientVersionGetNewRequestDTO(this);
+        }
+    }
+
+    private ClientVersionGetNewRequestDTO(Builder b) {
+        locale = b.locale;
+        currentVersion = b.currentVersion;
+        clientId = b.clientId;
+    }
 }
