@@ -31,7 +31,7 @@ public class ClientVersionService {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
         List<ClientVersionDTO> newVersions = Optional.ofNullable(dto.getCurrentVersion())
-                // Если указана версия - находим более поздние версии клиентского приложения
+                // If the version specified , we find later versions of the client application
                 .map(v -> {
                     ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(v, dto.getClientId())
                             .orElseThrow(() -> new ValidationException(
@@ -41,7 +41,7 @@ public class ClientVersionService {
                     return clientVersionRepository.findAllByIdGreaterThanAndClientId(
                             currentVersion.getId(), dto.getClientId());
                 })
-                // Если версия не указана - находим все версии клиентского приложения
+                // Another - finding all versions of the client application
                 .orElse(clientVersionRepository.findAllByClientId(dto.getClientId()))
                 .stream()
                 .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
