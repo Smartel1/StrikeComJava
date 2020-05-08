@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "client_versions")
@@ -130,5 +131,26 @@ public class ClientVersion {
             default:
                 return "";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClientVersion that = (ClientVersion) o;
+        return required == that.required &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(updatedAt, that.updatedAt) &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(clientId, that.clientId) &&
+                Objects.equals(descriptionRu, that.descriptionRu) &&
+                Objects.equals(descriptionEn, that.descriptionEn) &&
+                Objects.equals(descriptionEs, that.descriptionEs) &&
+                Objects.equals(descriptionDe, that.descriptionDe);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(createdAt, updatedAt, version, clientId, required, descriptionRu, descriptionEn, descriptionEs, descriptionDe);
     }
 }
