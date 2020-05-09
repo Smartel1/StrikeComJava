@@ -132,25 +132,4 @@ public class ClientVersion {
                 return "";
         }
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ClientVersion that = (ClientVersion) o;
-        return required == that.required &&
-                Objects.equals(createdAt, that.createdAt) &&
-                Objects.equals(updatedAt, that.updatedAt) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(clientId, that.clientId) &&
-                Objects.equals(descriptionRu, that.descriptionRu) &&
-                Objects.equals(descriptionEn, that.descriptionEn) &&
-                Objects.equals(descriptionEs, that.descriptionEs) &&
-                Objects.equals(descriptionDe, that.descriptionDe);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(createdAt, updatedAt, version, clientId, required, descriptionRu, descriptionEn, descriptionEs, descriptionDe);
-    }
 }
