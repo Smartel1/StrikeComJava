@@ -116,15 +116,11 @@ class ClientVersionServiceTest {
                 .thenReturn(Arrays.asList(clientVersion));
         ListWrapperDTO<ClientVersionDTO> versions = service.getNewVersions(getNewRequestDto);
 
-        verify(repository).getByVersionAndClientId(getNewRequestDto.getCurrentVersion(), getNewRequestDto.getClientId());
-        verify(repository).findAllByIdGreaterThanAndClientId(clientVersion.getId(), getNewRequestDto.getClientId());
-
         var expected = new ClientVersionDTO();
         expected.setVersion(getNewRequestDto.getCurrentVersion());
         expected.add(DESCRIPTION, DESCRIPTION_RU);
 
-        assertThat(versions.getData()).hasSize(1);
-        assertThat(versions.getData()).contains(expected);
+        assertThat(versions.getData()).hasSize(1).contains(expected);
 
         var actual = versions.getData().get(0);
         assertThat(actual).isEqualTo(expected);
@@ -149,7 +145,7 @@ class ClientVersionServiceTest {
 
         var actual = service.create(requestDto);
 
-        ArgumentCaptor<ClientVersion> clientVersionArgumentCaptor = ArgumentCaptor.forClass(ClientVersion.class);
+        var clientVersionArgumentCaptor = ArgumentCaptor.forClass(ClientVersion.class);
         verify(repository).save(clientVersionArgumentCaptor.capture());
 
         assertThat(actual).isEqualTo(expected);
