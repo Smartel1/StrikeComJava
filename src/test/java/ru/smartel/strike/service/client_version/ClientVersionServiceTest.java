@@ -41,7 +41,8 @@ class ClientVersionServiceTest {
     private ClientVersionDTOValidator dtoValidator;
 
     private final static long ID = 0;
-    private final static String VERSION = "version";
+    private final static String VERSION = "1.0.0";
+    private final static String CLIENT_ID = "android";
     private final static String DESCRIPTION_DE = "descriptionDe";
     private final static String DESCRIPTION_RU = "descriptionRu";
     private final static String DESCRIPTION_EN = "descriptionEn";
@@ -51,7 +52,7 @@ class ClientVersionServiceTest {
 
     private static ClientVersionCreateRequestDTO getCreateRequestDto() {
         var requestDTO = new ClientVersionCreateRequestDTO();
-        requestDTO.setClientId("id");
+        requestDTO.setClientId(CLIENT_ID);
         requestDTO.setRequired(IS_REQUIRED);
         requestDTO.setLocale(Locale.RU);
         requestDTO.setVersion(VERSION);
@@ -74,8 +75,8 @@ class ClientVersionServiceTest {
 
     private static ClientVersionGetNewRequestDTO clientVersionGetNewRequestDTO() {
         var getNewRequestDto = new ClientVersionGetNewRequestDTO();
-        getNewRequestDto.setClientId(VERSION);
-        getNewRequestDto.setCurrentVersion("CURRENT_" + VERSION);
+        getNewRequestDto.setClientId(CLIENT_ID);
+        getNewRequestDto.setCurrentVersion(VERSION);
         getNewRequestDto.setLocale(Locale.RU);
 
         return getNewRequestDto;
@@ -102,19 +103,25 @@ class ClientVersionServiceTest {
 
     @Test
     void getNewVersions_whenClientVersionGetNewRequestDTO_thenReturnListWrapperDto() {
-        var getNewRequestDto = new ClientVersionGetNewRequestDTO();
-        getNewRequestDto.setClientId(VERSION);
-        getNewRequestDto.setLocale(Locale.RU);
+        var getNewRequestDto = clientVersionGetNewRequestDTO();
 
         var clientVersion = new ClientVersion();
         clientVersion.setVersion(VERSION);
+        clientVersion.setDescriptionRu(DESCRIPTION_RU);
 
-        when(repository.findAllByClientId(getNewRequestDto.getClientId())).thenReturn(Arrays.asList(clientVersion));
+        when(repository.getByVersionAndClientId(getNewRequestDto.getCurrentVersion(), getNewRequestDto.getClientId()))
+                .thenReturn(Optional.of(clientVersion));
+
+        when(repository.findAllByIdGreaterThanAndClientId(clientVersion.getId(), getNewRequestDto.getClientId()))
+                .thenReturn(Arrays.asList(clientVersion));
         ListWrapperDTO<ClientVersionDTO> versions = service.getNewVersions(getNewRequestDto);
 
+        verify(repository).getByVersionAndClientId(getNewRequestDto.getCurrentVersion(), getNewRequestDto.getClientId());
+        verify(repository).findAllByIdGreaterThanAndClientId(clientVersion.getId(), getNewRequestDto.getClientId());
+
         var expected = new ClientVersionDTO();
-        expected.setVersion(getNewRequestDto.getClientId());
-        expected.add(DESCRIPTION, null);
+        expected.setVersion(getNewRequestDto.getCurrentVersion());
+        expected.add(DESCRIPTION, DESCRIPTION_RU);
 
         assertThat(versions.getData()).hasSize(1);
         assertThat(versions.getData()).contains(expected);
@@ -142,8 +149,8 @@ class ClientVersionServiceTest {
 
         var actual = service.create(requestDto);
 
-        ArgumentCaptor<ClientVersion> userArgumentCaptor = ArgumentCaptor.forClass(ClientVersion.class);
-        verify(repository).save(userArgumentCaptor.capture());
+        ArgumentCaptor<ClientVersion> clientVersionArgumentCaptor = ArgumentCaptor.forClass(ClientVersion.class);
+        verify(repository).save(clientVersionArgumentCaptor.capture());
 
         assertThat(actual).isEqualTo(expected);
     }
