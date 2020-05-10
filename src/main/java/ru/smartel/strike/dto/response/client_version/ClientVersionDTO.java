@@ -4,6 +4,8 @@ import ru.smartel.strike.dto.response.ExtendableDTO;
 import ru.smartel.strike.entity.ClientVersion;
 import ru.smartel.strike.service.Locale;
 
+import java.util.Objects;
+
 public class ClientVersionDTO extends ExtendableDTO {
     private long id;
     private String version;
@@ -47,5 +49,21 @@ public class ClientVersionDTO extends ExtendableDTO {
 
     public void setRequired(boolean required) {
         isRequired = required;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClientVersionDTO that = (ClientVersionDTO) o;
+        return id == that.id &&
+                isRequired == that.isRequired &&
+                Objects.equals(version, that.version) &&
+                Objects.equals(getOptionalFields(), that.getOptionalFields());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, version, isRequired, getOptionalFields());
     }
 }

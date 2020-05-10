@@ -33,9 +33,15 @@ dependencies {
     // test dependencies
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit', module: 'junit'
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation "org.junit.jupiter:junit-jupiter:$junit_version"
     testImplementation "org.junit.jupiter:junit-jupiter-params:$junit_version"
+    testImplementation "com.h2database:h2:$h2_version"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 group = 'ru.smartel'

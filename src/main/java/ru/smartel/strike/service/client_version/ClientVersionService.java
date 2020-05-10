@@ -30,28 +30,24 @@ public class ClientVersionService {
     public ListWrapperDTO<ClientVersionDTO> getNewVersions(ClientVersionGetNewRequestDTO dto) {
         clientVersionDTOValidator.validateListRequestDTO(dto);
 
-        List<ClientVersion> clientVersions;
+        List<ClientVersionDTO> newVersions = Optional.ofNullable(dto.getCurrentVersion())
+                // If the version specified , we find later versions of the client application
+                .map(v -> {
+                    ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(v, dto.getClientId())
+                            .orElseThrow(() -> new ValidationException(
+                                    Collections.singletonMap("error", Collections.singletonList(
+                                            "Нет такой версии: " + dto.getClientId() + ":" + v))));
 
-        if (dto.getCurrentVersion() != null) {
-            ClientVersion currentVersion = clientVersionRepository.getByVersionAndClientId(dto.getCurrentVersion(), dto.getClientId())
-                    .orElseThrow(() -> new ValidationException(
-                            Collections.singletonMap("error", Collections.singletonList(
-                                    "Нет такой версии: " + dto.getClientId() + ":" + dto.getCurrentVersion()))));
-
-            clientVersions = clientVersionRepository.findAllByIdGreaterThanAndClientId(
-                    currentVersion.getId(), dto.getClientId());
-        } else {
-            clientVersions = clientVersionRepository.findAllByClientId(dto.getClientId());
-        }
-
-        List<ClientVersionDTO> newVersions = clientVersions.stream()
+                    return clientVersionRepository.findAllByIdGreaterThanAndClientId(
+                            currentVersion.getId(), dto.getClientId());
+                })
+                // Another - finding all versions of the client application
+                .orElse(clientVersionRepository.findAllByClientId(dto.getClientId()))
+                .stream()
                 .map(cv -> ClientVersionDTO.of(cv, dto.getLocale()))
                 .collect(Collectors.toList());
 
-        return new ListWrapperDTO<>(
-                newVersions,
-                null
-        );
+        return new ListWrapperDTO<>(newVersions, null);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
