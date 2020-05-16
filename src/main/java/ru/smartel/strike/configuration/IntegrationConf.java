@@ -12,10 +12,8 @@ import ru.smartel.strike.dto.service.sort.network.Network;
 
 import java.util.stream.Collectors;
 
-import static ru.smartel.strike.service.publish.InstagramService.INSTAGRAM_CHANNEL;
 import static ru.smartel.strike.service.publish.OkService.OK_CHANNEL;
 import static ru.smartel.strike.service.publish.TelegramService.TELEGRAM_CHANNEL;
-import static ru.smartel.strike.service.publish.TwitterService.TWITTER_CHANNEL;
 import static ru.smartel.strike.service.publish.VkService.VK_CHANNEL;
 
 @Configuration
@@ -35,9 +33,7 @@ public class IntegrationConf {
                 .route("headers." + NETWORK_HEADER, r -> r
                         .channelMapping(Network.TELEGRAM.getId(), TELEGRAM_CHANNEL)
                         .channelMapping(Network.VK.getId(), VK_CHANNEL)
-                        .channelMapping(Network.OK.getId(), OK_CHANNEL)
-                        .channelMapping(Network.TWITTER.getId(), TWITTER_CHANNEL)
-                        .channelMapping(Network.INSTAGRAM.getId(), INSTAGRAM_CHANNEL));
+                        .channelMapping(Network.OK.getId(), OK_CHANNEL));
     }
 
     /**

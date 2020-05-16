@@ -57,12 +57,6 @@ public class Post {
     @Column(name = "sent_to_telegram")
     private boolean sentToTelegram = false;
 
-    @Column(name = "sent_to_twitter")
-    private boolean sentToTwitter = false;
-
-    @Column(name = "sent_to_instagram")
-    private boolean sentToInstagram = false;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
@@ -192,21 +186,5 @@ public class Post {
 
     public void setSentToTelegram(boolean sentToTelegram) {
         this.sentToTelegram = sentToTelegram;
-    }
-
-    public boolean isSentToTwitter() {
-        return sentToTwitter;
-    }
-
-    public void setSentToTwitter(boolean sentToTwitter) {
-        this.sentToTwitter = sentToTwitter;
-    }
-
-    public boolean isSentToInstagram() {
-        return sentToInstagram;
-    }
-
-    public void setSentToInstagram(boolean sentToInstagram) {
-        this.sentToInstagram = sentToInstagram;
     }
 }

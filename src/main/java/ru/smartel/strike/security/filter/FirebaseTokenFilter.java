@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ConcurrentModificationException;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 @Component
 public class FirebaseTokenFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(FirebaseTokenFilter.class);
+
 
     private final ObjectMapper objectMapper;
     private final FirebaseProperties firebaseProperties;
@@ -63,7 +65,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
         }
 
         if (firebaseService.firebaseAuthNotSet()) {
-            writeErrorToResponse(response, "Не сконфигурирован firebase");
+            writeErrorToResponse(response, "Не сконфигурирован firebase", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
 
@@ -78,7 +80,10 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 authenticate(bearer.substring(7));
             }
         } catch (AuthenticationException ex) {
-            writeErrorToResponse(response, ex.getLocalizedMessage());
+            writeErrorToResponse(response, ex.getLocalizedMessage(), HttpStatus.SC_UNAUTHORIZED);
+            return;
+        } catch (ConcurrentModificationException e) { // multiple registrations of same user at the same moment
+            writeErrorToResponse(response, e.getMessage(), HttpStatus.SC_CONFLICT);
             return;
         }
 
@@ -94,12 +99,12 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
             throw new FirebaseAuthenticationException(e.getMessage());
         }
 
-        String uid = (String)token.getClaims().get("sub");
+        String uid = (String) token.getClaims().get("sub");
 
         User user = userService.get(uid).orElse(null);
         if (null == user) {
-            user = new User();
-            createOrUpdateUser(uid);
+            // registration of new user
+            user = createOrUpdateUser(uid);
         }
 
         LocalDateTime tokenIssuedAt = LocalDateTime.ofEpochSecond(
@@ -125,9 +130,9 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                         UserPrincipal.from(user), getUserAuthorities(user), null, true));
     }
 
-    private void createOrUpdateUser(String uid) {
+    private User createOrUpdateUser(String uid) {
         try {
-            firebaseService.updateUserFields(uid);
+            return firebaseService.createOrUpdateUser(uid);
         } catch (FirebaseAuthException e) {
             throw new FirebaseAuthenticationException(e.getMessage());
         }
@@ -143,8 +148,8 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
     /**
      * Write exception DTO to response
      */
-    private void writeErrorToResponse(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    private void writeErrorToResponse(HttpServletResponse response, String message, int statusCode) throws IOException {
+        response.setStatus(statusCode);
         response.setContentType(ContentType.APPLICATION_JSON.toString());
         String errorMessageJson = objectMapper.writeValueAsString(new ApiErrorDTO("Проблемы при аутентификации", message));
         response.getWriter().write(errorMessageJson);

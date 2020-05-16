@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.service.user.UserService;
 
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class FirebaseService {
     }
 
     /**
-     * Whether firebaseAuth been is missing in context
+     * Whether firebaseAuth bean is missing in context
      */
     public boolean firebaseAuthNotSet() {
         return isNull(firebaseAuth);
@@ -43,9 +44,9 @@ public class FirebaseService {
         return firebaseAuth.getUser(uid);
     }
 
-    public void updateUserFields(String uid) throws FirebaseAuthException {
+    public User createOrUpdateUser(String uid) throws FirebaseAuthException {
         var userRecord = getUser(uid);
-        userService.updateOrCreate(userRecord.getUid(),
+        return userService.updateOrCreate(userRecord.getUid(),
                 Optional.ofNullable(userRecord.getDisplayName()).orElse("unnamed user"),
                 userRecord.getEmail(),
                 userRecord.getPhotoUrl());

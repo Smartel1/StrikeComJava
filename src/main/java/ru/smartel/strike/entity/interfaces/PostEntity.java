@@ -159,22 +159,6 @@ public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
         getPost().setSentToTelegram(value);
     }
 
-    default boolean getSentToTwitter() {
-        return getPost().isSentToTwitter();
-    }
-
-    default void setSentToTwitter(boolean value) {
-        getPost().setSentToTwitter(value);
-    }
-
-    default boolean getSentToInstagram() {
-        return getPost().isSentToInstagram();
-    }
-
-    default void setSentToInstagram(boolean value) {
-        getPost().setSentToInstagram(value);
-    }
-
     Set<Photo> getPhotos();
 
     void setPhotos(Set<Photo> photos);

@@ -9,13 +9,17 @@ import ru.smartel.strike.entity.User;
 import ru.smartel.strike.repository.etc.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.isNull;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class UserService {
+    // Key is uid, value is unused boolean
+    private final ConcurrentHashMap<String, Boolean> registrationMonitor = new ConcurrentHashMap<>();
 
     private final UserRepository userRepository;
     private final UserDTOValidator validator;
@@ -51,16 +55,31 @@ public class UserService {
         return UserDetailDTO.from(user);
     }
 
-    public void updateOrCreate(String uid, String name, String email, String imageUrl) {
+    /**
+     * Update user fields (or register new user, if uid is absent inDB)
+     * This method is synchronized by uid
+     * @param uid uid
+     * @param name name
+     * @param email email
+     * @param imageUrl image url
+     * @return user
+     */
+    public User updateOrCreate(String uid, String name, String email, String imageUrl) {
         User user = userRepository.findFirstByUid(uid).orElse(null);
         if (isNull(user)) {
+            if (registrationMonitor.containsKey(uid)) {
+                throw new ConcurrentModificationException("Multiple registrations of same user!");
+            }
+            registrationMonitor.put(uid, true);
             user = new User();
             user.setUid(uid);
+            userRepository.saveAndFlush(user);
+            registrationMonitor.remove(uid);
         }
         user.setName(name);
         user.setEmail(email);
         user.setImageUrl(imageUrl);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId")

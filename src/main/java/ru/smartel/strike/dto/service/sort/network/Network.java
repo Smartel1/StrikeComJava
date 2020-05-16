@@ -2,10 +2,8 @@ package ru.smartel.strike.dto.service.sort.network;
 
 public enum Network {
     TELEGRAM(1L, "telegram"),
-    INSTAGRAM(2L, "instagram"),
-    OK(3L, "odnoklassniki"),
-    VK(4L, "vkontakte"),
-    TWITTER(5L, "twitter"),
+    OK(2L, "odnoklassniki"),
+    VK(3L, "vkontakte"),
     ;
 
     Network(Long id, String slug) {
@@ -13,8 +11,8 @@ public enum Network {
         this.slug = slug;
     }
 
-    private Long id;
-    private String slug;
+    private final Long id;
+    private final String slug;
 
     public Long getId() {
         return id;

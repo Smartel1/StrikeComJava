@@ -47,12 +47,6 @@ public class PostPublicationService {
         if (sentTo.contains(Network.OK.getId())) {
             post.setSentToOk(true);
         }
-        if (sentTo.contains(Network.TWITTER.getId())) {
-            post.setSentToTwitter(true);
-        }
-        if (sentTo.contains(Network.INSTAGRAM.getId())) {
-            post.setSentToInstagram(true);
-        }
     }
 
     /**
@@ -65,9 +59,6 @@ public class PostPublicationService {
     private Set<Long> getNetworkIdsToSendTo(PostEntity post, Set<Long> desiredSendTo) {
         Set<Long> sendTo = new HashSet<>(desiredSendTo);
         Set<Long> sentTo = new HashSet<>();
-        if (post.getSentToInstagram()) {
-            sentTo.add(Network.INSTAGRAM.getId());
-        }
         if (post.getSentToVk()) {
             sentTo.add(Network.VK.getId());
         }
@@ -76,9 +67,6 @@ public class PostPublicationService {
         }
         if (post.getSentToOk()) {
             sentTo.add(Network.OK.getId());
-        }
-        if (post.getSentToTwitter()) {
-            sentTo.add(Network.TWITTER.getId());
         }
         sendTo.removeAll(sentTo);
         return sendTo;
