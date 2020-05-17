@@ -22,7 +22,7 @@ import javax.validation.constraints.Size;
 @Validated
 public class LocalityController {
 
-    private LocalityService localityService;
+    private final LocalityService localityService;
 
     public LocalityController(LocalityService localityService) {
         this.localityService = localityService;

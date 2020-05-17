@@ -16,8 +16,8 @@ import ru.smartel.strike.service.news.NewsService;
 @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
 public class ModerationController {
 
-    private EventService eventService;
-    private NewsService newsService;
+    private final EventService eventService;
+    private final NewsService newsService;
 
     public ModerationController(EventService eventService, NewsService newsService) {
         this.eventService = eventService;

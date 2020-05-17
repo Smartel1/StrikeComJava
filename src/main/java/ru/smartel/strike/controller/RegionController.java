@@ -22,7 +22,7 @@ import javax.validation.constraints.Size;
 @Validated
 public class RegionController {
 
-    private RegionService regionService;
+    private final RegionService regionService;
 
     public RegionController(RegionService regionService) {
         this.regionService = regionService;

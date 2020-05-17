@@ -14,7 +14,7 @@ import ru.smartel.strike.service.client_version.ClientVersionService;
 @RequestMapping("/api/v2/{locale}/client-versions")
 public class ClientVersionController {
 
-    private ClientVersionService clientVersionService;
+    private final ClientVersionService clientVersionService;
 
     public ClientVersionController(ClientVersionService clientVersionService) {
         this.clientVersionService = clientVersionService;

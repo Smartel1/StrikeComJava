@@ -56,30 +56,46 @@ public class UserService {
     }
 
     /**
-     * Update user fields (or register new user, if uid is absent inDB)
+     * Register new user
      * This method is synchronized by uid
-     * @param uid uid
-     * @param name name
-     * @param email email
+     *
+     * @param uid      uid
+     * @param name     name
+     * @param email    email
      * @param imageUrl image url
      * @return user
      */
-    public User updateOrCreate(String uid, String name, String email, String imageUrl) {
+    public User register(String uid, String name, String email, String imageUrl) {
+        if (registrationMonitor.containsKey(uid)) {
+            throw new ConcurrentModificationException("Multiple registrations of same user!");
+        }
+        registrationMonitor.put(uid, true);
+        var user = new User();
+        user.setUid(uid);
+        user.setName(name);
+        user.setEmail(email);
+        user.setImageUrl(imageUrl);
+        userRepository.saveAndFlush(user);
+        registrationMonitor.remove(uid);
+        return user;
+    }
+
+    /**
+     * Update user fields. If user not found then do nothing
+     *
+     * @param uid      uid
+     * @param name     name
+     * @param email    email
+     * @param imageUrl image url
+     */
+    public void update(String uid, String name, String email, String imageUrl) {
         User user = userRepository.findFirstByUid(uid).orElse(null);
         if (isNull(user)) {
-            if (registrationMonitor.containsKey(uid)) {
-                throw new ConcurrentModificationException("Multiple registrations of same user!");
-            }
-            registrationMonitor.put(uid, true);
-            user = new User();
-            user.setUid(uid);
-            userRepository.saveAndFlush(user);
-            registrationMonitor.remove(uid);
+            return;
         }
         user.setName(name);
         user.setEmail(email);
         user.setImageUrl(imageUrl);
-        return userRepository.save(user);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or principal.getId() == #userId")

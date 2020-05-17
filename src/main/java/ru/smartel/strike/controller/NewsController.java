@@ -17,7 +17,7 @@ import java.util.Optional;
 @RequestMapping("/api/v2/{locale}/news")
 public class NewsController {
 
-    private NewsService newsService;
+    private final NewsService newsService;
 
     public NewsController(NewsService newsService) {
         this.newsService = newsService;

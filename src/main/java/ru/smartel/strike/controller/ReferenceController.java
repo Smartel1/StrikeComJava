@@ -16,7 +16,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v2/{locale}")
 public class ReferenceController {
-    private ReferenceService referenceService;
+
+    private final ReferenceService referenceService;
 
     public ReferenceController(ReferenceService referenceService) {
         this.referenceService = referenceService;

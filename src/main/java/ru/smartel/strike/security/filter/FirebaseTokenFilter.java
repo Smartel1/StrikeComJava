@@ -1,12 +1,12 @@
 package ru.smartel.strike.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.smartel.strike.configuration.properties.FirebaseProperties;
 import ru.smartel.strike.dto.exception.ApiErrorDTO;
 import ru.smartel.strike.entity.User;
-import ru.smartel.strike.security.FirebaseAuthenticationException;
 import ru.smartel.strike.security.token.UserAuthenticationToken;
 import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.firebase.FirebaseService;
@@ -57,7 +56,9 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain) throws IOException, ServletException {
         if (firebaseProperties.isAuthStub()) {
             authenticateAsModerator();
             chain.doFilter(request, response);
@@ -91,21 +92,11 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
     }
 
     private void authenticate(String bearer) throws AuthenticationException {
-        FirebaseToken token;
-
-        try {
-            token = firebaseService.parseAndVerifyToken(bearer);
-        } catch (FirebaseAuthException e) {
-            throw new FirebaseAuthenticationException(e.getMessage());
-        }
+        FirebaseToken token = firebaseService.parseAndVerifyToken(bearer);
 
         String uid = (String) token.getClaims().get("sub");
 
-        User user = userService.get(uid).orElse(null);
-        if (null == user) {
-            // registration of new user
-            user = createOrUpdateUser(uid);
-        }
+        User user = firebaseService.getOrRegisterUser(uid);
 
         LocalDateTime tokenIssuedAt = LocalDateTime.ofEpochSecond(
                 Long.parseLong(token.getClaims().get("iat").toString()),
@@ -114,7 +105,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         // If token was issued before user was updated last time, then update user fields (async)
         if (user.getUpdatedAt().compareTo(tokenIssuedAt) < 0) {
-            CompletableFuture.runAsync(() -> createOrUpdateUser(uid));
+            CompletableFuture.runAsync(() -> firebaseService.syncUserFields(uid));
         }
 
         SecurityContextHolder.getContext().setAuthentication(
@@ -128,14 +119,6 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(
                 new UserAuthenticationToken(
                         UserPrincipal.from(user), getUserAuthorities(user), null, true));
-    }
-
-    private User createOrUpdateUser(String uid) {
-        try {
-            return firebaseService.createOrUpdateUser(uid);
-        } catch (FirebaseAuthException e) {
-            throw new FirebaseAuthenticationException(e.getMessage());
-        }
     }
 
     private Set<GrantedAuthority> getUserAuthorities(User user) {

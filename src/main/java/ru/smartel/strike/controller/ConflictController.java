@@ -25,7 +25,7 @@ import ru.smartel.strike.service.conflict.ConflictService;
 @RequestMapping("/api/v2/{locale}/conflicts")
 public class ConflictController {
 
-    private ConflictService conflictService;
+    private final ConflictService conflictService;
 
     public ConflictController(ConflictService conflictService) {
         this.conflictService = conflictService;
