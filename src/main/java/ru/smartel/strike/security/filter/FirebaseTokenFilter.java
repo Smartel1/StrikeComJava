@@ -91,7 +91,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    private void authenticate(String bearer) throws AuthenticationException {
+    private void authenticate(String bearer) {
         FirebaseToken token = firebaseService.parseAndVerifyToken(bearer);
 
         String uid = (String) token.getClaims().get("sub");
