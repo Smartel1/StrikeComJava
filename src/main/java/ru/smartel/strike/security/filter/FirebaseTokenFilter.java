@@ -74,7 +74,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
 
         try {
             if (bearer != null) {
-                logger.info("User uses bearer: " + bearer);
+                logger.debug("User uses bearer: " + bearer);
                 if (!bearer.startsWith("Bearer ")) {
                     throw new BadCredentialsException("Некорректный заголовок Authorization (должен начинаться с 'bearer')");
                 }
