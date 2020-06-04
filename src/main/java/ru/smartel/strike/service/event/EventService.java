@@ -356,31 +356,31 @@ public class EventService {
                             ZoneOffset.UTC));
         }
         if (null != dto.getSourceLink()) {
-            event.setSourceLink(dto.getSourceLink().orElse(null));
+            event.setSourceLink(dto.getSourceLink().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleRu()) {
-            event.setTitleRu(dto.getTitleRu().orElse(null));
+            event.setTitleRu(dto.getTitleRu().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleEn()) {
-            event.setTitleEn(dto.getTitleEn().orElse(null));
+            event.setTitleEn(dto.getTitleEn().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleEs()) {
-            event.setTitleEs(dto.getTitleEs().orElse(null));
+            event.setTitleEs(dto.getTitleEs().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleDe()) {
-            event.setTitleDe(dto.getTitleDe().orElse(null));
+            event.setTitleDe(dto.getTitleDe().map(String::trim).orElse(null));
         }
         if (null != dto.getContentRu()) {
-            event.setContentRu(dto.getContentRu().orElse(null));
+            event.setContentRu(dto.getContentRu().map(String::trim).orElse(null));
         }
         if (null != dto.getContentEn()) {
-            event.setContentEn(dto.getContentEn().orElse(null));
+            event.setContentEn(dto.getContentEn().map(String::trim).orElse(null));
         }
         if (null != dto.getContentEs()) {
-            event.setContentEs(dto.getContentEs().orElse(null));
+            event.setContentEs(dto.getContentEs().map(String::trim).orElse(null));
         }
         if (null != dto.getContentDe()) {
-            event.setContentDe(dto.getContentDe().orElse(null));
+            event.setContentDe(dto.getContentDe().map(String::trim).orElse(null));
         }
         if (null != dto.getPublished()) {
             event.setPublished(dto.getPublished().orElseThrow());
@@ -398,10 +398,10 @@ public class EventService {
             setEventType(event, dto.getEventTypeId().orElse(null));
         }
         if (null != dto.getTitle()) {
-            event.setTitleByLocale(locale, dto.getTitle().orElse(null));
+            event.setTitleByLocale(locale, dto.getTitle().map(String::trim).orElse(null));
         }
         if (null != dto.getContent()) {
-            event.setContentByLocale(locale, dto.getContent().orElse(null));
+            event.setContentByLocale(locale, dto.getContent().map(String::trim).orElse(null));
         }
         if (null != dto.getPhotoUrls()) {
             syncPhotos(event, dto.getPhotoUrls().orElseThrow());
@@ -454,6 +454,7 @@ public class EventService {
     private void syncPhotos(Event event, List<String> photoURLs) {
         photoRepository.deleteAll(event.getPhotos());
         event.setPhotos(photoURLs.stream()
+                .map(String::trim)
                 .map(Photo::new)
                 .peek(photoRepository::save)
                 .collect(Collectors.toSet()));
@@ -467,9 +468,9 @@ public class EventService {
         event.setVideos(videos.stream()
                 .map(videoDTO -> {
                     Video video = new Video();
-                    video.setUrl(videoDTO.getUrl());
+                    video.setUrl(videoDTO.getUrl().trim());
                     if (null != videoDTO.getPreviewUrl()) {
-                        video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
+                        video.setPreviewUrl(videoDTO.getPreviewUrl().map(String::trim).orElse(null));
                     }
                     video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
                     return video;
@@ -488,6 +489,7 @@ public class EventService {
         event.getTags().addAll(
                 tagNames
                         .stream()
+                        .map(String::trim)
                         .map(tagName -> tagRepository.findFirstByName(tagName)
                                 .orElse(new Tag(tagName)))
                         .collect(Collectors.toList())

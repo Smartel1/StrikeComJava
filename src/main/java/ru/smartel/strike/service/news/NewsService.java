@@ -260,40 +260,40 @@ public class NewsService {
             news.setDate(LocalDateTime.ofEpochSecond(dto.getDate().orElseThrow(), 0, ZoneOffset.UTC));
         }
         if (null != dto.getSourceLink()) {
-            news.setSourceLink(dto.getSourceLink().orElse(null));
+            news.setSourceLink(dto.getSourceLink().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleRu()) {
-            news.setTitleRu(dto.getTitleRu().orElse(null));
+            news.setTitleRu(dto.getTitleRu().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleEn()) {
-            news.setTitleEn(dto.getTitleEn().orElse(null));
+            news.setTitleEn(dto.getTitleEn().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleEs()) {
-            news.setTitleEs(dto.getTitleEs().orElse(null));
+            news.setTitleEs(dto.getTitleEs().map(String::trim).orElse(null));
         }
         if (null != dto.getTitleDe()) {
-            news.setTitleDe(dto.getTitleDe().orElse(null));
+            news.setTitleDe(dto.getTitleDe().map(String::trim).orElse(null));
         }
         if (null != dto.getContentRu()) {
-            news.setContentRu(dto.getContentRu().orElse(null));
+            news.setContentRu(dto.getContentRu().map(String::trim).orElse(null));
         }
         if (null != dto.getContentEn()) {
-            news.setContentEn(dto.getContentEn().orElse(null));
+            news.setContentEn(dto.getContentEn().map(String::trim).orElse(null));
         }
         if (null != dto.getContentEs()) {
-            news.setContentEs(dto.getContentEs().orElse(null));
+            news.setContentEs(dto.getContentEs().map(String::trim).orElse(null));
         }
         if (null != dto.getContentDe()) {
-            news.setContentDe(dto.getContentDe().orElse(null));
+            news.setContentDe(dto.getContentDe().map(String::trim).orElse(null));
         }
         if (null != dto.getPublished()) {
             news.setPublished(dto.getPublished().orElseThrow());
         }
         if (null != dto.getTitle()) {
-            news.setTitleByLocale(locale, dto.getTitle().orElse(null));
+            news.setTitleByLocale(locale, dto.getTitle().map(String::trim).orElse(null));
         }
         if (null != dto.getContent()) {
-            news.setContentByLocale(locale, dto.getContent().orElse(null));
+            news.setContentByLocale(locale, dto.getContent().map(String::trim).orElse(null));
         }
         if (null != dto.getPhotoUrls()) {
             syncPhotos(news, dto.getPhotoUrls().orElseThrow());
@@ -312,6 +312,7 @@ public class NewsService {
     private void syncPhotos(News news, List<String> photoURLs) {
         photoRepository.deleteAll(news.getPhotos());
         news.setPhotos(photoURLs.stream()
+                .map(String::trim)
                 .map(Photo::new)
                 .peek(photoRepository::save)
                 .collect(Collectors.toSet())
@@ -326,9 +327,9 @@ public class NewsService {
         news.setVideos(videos.stream()
                 .map(videoDTO -> {
                     Video video = new Video();
-                    video.setUrl(videoDTO.getUrl());
+                    video.setUrl(videoDTO.getUrl().trim());
                     if (null != videoDTO.getPreviewUrl()) {
-                        video.setPreviewUrl(videoDTO.getPreviewUrl().orElse(null));
+                        video.setPreviewUrl(videoDTO.getPreviewUrl().map(String::trim).orElse(null));
                     }
                     video.setVideoType(videoTypeRepository.getOne(videoDTO.getVideoTypeId()));
                     return video;
@@ -347,6 +348,7 @@ public class NewsService {
         news.getTags().addAll(
                 tagNames
                         .stream()
+                        .map(String::trim)
                         .map(tagName -> tagRepository.findFirstByName(tagName)
                                 .orElse(new Tag(tagName)))
                         .collect(Collectors.toList())
