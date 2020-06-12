@@ -34,6 +34,7 @@ public abstract class PostRequestDTO {
     private Optional<List<String>> photoUrls;
     private Optional<List<VideoDTO>> videos;
     private Set<Long> publishTo = Stream.of(Network.values()).map(Network::getId).collect(toSet());
+    private boolean pushRequired = true;
 
     public Optional<Boolean> getPublished() {
         return published;
@@ -169,5 +170,13 @@ public abstract class PostRequestDTO {
 
     public void setPublishTo(Set<Long> publishTo) {
         this.publishTo = publishTo;
+    }
+
+    public boolean isPushRequired() {
+        return pushRequired;
+    }
+
+    public void setPushRequired(boolean pushRequired) {
+        this.pushRequired = pushRequired;
     }
 }

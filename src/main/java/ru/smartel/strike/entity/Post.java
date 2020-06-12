@@ -57,6 +57,18 @@ public class Post {
     @Column(name = "sent_to_telegram")
     private boolean sentToTelegram = false;
 
+    @Column(name = "sent_push_ru")
+    private boolean sentPushRu = false;
+
+    @Column(name = "sent_push_en")
+    private boolean sentPushEn = false;
+
+    @Column(name = "sent_push_es")
+    private boolean sentPushEs = false;
+
+    @Column(name = "sent_push_de")
+    private boolean sentPushDe = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
@@ -186,5 +198,37 @@ public class Post {
 
     public void setSentToTelegram(boolean sentToTelegram) {
         this.sentToTelegram = sentToTelegram;
+    }
+
+    public boolean isSentPushRu() {
+        return sentPushRu;
+    }
+
+    public void setSentPushRu(boolean sentPushRu) {
+        this.sentPushRu = sentPushRu;
+    }
+
+    public boolean isSentPushEn() {
+        return sentPushEn;
+    }
+
+    public void setSentPushEn(boolean sentPushEn) {
+        this.sentPushEn = sentPushEn;
+    }
+
+    public boolean isSentPushEs() {
+        return sentPushEs;
+    }
+
+    public void setSentPushEs(boolean sentPushEs) {
+        this.sentPushEs = sentPushEs;
+    }
+
+    public boolean isSentPushDe() {
+        return sentPushDe;
+    }
+
+    public void setSentPushDe(boolean sentPushDe) {
+        this.sentPushDe = sentPushDe;
     }
 }

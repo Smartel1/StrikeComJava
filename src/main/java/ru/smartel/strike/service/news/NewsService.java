@@ -181,6 +181,7 @@ public class NewsService {
                     .filter(loc -> null != news.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
+            news.setPushFlagsForLocales(titlesByLocales.keySet());
             pushService.newsPublished(
                     news.getId(),
                     news.getAuthor().getId(),
@@ -209,30 +210,31 @@ public class NewsService {
                 new UserCanModerate(user).when(changingPublicationStatus)
         );
 
-        //We need to know which titles was not translated before update (not to send push twice to locale topic)
-        Set<Locale> nonLocalizedTitlesBeforeUpdate = Stream.of(Locale.values())
-                .filter(loc -> null == news.getTitleByLocale(loc))
-                .collect(Collectors.toSet());
-
         fillNewsFields(news, dto, dto.getLocale());
 
         if (news.isPublished()) { //after update
             // titles which was not localized earlier and have been localized in this transaction
             postPublicationService.publishAndSetFlags(news, dto.getPublishTo());
-            // todo save to database
-            Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
-                    .filter(loc -> !loc.equals(Locale.ALL))
-                    .filter(nonLocalizedTitlesBeforeUpdate::contains)
-                    .filter(loc -> null != news.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
 
-            pushService.newsPublished(
-                    dto.getNewsId(),
-                    null != news.getAuthor() ? news.getAuthor().getId() : null,
-                    titlesLocalizedDuringThisUpdate,
-                    null != news.getAuthor() ? news.getAuthor().getFcm() : null,
-                    changingPublicationStatus //whether notify news's author or not
-            );
+            if (dto.isPushRequired()) {
+                // titles with this locales was pushed earlier
+                var alreadyPushedLocales = news.getPushLocales();
+                // filled titles which was not pushed earlier
+                Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
+                        .filter(loc -> !loc.equals(Locale.ALL))
+                        .filter(loc -> !alreadyPushedLocales.contains(loc))
+                        .filter(loc -> null != news.getTitleByLocale(loc))
+                        .collect(Collectors.toMap(Function.identity(), news::getTitleByLocale));
+
+                news.setPushFlagsForLocales(titlesLocalizedDuringThisUpdate.keySet());
+                pushService.newsPublished(
+                        dto.getNewsId(),
+                        null != news.getAuthor() ? news.getAuthor().getId() : null,
+                        titlesLocalizedDuringThisUpdate,
+                        null != news.getAuthor() ? news.getAuthor().getFcm() : null,
+                        changingPublicationStatus //whether notify news's author or not
+                );
+            }
         }
 
         return NewsDetailDTO.of(news, dto.getLocale());

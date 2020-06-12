@@ -215,6 +215,7 @@ public class EventService {
                     .filter(loc -> null != event.getTitleByLocale(loc))
                     .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
+            event.setPushFlagsForLocales(titlesByLocales.keySet());
             pushService.eventPublished(
                     event.getId(),
                     event.getAuthor().getId(),
@@ -253,11 +254,6 @@ public class EventService {
                 new NotAParentEvent(event.getId(), eventRepository).when(changingConflictJoint)
         );
 
-        //We need to know which titles was not translated before update (not to send push twice to locale topic)
-        Set<Locale> nonLocalizedTitlesBeforeUpdate = Stream.of(Locale.values())
-                .filter(loc -> null == event.getTitleByLocale(loc))
-                .collect(Collectors.toSet());
-
         fillEventFields(event, dto, dto.getLocale());
         eventRepository.save(event);
         updateConflictsEventStatuses(event.getConflict().getId());
@@ -270,24 +266,28 @@ public class EventService {
         if (event.isPublished()) { //after update
             postPublicationService.publishAndSetFlags(event, dto.getPublishTo());
 
-            // titles which was not localized earlier and have been localized in this transaction
-            // todo save to database
-            Map<Locale, String> titlesLocalizedDuringThisUpdate = Stream.of(Locale.values())
-                    .filter(loc -> !loc.equals(Locale.ALL))
-                    .filter(nonLocalizedTitlesBeforeUpdate::contains)
-                    .filter(loc -> null != event.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
+            if (dto.isPushRequired()) {
+                // titles with this locales was pushed earlier
+                var alreadyPushedLocales = event.getPushLocales();
+                // filled titles which was not pushed earlier
+                Map<Locale, String> titlesToPush = Stream.of(Locale.values())
+                        .filter(loc -> !loc.equals(Locale.ALL))
+                        .filter(loc -> !alreadyPushedLocales.contains(loc))
+                        .filter(loc -> null != event.getTitleByLocale(loc))
+                        .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
-            pushService.eventPublished(
-                    dto.getEventId(),
-                    null != event.getAuthor() ? event.getAuthor().getId() : null,
-                    event.getLongitude(),
-                    event.getLatitude(),
-                    Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
-                    titlesLocalizedDuringThisUpdate,
-                    null != event.getAuthor() ? event.getAuthor().getFcm() : null,
-                    changingPublicationStatus //whether notify event's author or not
-            );
+                event.setPushFlagsForLocales(titlesToPush.keySet());
+                pushService.eventPublished(
+                        dto.getEventId(),
+                        null != event.getAuthor() ? event.getAuthor().getId() : null,
+                        event.getLongitude(),
+                        event.getLatitude(),
+                        Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
+                        titlesToPush,
+                        null != event.getAuthor() ? event.getAuthor().getFcm() : null,
+                        changingPublicationStatus //whether notify event's author or not
+                );
+            }
         }
 
         return EventDetailDTO.of(event, dto.getLocale());

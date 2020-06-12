@@ -1,12 +1,10 @@
 package ru.smartel.strike.entity.interfaces;
 
-import ru.smartel.strike.entity.Photo;
-import ru.smartel.strike.entity.Post;
-import ru.smartel.strike.entity.Tag;
-import ru.smartel.strike.entity.User;
-import ru.smartel.strike.entity.Video;
+import ru.smartel.strike.entity.*;
+import ru.smartel.strike.service.Locale;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.Set;
 
 public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
@@ -159,6 +157,38 @@ public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
         getPost().setSentToTelegram(value);
     }
 
+    default boolean isSentPushRu() {
+        return getPost().isSentPushRu();
+    }
+
+    default void setSentPushRu(boolean sentPushRu) {
+        getPost().setSentPushRu(sentPushRu);
+    }
+
+    default boolean isSentPushEn() {
+        return getPost().isSentPushEn();
+    }
+
+    default void setSentPushEn(boolean sentPushEn) {
+        getPost().setSentPushEn(sentPushEn);
+    }
+
+    default boolean isSentPushEs() {
+        return getPost().isSentPushEs();
+    }
+
+    default void setSentPushEs(boolean sentPushEs) {
+        getPost().setSentPushEs(sentPushEs);
+    }
+
+    default boolean isSentPushDe() {
+        return getPost().isSentPushDe();
+    }
+
+    default void setSentPushDe(boolean sentPushDe) {
+        getPost().setSentPushDe(sentPushDe);
+    }
+
     Set<Photo> getPhotos();
 
     void setPhotos(Set<Photo> photos);
@@ -170,4 +200,36 @@ public interface PostEntity extends HavingTitles, HavingContents, Identifiable {
     Set<Tag> getTags();
 
     void setTags(Set<Tag> tags);
+
+    default void setPushFlagsForLocales(Set<Locale> locales) {
+        if (locales.contains(Locale.RU)) {
+            this.setSentPushRu(true);
+        }
+        if (locales.contains(Locale.EN)) {
+            this.setSentPushEn(true);
+        }
+        if (locales.contains(Locale.ES)) {
+            this.setSentPushEs(true);
+        }
+        if (locales.contains(Locale.DE)) {
+            this.setSentPushDe(true);
+        }
+    }
+
+    default Set<Locale> getPushLocales() {
+        var result = EnumSet.noneOf(Locale.class);
+        if (this.isSentPushRu()) {
+            result.add(Locale.RU);
+        }
+        if (this.isSentPushEn()) {
+            result.add(Locale.EN);
+        }
+        if (this.isSentPushEs()) {
+            result.add(Locale.ES);
+        }
+        if (this.isSentPushDe()) {
+            result.add(Locale.DE);
+        }
+        return result;
+    }
 }
