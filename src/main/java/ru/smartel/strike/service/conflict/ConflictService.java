@@ -41,14 +41,14 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class ConflictService {
 
-    private ConflictDTOValidator dtoValidator;
-    private FiltersTransformer filtersTransformer;
-    private ConflictRepository conflictRepository;
-    private ConflictReasonRepository conflictReasonRepository;
-    private ConflictResultRepository conflictResultRepository;
-    private IndustryRepository industryRepository;
-    private EventRepository eventRepository;
-    private EventService eventService;
+    private final ConflictDTOValidator dtoValidator;
+    private final FiltersTransformer filtersTransformer;
+    private final ConflictRepository conflictRepository;
+    private final ConflictReasonRepository conflictReasonRepository;
+    private final ConflictResultRepository conflictResultRepository;
+    private final IndustryRepository industryRepository;
+    private final EventRepository eventRepository;
+    private final EventService eventService;
 
     public ConflictService(ConflictDTOValidator dtoValidator,
                            FiltersTransformer filtersTransformer,
