@@ -1,14 +1,7 @@
 package ru.smartel.strike.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
@@ -16,6 +9,7 @@ import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
+import ru.smartel.strike.dto.response.conflict.ConflictReportDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
@@ -44,6 +38,11 @@ public class ConflictController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
         return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
+    }
+
+    @GetMapping("report")
+    public DetailWrapperDTO<ConflictReportDTO> show(@RequestParam("year") int year) {
+        return new DetailWrapperDTO<>(conflictService.getReportByYear(year));
     }
 
     @GetMapping("{id}/latest-locality")

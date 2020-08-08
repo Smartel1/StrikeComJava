@@ -10,6 +10,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
+import ru.smartel.strike.dto.response.conflict.ConflictReportDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
@@ -35,7 +36,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -98,7 +100,7 @@ public class ConflictService {
                 .stream()
                 .sorted(sortDTO.toComparator())
                 .map(conflict -> ConflictListDTO.of(conflict, dto.getLocale(), dto.isBrief()))
-                .collect(Collectors.toList());
+                .collect(toList());
 
         return new ListWrapperDTO<>(conflictListDTOS, responseMeta);
     }
@@ -109,6 +111,26 @@ public class ConflictService {
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 
         return ConflictDetailDTO.of(conflict, locale);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    public ConflictReportDTO getReportByYear(int year) {
+        var result = new ConflictReportDTO();
+        result.setCountByCountries(conflictRepository.getCountByCountries(year));
+        result.setCountByDistricts(conflictRepository.getCountByDistricts(year));
+        result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(year));
+        result.setCountByIndustry(conflictRepository.getCountByIndustry(year));
+        int totalConflictsByIndustry = result.getCountByIndustry().values().stream().reduce(0, Integer::sum);
+        result.getCountByIndustry().forEach((k,v) -> result.getCountPercentByIndustry().put(k, v * 100 / totalConflictsByIndustry));
+
+        result.setCountByReason(conflictRepository.getCountByReason(year));
+        int totalConflictsByReason = result.getCountByReason().values().stream().reduce(0, Integer::sum);
+        result.getCountByReason().forEach((k,v) -> result.getCountPercentByReason().put(k, v * 100 / totalConflictsByReason));
+
+        result.setCountByResult(conflictRepository.getCountByResult(year));
+        int totalConflictsByResult = result.getCountByResult().values().stream().reduce(0, Integer::sum);
+        result.getCountByResult().forEach((k,v) -> result.getCountPercentByResult().put(k, v * 100 / totalConflictsByResult));
+        return result;
     }
 
     public ExtendedLocalityDTO getLatestLocality(long conflictId, Locale locale) {
@@ -177,7 +199,6 @@ public class ConflictService {
                 .orElse(null);
 
         conflictRepository.insertAsLastChildOf(conflict, parentConflict);
-
 
 
         // If dateTo going to be changed - update events' statuses

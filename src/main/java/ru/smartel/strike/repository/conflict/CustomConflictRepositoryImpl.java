@@ -18,7 +18,7 @@ import java.util.List;
 public class CustomConflictRepositoryImpl implements CustomConflictRepository {
 
     @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
     @Autowired
     private NestedNodeRepository<Long, Conflict> conflictNestedNodeRepository;
