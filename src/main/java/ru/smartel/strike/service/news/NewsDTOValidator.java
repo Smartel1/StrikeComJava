@@ -5,14 +5,11 @@ import ru.smartel.strike.dto.request.news.NewsCreateRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsListRequestDTO;
 import ru.smartel.strike.dto.request.news.NewsUpdateRequestDTO;
 import ru.smartel.strike.service.validation.BasePostDTOValidator;
-import ru.smartel.strike.util.ValidationUtil;
 
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.NotNull;
-import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
-import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
+import static ru.smartel.strike.util.ValidationUtil.*;
 
 @Component
 public class NewsDTOValidator extends BasePostDTOValidator {
@@ -21,7 +18,7 @@ public class NewsDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateListQueryDTO(dto);
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);
@@ -31,7 +28,7 @@ public class NewsDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateStoreDTO(dto);
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);
@@ -41,15 +38,15 @@ public class NewsDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateUpdateDTO(dto);
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getUser()) {
-            addErrorMessage("user", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("user", notNull(), errors);
         }
 
         if (null == dto.getNewsId()) {
-            addErrorMessage("newsId", new NotNull(), errors);
+            addErrorMessage("newsId", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);

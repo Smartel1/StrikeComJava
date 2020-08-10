@@ -94,10 +94,17 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_result_id")
     private ConflictResult result;
-
+    /**
+     * Calculated field. But can be set by admin
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "main_type_id")
     private EventType mainType;
+    /**
+     * Whether automatically update mainType or not
+     */
+    @Column(name = "automanaging_main_type")
+    private boolean automanagingMainType = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
@@ -261,6 +268,14 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
 
     public void setMainType(EventType mainType) {
         this.mainType = mainType;
+    }
+
+    public boolean isAutomanagingMainType() {
+        return automanagingMainType;
+    }
+
+    public void setAutomanagingMainType(boolean automanagingMainType) {
+        this.automanagingMainType = automanagingMainType;
     }
 
     public Industry getIndustry() {

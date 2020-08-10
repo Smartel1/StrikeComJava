@@ -31,6 +31,8 @@ public class ConflictCreateRequestDTO {
     private Optional<Long> conflictResultId;
     private Optional<Long> industryId;
     private Optional<Long> parentEventId;
+    private Optional<Long> mainTypeId;
+    private Boolean automanagingMainType;
 
     public Locale getLocale() {
         return locale;
@@ -158,5 +160,21 @@ public class ConflictCreateRequestDTO {
 
     public void setParentEventId(Optional<Long> parentEventId) {
         this.parentEventId = parentEventId;
+    }
+
+    public Optional<Long> getMainTypeId() {
+        return mainTypeId;
+    }
+
+    public void setMainTypeId(Optional<Long> mainTypeId) {
+        this.mainTypeId = mainTypeId;
+    }
+
+    public Boolean getAutomanagingMainType() {
+        return automanagingMainType;
+    }
+
+    public void setAutomanagingMainType(Boolean automanagingMainType) {
+        this.automanagingMainType = automanagingMainType;
     }
 }

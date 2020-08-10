@@ -12,19 +12,16 @@ import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictReportDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
-import ru.smartel.strike.dto.service.event.type.EventTypeCountDTO;
 import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.reference.ConflictReason;
-import ru.smartel.strike.entity.reference.ConflictResult;
-import ru.smartel.strike.entity.reference.Industry;
 import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
 import ru.smartel.strike.repository.event.EventRepository;
+import ru.smartel.strike.repository.event.EventTypeRepository;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.event.EventService;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -43,11 +40,6 @@ import static java.util.stream.Collectors.toList;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ConflictService {
-    /**
-     * count of events with one type needed to set this type to conflict
-     */
-    public static final int EVENT_TYPE_THRESHOLD = 20;
-
     private final ConflictDTOValidator dtoValidator;
     private final FiltersTransformer filtersTransformer;
     private final ConflictRepository conflictRepository;
@@ -56,6 +48,7 @@ public class ConflictService {
     private final IndustryRepository industryRepository;
     private final EventRepository eventRepository;
     private final EventService eventService;
+    private final EventTypeRepository eventTypeRepository;
 
     public ConflictService(ConflictDTOValidator dtoValidator,
                            FiltersTransformer filtersTransformer,
@@ -64,7 +57,8 @@ public class ConflictService {
                            ConflictResultRepository conflictResultRepository,
                            IndustryRepository industryRepository,
                            EventRepository eventRepository,
-                           EventService eventService) {
+                           EventService eventService,
+                           EventTypeRepository eventTypeRepository) {
         this.dtoValidator = dtoValidator;
         this.filtersTransformer = filtersTransformer;
         this.conflictRepository = conflictRepository;
@@ -73,6 +67,7 @@ public class ConflictService {
         this.industryRepository = industryRepository;
         this.eventRepository = eventRepository;
         this.eventService = eventService;
+        this.eventTypeRepository = eventTypeRepository;
     }
 
     @PreAuthorize("permitAll()")
@@ -202,7 +197,6 @@ public class ConflictService {
 
         conflictRepository.insertAsLastChildOf(conflict, parentConflict);
 
-
         // If dateTo going to be changed - update events' statuses
         if (!Objects.equals(dateToBeforeUpdate, conflict.getDateTo())) {
             eventService.updateConflictsEventStatuses(conflict.getId());
@@ -263,106 +257,34 @@ public class ConflictService {
         }
 
         if (null != dto.getConflictReasonId()) {
-            setReason(conflict, dto.getConflictReasonId().orElse(null));
+            conflict.setReason(dto.getConflictReasonId()
+                    .map(conflictReasonRepository::getOne)
+                    .orElse(null));
         }
         if (null != dto.getConflictResultId()) {
-            setResult(conflict, dto.getConflictResultId().orElse(null));
+            conflict.setResult(dto.getConflictResultId()
+                    .map(conflictResultRepository::getOne)
+                    .orElse(null));
         }
         if (null != dto.getIndustryId()) {
-            setIndustry(conflict, dto.getIndustryId().orElse(null));
+            conflict.setIndustry(dto.getIndustryId()
+                    .map(industryRepository::getOne)
+                    .orElse(null));
         }
         if (null != dto.getParentEventId()) {
-            setParentEvent(conflict, dto.getParentEventId().orElse(null));
+            conflict.setParentEvent(dto.getParentEventId()
+                    .map(eventRepository::getOne)
+                    .orElse(null));
         }
-    }
-
-    private void setReason(Conflict conflict, Long reasonId) {
-        ConflictReason conflictReason = null;
-
-        if (null != reasonId) {
-            conflictReason = conflictReasonRepository.getOne(reasonId);
+        if (null != dto.getMainTypeId()) {
+            conflict.setMainType(dto.getMainTypeId()
+                    .map(eventTypeRepository::getOne)
+                    .orElse(null));
+            // if once set main type manually, automanaging is disabling
+            conflict.setAutomanagingMainType(false);
         }
-
-        conflict.setReason(conflictReason);
-    }
-
-    private void setResult(Conflict conflict, Long resultId) {
-        ConflictResult conflictResult = null;
-
-        if (null != resultId) {
-            conflictResult = conflictResultRepository.getOne(resultId);
+        if (null != dto.getAutomanagingMainType()) {
+            conflict.setAutomanagingMainType(dto.getAutomanagingMainType());
         }
-
-        conflict.setResult(conflictResult);
-    }
-
-    private void setIndustry(Conflict conflict, Long industryId) {
-        Industry industry = null;
-
-        if (null != industryId) {
-            industry = industryRepository.getOne(industryId);
-        }
-
-        conflict.setIndustry(industry);
-    }
-
-    private void setParentEvent(Conflict conflict, Long parentEventId) {
-        Event parentEvent = null;
-
-        if (null != parentEventId) {
-            parentEvent = eventRepository.getOne(parentEventId);
-        }
-
-        conflict.setParentEvent(parentEvent);
-    }
-
-    /**
-     * Update main type of conflict depending on it's events' types
-     *
-     * @param conflictId conflict id
-     * @return main type id or null, if cannot calculate
-     */
-    public Long calculateMainType(long conflictId) {
-        var presentTypes = eventRepository.getEventTypesCountByConflictId(conflictId);
-        if (presentTypes.isEmpty()) {
-            return null;
-        }
-
-        // if all events has the same type, then set this type to conflict
-        if (presentTypes.size() == 1) {
-            return presentTypes.get(0).getTypeId();
-        }
-
-        // If more than EVENT_TYPE_THRESHOLD events has the same type, then set this type to conflict.
-        // But if 2 or more type are present in more than EVENT_TYPE_THRESHOLD events, then set null.
-        var dominatingTypes = presentTypes.stream()
-                .filter(presentType -> presentType.getEventsCount() >= EVENT_TYPE_THRESHOLD)
-                .collect(toList());
-        if (!dominatingTypes.isEmpty()) {
-            if (dominatingTypes.size() == 1) {
-                return dominatingTypes.get(0).getTypeId();
-            }
-            return null;
-        }
-
-        // If one of the types present with maximum events count and has maximum priority - it wins
-        int maxTypePriority = presentTypes.stream()
-                .map(EventTypeCountDTO::getPriority)
-                .max(Integer::compareTo).orElseThrow(() -> new IllegalStateException("type priority cannot be null"));
-
-        if (maxTypePriority == 0) {
-            return null;
-        }
-
-        long maxEventsCount = presentTypes.stream()
-                .map(EventTypeCountDTO::getEventsCount)
-                .max(Long::compareTo).orElseThrow(() -> new IllegalStateException("events count cannot be null"));
-
-        var winType = presentTypes.stream()
-                .filter(presentType -> presentType.getEventsCount() == maxEventsCount)
-                .filter(presentType -> presentType.getPriority() == maxTypePriority)
-                .findFirst();
-
-        return winType.map(EventTypeCountDTO::getTypeId).orElse(null);
     }
 }

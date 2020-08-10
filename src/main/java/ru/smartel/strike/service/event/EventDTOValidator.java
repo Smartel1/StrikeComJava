@@ -5,14 +5,11 @@ import ru.smartel.strike.dto.request.event.EventCreateRequestDTO;
 import ru.smartel.strike.dto.request.event.EventListRequestDTO;
 import ru.smartel.strike.dto.request.event.EventUpdateRequestDTO;
 import ru.smartel.strike.service.validation.BasePostDTOValidator;
-import ru.smartel.strike.util.ValidationUtil;
 
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.NotNull;
-import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
-import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
+import static ru.smartel.strike.util.ValidationUtil.*;
 
 @Component
 public class EventDTOValidator extends BasePostDTOValidator {
@@ -21,18 +18,18 @@ public class EventDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateListQueryDTO(dto);
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null != dto.getFilters() && null != dto.getFilters().getNear()) {
             if (null == dto.getFilters().getNear().getLat()) {
-                addErrorMessage("filters.near.lat", new NotNull(), errors);
+                addErrorMessage("filters.near.lat", notNull(), errors);
             }
             if (null == dto.getFilters().getNear().getLng()) {
-                addErrorMessage("filters.near.lng", new NotNull(), errors);
+                addErrorMessage("filters.near.lng", notNull(), errors);
             }
             if (null == dto.getFilters().getNear().getRadius()) {
-                addErrorMessage("filters.near.radius", new NotNull(), errors);
+                addErrorMessage("filters.near.radius", notNull(), errors);
             }
         }
 
@@ -43,29 +40,29 @@ public class EventDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateStoreDTO(dto);
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getUser()) {
-            addErrorMessage("user", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("user", notNull(), errors);
         }
 
         if (null == dto.getConflictId()) {
-            addErrorMessage("conflictId", new ValidationUtil.Required(), errors);
+            addErrorMessage("conflictId", required(), errors);
         } else if (dto.getConflictId().isEmpty()) {
-            addErrorMessage("conflictId", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("conflictId", notNull(), errors);
         }
 
         if (null == dto.getLatitude()) {
-            addErrorMessage("latitude", new ValidationUtil.Required(), errors);
+            addErrorMessage("latitude", required(), errors);
         } else if (dto.getLatitude().isEmpty()) {
-            addErrorMessage("latitude", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("latitude", notNull(), errors);
         }
 
         if (null == dto.getLongitude()) {
-            addErrorMessage("longitude", new ValidationUtil.Required(), errors);
+            addErrorMessage("longitude", required(), errors);
         } else if (dto.getLongitude().isEmpty()) {
-            addErrorMessage("longitude", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("longitude", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);
@@ -75,31 +72,31 @@ public class EventDTOValidator extends BasePostDTOValidator {
         Map<String, List<String>> errors = super.validateUpdateDTO(dto);
 
         if (null == dto.getEventId()) {
-            addErrorMessage("eventId", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("eventId", notNull(), errors);
         }
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getUser()) {
-            addErrorMessage("user", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("user", notNull(), errors);
         }
 
         if (null != dto.getConflictId() && dto.getConflictId().isEmpty()) {
-            addErrorMessage("conflictId", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("conflictId", notNull(), errors);
         }
 
         if (null != dto.getDate() && dto.getDate().isEmpty()) {
-            addErrorMessage("date", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("date", notNull(), errors);
         }
 
         if (null != dto.getLatitude() && dto.getLatitude().isEmpty()) {
-            addErrorMessage("latitude", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("latitude", notNull(), errors);
         }
 
         if (null != dto.getLongitude() && dto.getLongitude().isEmpty()) {
-            addErrorMessage("longitude", new ValidationUtil.NotNull(), errors);
+            addErrorMessage("longitude", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);

@@ -20,8 +20,6 @@ import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EventStatus;
-import ru.smartel.strike.entity.reference.EventType;
-import ru.smartel.strike.entity.reference.Locality;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.event.EventRepository;
@@ -32,6 +30,7 @@ import ru.smartel.strike.rules.EventBeforeConflictsEnd;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
 import ru.smartel.strike.service.Locale;
+import ru.smartel.strike.service.conflict.ConflictMainTypeService;
 import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.service.notifications.PushService;
 import ru.smartel.strike.service.publish.PostPublicationService;
@@ -67,6 +66,7 @@ public class EventService {
     private final EventDTOValidator validator;
     private final PushService pushService;
     private final PostPublicationService postPublicationService;
+    private final ConflictMainTypeService conflictMainTypeService;
 
     public EventService(
             TagRepository tagRepository,
@@ -83,7 +83,8 @@ public class EventService {
             FiltersTransformer filtersTransformer,
             EventDTOValidator validator,
             PushService pushService,
-            PostPublicationService postPublicationService) {
+            PostPublicationService postPublicationService,
+            ConflictMainTypeService conflictMainTypeService) {
         this.tagRepository = tagRepository;
         this.businessValidationService = businessValidationService;
         this.eventRepository = eventRepository;
@@ -99,6 +100,7 @@ public class EventService {
         this.validator = validator;
         this.pushService = pushService;
         this.postPublicationService = postPublicationService;
+        this.conflictMainTypeService = conflictMainTypeService;
     }
 
     public Long getNonPublishedCount() {
@@ -202,6 +204,10 @@ public class EventService {
         eventRepository.save(event);
         updateConflictsEventStatuses(event.getConflict().getId());
 
+        if (event.getConflict() != null) {
+            conflictMainTypeService.refreshMainType(event.getConflict().getId());
+        }
+
         //Send push
         if (!event.isPublished()) {
             //if event is created non published - notify moderators
@@ -227,7 +233,6 @@ public class EventService {
                     false
             );
         }
-
         return EventDetailDTO.of(event, dto.getLocale());
     }
 
@@ -263,6 +268,10 @@ public class EventService {
                 new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
 
+        if (event.getConflict() != null) {
+            conflictMainTypeService.refreshMainType(event.getConflict().getId());
+        }
+
         if (event.isPublished()) { //after update
             postPublicationService.publishAndSetFlags(event, dto.getPublishTo());
 
@@ -289,7 +298,6 @@ public class EventService {
                 );
             }
         }
-
         return EventDetailDTO.of(event, dto.getLocale());
     }
 
@@ -304,6 +312,10 @@ public class EventService {
         long conflictId = event.getConflict().getId();
         eventRepository.delete(event);
         updateConflictsEventStatuses(conflictId);
+
+        if (event.getConflict() != null) {
+            conflictMainTypeService.refreshMainType(event.getConflict().getId());
+        }
 
         //If event was not published - notify its' author about rejection
         if (!event.isPublished() && null != event.getAuthor()) {
@@ -392,10 +404,14 @@ public class EventService {
             event.setLongitude(dto.getLongitude().orElseThrow());
         }
         if (null != dto.getLocalityId()) {
-            setLocality(event, dto.getLocalityId().orElse(null));
+            event.setLocality(dto.getLocalityId()
+                    .map(localityRepository::getOne)
+                    .orElse(null));
         }
         if (null != dto.getEventTypeId()) {
-            setEventType(event, dto.getEventTypeId().orElse(null));
+            event.setType(dto.getEventTypeId()
+                    .map(eventTypeRepository::getOne)
+                    .orElse(null));
         }
         if (null != dto.getTitle()) {
             event.setTitleByLocale(locale, dto.getTitle().map(String::trim).orElse(null));
@@ -420,32 +436,6 @@ public class EventService {
     private void setConflict(Event event, Long conflictId) {
         Conflict conflict = conflictRepository.getOne(conflictId);
         event.setConflict(conflict);
-    }
-
-    /**
-     * Set locality. If received localityId equals to null, then set to null
-     */
-    private void setLocality(Event event, Long localityId) {
-        Locality locality = null;
-
-        if (null != localityId) {
-            locality = localityRepository.getOne(localityId);
-        }
-
-        event.setLocality(locality);
-    }
-
-    /**
-     * Set event's type. If received eventTypeId equals null, then set to null
-     */
-    private void setEventType(Event event, Long eventTypeId) {
-        EventType eventType = null;
-
-        if (null != eventTypeId) {
-            eventType = eventTypeRepository.getOne(eventTypeId);
-        }
-
-        event.setType(eventType);
     }
 
     /**

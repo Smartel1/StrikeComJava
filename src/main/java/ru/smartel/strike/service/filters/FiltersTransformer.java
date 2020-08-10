@@ -9,21 +9,9 @@ import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
 import ru.smartel.strike.entity.News;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
-import ru.smartel.strike.specification.conflict.AfterDateConflict;
-import ru.smartel.strike.specification.conflict.AncestorsOfConflict;
-import ru.smartel.strike.specification.conflict.BeforeDateConflict;
-import ru.smartel.strike.specification.conflict.ChildrenOfConflict;
-import ru.smartel.strike.specification.conflict.MatchReasonsConflict;
-import ru.smartel.strike.specification.conflict.MatchResultsConflict;
-import ru.smartel.strike.specification.conflict.NearCoordinateConflict;
-import ru.smartel.strike.specification.conflict.TextMentionConflict;
+import ru.smartel.strike.specification.conflict.*;
 import ru.smartel.strike.specification.event.*;
-import ru.smartel.strike.specification.news.AfterDateNews;
-import ru.smartel.strike.specification.news.BeforeDateNews;
-import ru.smartel.strike.specification.news.FavouriteNews;
-import ru.smartel.strike.specification.news.NewsWithAnyTags;
-import ru.smartel.strike.specification.news.PublishedNews;
-import ru.smartel.strike.specification.news.WithContentNews;
+import ru.smartel.strike.specification.news.*;
 
 import java.util.List;
 
@@ -96,6 +84,7 @@ public class FiltersTransformer {
         if (null != filters.getFulltext()) result = result.and(new TextMentionConflict(filters.getFulltext()));
         if (null != filters.getConflictResultIds()) result = result.and(new MatchResultsConflict(filters.getConflictResultIds()));
         if (null != filters.getConflictReasonIds()) result = result.and(new MatchReasonsConflict(filters.getConflictReasonIds()));
+        if (null != filters.getMainTypeIds()) result = result.and(new MatchMainTypesConflict(filters.getMainTypeIds()));
         if (null != filters.getAncestorsOf()) {
             Conflict descendant = conflictRepository.findById(filters.getAncestorsOf()).orElse(null);
             if (null == descendant) {

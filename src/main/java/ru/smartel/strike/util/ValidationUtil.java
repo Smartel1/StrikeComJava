@@ -12,12 +12,12 @@ public class ValidationUtil {
     //no need to instantiate this util class
     private ValidationUtil() {}
 
-    public static void addErrorMessage(String field, ErrorMessage errorType, Map<String, List<String>> errorsCollection) {
+    public static void addErrorMessage(String field, String errorMessage, Map<String, List<String>> errorsCollection) {
         if (errorsCollection.containsKey(field)) {
-            errorsCollection.get(field).add(errorType.toString());
+            errorsCollection.get(field).add(errorMessage);
         } else {
             List<String> errors = new ArrayList<>();
-            errors.add(errorType.toString());
+            errors.add(errorMessage);
             errorsCollection.put(field, errors);
         }
     }
@@ -28,60 +28,27 @@ public class ValidationUtil {
         }
     }
 
-    public interface ErrorMessage {
-        String toString();
+    public static String notNull() {
+        return "must not be null";
     }
 
-    public static class NotNull implements ErrorMessage {
-        @Override
-        public String toString() {
-            return "must not be null";
-        }
+    public static String required() {
+        return "must be present";
     }
 
-    public static class Required implements ErrorMessage {
-        @Override
-        public String toString() {
-            return "must be present";
-        }
+    public static String oneOf(Collection<?> availableItems) {
+        return "must be one of: " + availableItems.toString();
     }
 
-    public static class OneOf<T> implements ErrorMessage {
-        Collection<T> availableItems;
-
-        public OneOf(Collection<T> availableItems) {
-            this.availableItems = availableItems;
-        }
-
-        @Override
-        public String toString() {
-            return "must be one of: " + availableItems.toString();
-        }
+    public static String min(int min) {
+        return "must be longer/more than " + min;
     }
 
-    public static class Min implements ErrorMessage {
-        private int min;
-
-        public Min(int min) {
-            this.min = min;
-        }
-
-        @Override
-        public String toString() {
-            return "must be longer/more than " + min;
-        }
+    public static String max(int max) {
+        return "must be shorter/less than " + max;
     }
 
-    public static class Max implements ErrorMessage {
-        private int max;
-
-        public Max(int max) {
-            this.max = max;
-        }
-
-        @Override
-        public String toString() {
-            return "must be shorter/less than " + max;
-        }
+    public static String numericCollection() {
+        return "must contain only numeric elements or nulls";
     }
 }

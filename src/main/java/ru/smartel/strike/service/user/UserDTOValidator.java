@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.NotNull;
-import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
-import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
+import static ru.smartel.strike.util.ValidationUtil.*;
 
 @Service
 public class UserDTOValidator {
@@ -17,7 +15,7 @@ public class UserDTOValidator {
         Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getUserId()) {
-            addErrorMessage("userId", new NotNull(), errors);
+            addErrorMessage("userId", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);

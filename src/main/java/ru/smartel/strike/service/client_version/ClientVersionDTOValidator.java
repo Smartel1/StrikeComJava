@@ -8,9 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.NotNull;
-import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
-import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
+import static ru.smartel.strike.util.ValidationUtil.*;
 
 @Component
 public class ClientVersionDTOValidator {
@@ -19,11 +17,11 @@ public class ClientVersionDTOValidator {
         Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getClientId()) {
-            addErrorMessage("clientId", new NotNull(), errors);
+            addErrorMessage("clientId", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);
@@ -33,32 +31,32 @@ public class ClientVersionDTOValidator {
         Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getClientId())
-            addErrorMessage("clientId", new NotNull(), errors);
+            addErrorMessage("clientId", notNull(), errors);
 
         if (null == dto.getVersion())
-            addErrorMessage("version", new NotNull(), errors);
+            addErrorMessage("version", notNull(), errors);
 
         if (null == dto.isRequired())
-            addErrorMessage("required", new NotNull(), errors);
+            addErrorMessage("required", notNull(), errors);
 
         if (null == dto.getDescriptionRu()) {
-            addErrorMessage("descriptionRu", new NotNull(), errors);
+            addErrorMessage("descriptionRu", notNull(), errors);
         }
 
         if (null == dto.getDescriptionEn()) {
-            addErrorMessage("descriptionEn", new NotNull(), errors);
+            addErrorMessage("descriptionEn", notNull(), errors);
         }
 
         if (null == dto.getDescriptionEs()) {
-            addErrorMessage("descriptionEs", new NotNull(), errors);
+            addErrorMessage("descriptionEs", notNull(), errors);
         }
 
         if (null == dto.getDescriptionDe()) {
-            addErrorMessage("descriptionDe", new NotNull(), errors);
+            addErrorMessage("descriptionDe", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);

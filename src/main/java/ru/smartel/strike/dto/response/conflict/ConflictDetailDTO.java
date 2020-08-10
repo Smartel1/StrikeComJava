@@ -2,10 +2,13 @@ package ru.smartel.strike.dto.response.conflict;
 
 import ru.smartel.strike.dto.response.TitlesExtendableDTO;
 import ru.smartel.strike.entity.Conflict;
+import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.service.Locale;
 
 import java.time.ZoneOffset;
-import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 public class ConflictDetailDTO extends TitlesExtendableDTO {
 
@@ -20,6 +23,8 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
     private Long industryId;
     private Long parentEventId;
     private Long createdAt;
+    private Long mainTypeId;
+    private boolean automanagingMainType;
 
     public static ConflictDetailDTO of(Conflict conflict, Locale locale) {
         ConflictDetailDTO instance = new ConflictDetailDTO();
@@ -28,15 +33,15 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         instance.setLatitude(conflict.getLatitude());
         instance.setLongitude(conflict.getLongitude());
         instance.setCompanyName(conflict.getCompanyName());
-        instance.setDateFrom(null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
-        instance.setDateTo(null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
-        instance.setConflictReasonId(null != conflict.getReason() ? conflict.getReason().getId() : null);
-        instance.setConflictResultId(null != conflict.getResult() ? conflict.getResult().getId() : null);
-        instance.setIndustryId(null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
-        instance.setParentEventId(null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
-        instance.setCreatedAt(Optional.ofNullable(conflict.getCreatedAt())
-                .map(d -> d.toEpochSecond(ZoneOffset.UTC))
-                .orElse(null));
+        instance.setDateFrom(ofNullable(conflict.getDateFrom()).map(df -> df.toEpochSecond(ZoneOffset.UTC)).orElse(null));
+        instance.setDateTo(ofNullable(conflict.getDateTo()).map(df -> df.toEpochSecond(ZoneOffset.UTC)).orElse(null));
+        instance.setConflictReasonId(ofNullable(conflict.getReason()).map(EntityWithNames::getId).orElse(null));
+        instance.setConflictResultId(ofNullable(conflict.getResult()).map(EntityWithNames::getId).orElse(null));
+        instance.setIndustryId(ofNullable(conflict.getIndustry()).map(EntityWithNames::getId).orElse(null));
+        instance.setParentEventId(ofNullable(conflict.getParentEvent()).map(Event::getId).orElse(null));
+        instance.setCreatedAt(ofNullable(conflict.getCreatedAt()).map(d -> d.toEpochSecond(ZoneOffset.UTC)).orElse(null));
+        instance.setMainTypeId(ofNullable(conflict.getMainType()).map(EntityWithNames::getId).orElse(null));
+        instance.setAutomanagingMainType(conflict.isAutomanagingMainType());
         return instance;
     }
 
@@ -126,5 +131,21 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
 
     public void setParentEventId(Long parentEventId) {
         this.parentEventId = parentEventId;
+    }
+
+    public Long getMainTypeId() {
+        return mainTypeId;
+    }
+
+    public void setMainTypeId(Long mainTypeId) {
+        this.mainTypeId = mainTypeId;
+    }
+
+    public boolean isAutomanagingMainType() {
+        return automanagingMainType;
+    }
+
+    public void setAutomanagingMainType(boolean automanagingMainType) {
+        this.automanagingMainType = automanagingMainType;
     }
 }

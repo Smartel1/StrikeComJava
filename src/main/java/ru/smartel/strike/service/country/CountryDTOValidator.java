@@ -7,10 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static ru.smartel.strike.util.ValidationUtil.Min;
-import static ru.smartel.strike.util.ValidationUtil.NotNull;
-import static ru.smartel.strike.util.ValidationUtil.addErrorMessage;
-import static ru.smartel.strike.util.ValidationUtil.throwIfErrorsExist;
+import static ru.smartel.strike.util.ValidationUtil.*;
 
 @Component
 public class CountryDTOValidator {
@@ -18,31 +15,31 @@ public class CountryDTOValidator {
         Map<String, List<String>> errors = new HashMap<>();
 
         if (null == dto.getLocale()) {
-            addErrorMessage("locale", new NotNull(), errors);
+            addErrorMessage("locale", notNull(), errors);
         }
 
         if (null == dto.getNameRu()) {
-            addErrorMessage("nameRu", new NotNull(), errors);
+            addErrorMessage("nameRu", notNull(), errors);
         } else if (dto.getNameRu().length() < 1) {
-            addErrorMessage("nameRu", new Min(1), errors);
+            addErrorMessage("nameRu", min(1), errors);
         }
 
         if (null == dto.getNameEn()) {
-            addErrorMessage("nameEn", new NotNull(), errors);
+            addErrorMessage("nameEn", notNull(), errors);
         } else if (dto.getNameEn().length() < 1) {
-            addErrorMessage("nameEn", new Min(1), errors);
+            addErrorMessage("nameEn", min(1), errors);
         }
 
         if (null == dto.getNameEs()) {
-            addErrorMessage("nameEs", new NotNull(), errors);
+            addErrorMessage("nameEs", notNull(), errors);
         } else if (dto.getNameEs().length() < 1) {
-            addErrorMessage("nameEs", new Min(1), errors);
+            addErrorMessage("nameEs", min(1), errors);
         }
 
         if (null == dto.getNameDe()) {
-            addErrorMessage("nameDe", new NotNull(), errors);
+            addErrorMessage("nameDe", notNull(), errors);
         } else if (dto.getNameDe().length() < 1) {
-            addErrorMessage("nameDe", new Min(1), errors);
+            addErrorMessage("nameDe", min(1), errors);
         }
 
         throwIfErrorsExist(errors);
