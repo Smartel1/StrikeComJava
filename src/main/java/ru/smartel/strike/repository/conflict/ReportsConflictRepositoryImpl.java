@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Transactional(rollbackFor = Exception.class)
+@SuppressWarnings("unchecked")
 public class ReportsConflictRepositoryImpl implements ReportsConflictRepository {
 
     @PersistenceContext

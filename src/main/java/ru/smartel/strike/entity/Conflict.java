@@ -6,6 +6,7 @@ import pl.exsio.nestedj.model.NestedNode;
 import ru.smartel.strike.entity.interfaces.HavingTitles;
 import ru.smartel.strike.entity.reference.ConflictReason;
 import ru.smartel.strike.entity.reference.ConflictResult;
+import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Industry;
 
 import javax.persistence.CascadeType;
@@ -93,6 +94,10 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conflict_result_id")
     private ConflictResult result;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_type_id")
+    private EventType mainType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
@@ -248,6 +253,14 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
 
     public void setParentEvent(Event parentEvent) {
         this.parentEvent = parentEvent;
+    }
+
+    public EventType getMainType() {
+        return mainType;
+    }
+
+    public void setMainType(EventType mainType) {
+        this.mainType = mainType;
     }
 
     public Industry getIndustry() {

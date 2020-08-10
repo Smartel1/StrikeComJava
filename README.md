@@ -14,6 +14,7 @@
  API users cannot enter conflicting data (e.g. parent_event is not included in the list of parent conflict events)
  because they don’t have the ability to change parent_id.
  A nested set is used for ease of querying.
+ Conflicts have a property 'main type' which is calculated by this app depending on event types, and can be modified by moderator.
 ### Event
  One of the main entities.
  Belongs to a conflict or multiple conflicts if it is a branch point

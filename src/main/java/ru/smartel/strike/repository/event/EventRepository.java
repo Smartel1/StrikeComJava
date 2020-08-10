@@ -19,6 +19,8 @@ public interface EventRepository extends CustomEventRepository, JpaSpecification
 
     List<Event> findAllByConflictId(long conflictId);
 
+    long countByConflictId(long conflictId);
+
     Optional<Event> findFirstByConflictIdOrderByPostDateDesc(long conflictId);
 
     Optional<Event> findFirstByConflictIdAndLocalityNotNullOrderByPostDateDesc(long conflictId);
