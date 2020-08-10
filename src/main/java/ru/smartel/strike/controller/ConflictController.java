@@ -1,5 +1,6 @@
 package ru.smartel.strike.controller;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
@@ -14,6 +15,8 @@ import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictService;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v2/{locale}/conflicts")
@@ -41,8 +44,11 @@ public class ConflictController {
     }
 
     @GetMapping("report")
-    public DetailWrapperDTO<ConflictReportDTO> show(@RequestParam("year") int year) {
-        return new DetailWrapperDTO<>(conflictService.getReportByYear(year));
+    public DetailWrapperDTO<ConflictReportDTO> report(@RequestParam("from")
+                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                                      @RequestParam("to")
+                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return new DetailWrapperDTO<>(conflictService.getReportByPeriod(from, to));
     }
 
     @GetMapping("{id}/latest-locality")

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,14 @@ import static java.util.stream.Collectors.toList;
 @ControllerAdvice
 public class Handler {
     private static final Logger logger = LoggerFactory.getLogger(Handler.class);
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    @ResponseBody
+    public ApiErrorDTO processMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        logger.info("MissingServletRequestParameterException occurred: {}", ex.getMessage());
+        return new ApiErrorDTO("Validation failed", ex.getMessage());
+    }
 
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)

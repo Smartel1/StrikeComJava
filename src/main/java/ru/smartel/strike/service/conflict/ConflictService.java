@@ -28,6 +28,7 @@ import ru.smartel.strike.service.filters.FiltersTransformer;
 import ru.smartel.strike.specification.conflict.LocalizedConflict;
 
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -112,20 +113,20 @@ public class ConflictService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictReportDTO getReportByYear(int year) {
+    public ConflictReportDTO getReportByPeriod(LocalDate from, LocalDate to) {
         var result = new ConflictReportDTO();
-        result.setCountByCountries(conflictRepository.getCountByCountries(year));
-        result.setCountByDistricts(conflictRepository.getCountByDistricts(year));
-        result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(year));
-        result.setCountByIndustry(conflictRepository.getCountByIndustry(year));
+        result.setCountByCountries(conflictRepository.getCountByCountries(from, to));
+        result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to));
+        result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to));
+        result.setCountByIndustry(conflictRepository.getCountByIndustry(from, to));
         int totalConflictsByIndustry = result.getCountByIndustry().values().stream().reduce(0, Integer::sum);
         result.getCountByIndustry().forEach((k, v) -> result.getCountPercentByIndustry().put(k, v * 100 / totalConflictsByIndustry));
 
-        result.setCountByReason(conflictRepository.getCountByReason(year));
+        result.setCountByReason(conflictRepository.getCountByReason(from, to));
         int totalConflictsByReason = result.getCountByReason().values().stream().reduce(0, Integer::sum);
         result.getCountByReason().forEach((k, v) -> result.getCountPercentByReason().put(k, v * 100 / totalConflictsByReason));
 
-        result.setCountByResult(conflictRepository.getCountByResult(year));
+        result.setCountByResult(conflictRepository.getCountByResult(from, to));
         int totalConflictsByResult = result.getCountByResult().values().stream().reduce(0, Integer::sum);
         result.getCountByResult().forEach((k, v) -> result.getCountPercentByResult().put(k, v * 100 / totalConflictsByResult));
         return result;
