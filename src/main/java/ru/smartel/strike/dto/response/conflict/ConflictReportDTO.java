@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConflictReportDTO {
+    private long conflictsBeganBeforeDateFromCount;
     private Map<String, Integer> countByCountries = new HashMap<>();
     private Map<String, Integer> countByDistricts = new HashMap<>();
     private Map<String, Float> specificCountByDistricts = new HashMap<>(); // per citizen
@@ -15,7 +16,16 @@ public class ConflictReportDTO {
     private Map<String, Integer> countPercentByReasons = new HashMap<>();
     private Map<String, Integer> countPercentByResults = new HashMap<>();
     private Map<String, Integer> countPercentByTypes = new HashMap<>();
-    private long conflictsBeganBeforeDateFromCount;
+    private Map<String, Map<String, Float>> countPercentByResultsByTypes = new HashMap<>();
+    private Map<String, Map<String, Float>> countPercentByResultsByIndustries = new HashMap<>();
+
+    public long getConflictsBeganBeforeDateFromCount() {
+        return conflictsBeganBeforeDateFromCount;
+    }
+
+    public void setConflictsBeganBeforeDateFromCount(long conflictsBeganBeforeDateFromCount) {
+        this.conflictsBeganBeforeDateFromCount = conflictsBeganBeforeDateFromCount;
+    }
 
     public Map<String, Integer> getCountByCountries() {
         return countByCountries;
@@ -105,11 +115,19 @@ public class ConflictReportDTO {
         this.countPercentByTypes = countPercentByTypes;
     }
 
-    public long getConflictsBeganBeforeDateFromCount() {
-        return conflictsBeganBeforeDateFromCount;
+    public Map<String, Map<String, Float>> getCountPercentByResultsByTypes() {
+        return countPercentByResultsByTypes;
     }
 
-    public void setConflictsBeganBeforeDateFromCount(long conflictsBeganBeforeDateFromCount) {
-        this.conflictsBeganBeforeDateFromCount = conflictsBeganBeforeDateFromCount;
+    public void setCountPercentByResultsByTypes(Map<String, Map<String, Float>> countPercentByResultsByTypes) {
+        this.countPercentByResultsByTypes = countPercentByResultsByTypes;
+    }
+
+    public Map<String, Map<String, Float>> getCountPercentByResultsByIndustries() {
+        return countPercentByResultsByIndustries;
+    }
+
+    public void setCountPercentByResultsByIndustries(Map<String, Map<String, Float>> countPercentByResultsByIndustries) {
+        this.countPercentByResultsByIndustries = countPercentByResultsByIndustries;
     }
 }

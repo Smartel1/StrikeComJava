@@ -134,6 +134,8 @@ public class ConflictService {
         result.setCountByTypes(conflictRepository.getCountByTypes(from, to));
         result.getCountByTypes().forEach((k, v) -> result.getCountPercentByTypes().put(k, v * 100 / totalConflictsCount));
 
+        result.setCountPercentByResultsByTypes(conflictRepository.getCountPercentByResultsByTypes(from, to));
+        result.setCountPercentByResultsByIndustries(conflictRepository.getCountPercentByResultsByIndustries(from, to));
         return result;
     }
 
