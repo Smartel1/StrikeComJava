@@ -115,20 +115,25 @@ public class ConflictService {
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ConflictReportDTO getReportByPeriod(LocalDate from, LocalDate to) {
         var result = new ConflictReportDTO();
+        result.setConflictsBeganBeforeDateFromCount(conflictRepository.getOldConflictsCount(from, to));
         result.setCountByCountries(conflictRepository.getCountByCountries(from, to));
         result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to));
         result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to));
-        result.setCountByIndustry(conflictRepository.getCountByIndustry(from, to));
-        int totalConflictsByIndustry = result.getCountByIndustry().values().stream().reduce(0, Integer::sum);
-        result.getCountByIndustry().forEach((k, v) -> result.getCountPercentByIndustry().put(k, v * 100 / totalConflictsByIndustry));
 
-        result.setCountByReason(conflictRepository.getCountByReason(from, to));
-        int totalConflictsByReason = result.getCountByReason().values().stream().reduce(0, Integer::sum);
-        result.getCountByReason().forEach((k, v) -> result.getCountPercentByReason().put(k, v * 100 / totalConflictsByReason));
+        int totalConflictsCount = result.getCountByCountries().values().stream().reduce(0, Integer::sum);
 
-        result.setCountByResult(conflictRepository.getCountByResult(from, to));
-        int totalConflictsByResult = result.getCountByResult().values().stream().reduce(0, Integer::sum);
-        result.getCountByResult().forEach((k, v) -> result.getCountPercentByResult().put(k, v * 100 / totalConflictsByResult));
+        result.setCountByIndustries(conflictRepository.getCountByIndustries(from, to));
+        result.getCountByIndustries().forEach((k, v) -> result.getCountPercentByIndustries().put(k, v * 100 / totalConflictsCount));
+
+        result.setCountByReasons(conflictRepository.getCountByReasons(from, to));
+        result.getCountByReasons().forEach((k, v) -> result.getCountPercentByReasons().put(k, v * 100 / totalConflictsCount));
+
+        result.setCountByResults(conflictRepository.getCountByResults(from, to));
+        result.getCountByResults().forEach((k, v) -> result.getCountPercentByResults().put(k, v * 100 / totalConflictsCount));
+
+        result.setCountByTypes(conflictRepository.getCountByTypes(from, to));
+        result.getCountByTypes().forEach((k, v) -> result.getCountPercentByTypes().put(k, v * 100 / totalConflictsCount));
+
         return result;
     }
 

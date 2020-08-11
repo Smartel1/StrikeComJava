@@ -7,15 +7,24 @@ import java.util.Map;
 
 @Repository
 public interface ReportsConflictRepository {
+    /**
+     * Conflicts count, that have events in specified period, but started before 'from' date
+     */
+    long getOldConflictsCount(LocalDate from, LocalDate to);
+
     Map<String, Integer> getCountByCountries(LocalDate from, LocalDate to);
 
     Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to);
 
     Map<String, Float> getSpecificCountByDistricts(LocalDate from, LocalDate to);
 
-    Map<String, Integer> getCountByIndustry(LocalDate from, LocalDate to);
+    Map<String, Integer> getCountByIndustries(LocalDate from, LocalDate to);
 
-    Map<String, Integer> getCountByReason(LocalDate from, LocalDate to);
+    Map<String, Integer> getCountByReasons(LocalDate from, LocalDate to);
 
-    Map<String, Integer> getCountByResult(LocalDate from, LocalDate to);
+    Map<String, Integer> getCountByResults(LocalDate from, LocalDate to);
+
+    Map<String, Integer> getCountByTypes(LocalDate from, LocalDate to);
+
+    Map<String, Integer> getEfficiencyPercentByTypes(LocalDate from, LocalDate to);
 }

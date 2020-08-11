@@ -19,6 +19,19 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     private EntityManager entityManager;
 
     @Override
+    public long getOldConflictsCount(LocalDate from, LocalDate to) {
+        return ((BigInteger) entityManager.createNativeQuery(
+                "select count(distinct(c.id))" +
+                        " from conflicts c" +
+                        " left join events e on e.conflict_id = c.id" +
+                        " where e.date >= :from and e.date <= :to" +
+                        " and c.date_from < :from")
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getSingleResult()).longValue();
+    }
+
+    @Override
     public Map<String, Integer> getCountByCountries(LocalDate from, LocalDate to) {
         // conflict's country is the country of the first conflict's event (first by date)
         List<Object[]> resultList = entityManager.createNativeQuery(
@@ -93,7 +106,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByIndustry(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByIndustries(LocalDate from, LocalDate to) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select i.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
@@ -110,7 +123,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByReason(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByReasons(LocalDate from, LocalDate to) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select cr.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
@@ -126,7 +139,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                 .collect(Collectors.toMap(r -> mapKey(r[0]), r -> ((BigInteger) r[1]).intValue()));
     }
     @Override
-    public Map<String, Integer> getCountByResult(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByResults(LocalDate from, LocalDate to) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select cr.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
@@ -140,6 +153,28 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
 
         return resultList.stream()
                 .collect(Collectors.toMap(r -> mapKey(r[0]), r -> ((BigInteger) r[1]).intValue()));
+    }
+
+    @Override
+    public Map<String, Integer> getCountByTypes(LocalDate from, LocalDate to) {
+        List<Object[]> resultList = entityManager.createNativeQuery(
+                "select et.name_ru, count(distinct(c.id))" +
+                        " from conflicts c" +
+                        " left join event_types et on et.id = c.main_type_id" +
+                        " left join events e on e.conflict_id = c.id" +
+                        " where e.date >= :from and e.date <= :to" +
+                        " group by et.name_ru")
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .getResultList();
+
+        return resultList.stream()
+                .collect(Collectors.toMap(r -> mapKey(r[0]), r -> ((BigInteger) r[1]).intValue()));
+    }
+
+    @Override
+    public Map<String, Integer> getEfficiencyPercentByTypes(LocalDate from, LocalDate to) {
+        return null;
     }
 
     private String mapKey(Object key) {
