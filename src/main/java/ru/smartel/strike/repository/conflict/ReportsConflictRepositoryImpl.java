@@ -247,6 +247,42 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                 }));
     }
 
+    @Override
+    public Map<String, Map<String, Float>> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to) {
+        var industries = (List<Object[]>) entityManager.createNativeQuery(
+                "select name_ru, id from industries")
+                .getResultList();
+        return industries.stream().collect(Collectors.toMap(
+                raw -> (String) raw[0], // name of conflict main type
+                raw -> {
+                    var countToType = ((List<Object[]>) entityManager.createNativeQuery(
+                            "select et.name_ru, sub.count" +
+                                    " from event_types et" +
+                                    "   full outer join (select c.main_type_id mtype_id, count(distinct(c.id))" +
+                                    "                   from conflicts c" +
+                                    "                   left join events e on e.conflict_id = c.id" +
+                                    "                   where e.date >= :from and e.date <= :to" +
+                                    "                   and c.industry_id = :industryId" +
+                                    "                   group by c.main_type_id) sub on sub.mtype_id = et.id")
+                            .setParameter("industryId", raw[1])
+                            .setParameter("from", from)
+                            .setParameter("to", to)
+                            .getResultList())
+                            .stream().collect(Collectors.toMap(
+                                    raw1 -> mapKey(raw1[0]), // name of conflict main type
+                                    raw1 -> Optional.ofNullable(raw1[1])
+                                            .map(count -> ((BigInteger) count).intValue())
+                                            .orElse(0) // count of conflicts
+                            ));
+                    // to always return not specified count
+                    countToType.putIfAbsent(NOT_SPECIFIED, 0);
+                    int totalConflictOfType = countToType.values().stream().reduce(Integer::sum).orElse(0);
+                    var countPercentToType = new HashMap<String, Float>();
+                    countToType.forEach((key, value) -> countPercentToType.put(key, value == 0 ? 0 : value.floatValue() * 100 / totalConflictOfType));
+                    return countPercentToType;
+                }));
+    }
+
     private String mapKey(Object key) {
         return (String) Optional.ofNullable(key).orElse(NOT_SPECIFIED);
     }

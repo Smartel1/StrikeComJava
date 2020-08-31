@@ -29,4 +29,6 @@ public interface ReportsConflictRepository {
     Map<String, Map<String, Float>> getCountPercentByResultsByTypes(LocalDate from, LocalDate to);
 
     Map<String, Map<String, Float>> getCountPercentByResultsByIndustries(LocalDate from, LocalDate to);
+
+    Map<String, Map<String, Float>> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to);
 }

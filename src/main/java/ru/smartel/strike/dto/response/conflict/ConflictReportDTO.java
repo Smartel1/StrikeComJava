@@ -18,6 +18,7 @@ public class ConflictReportDTO {
     private Map<String, Integer> countPercentByTypes = new HashMap<>();
     private Map<String, Map<String, Float>> countPercentByResultsByTypes = new HashMap<>();
     private Map<String, Map<String, Float>> countPercentByResultsByIndustries = new HashMap<>();
+    private Map<String, Map<String, Float>> countPercentByTypesByIndustries = new HashMap<>();
 
     public long getConflictsBeganBeforeDateFromCount() {
         return conflictsBeganBeforeDateFromCount;
@@ -129,5 +130,13 @@ public class ConflictReportDTO {
 
     public void setCountPercentByResultsByIndustries(Map<String, Map<String, Float>> countPercentByResultsByIndustries) {
         this.countPercentByResultsByIndustries = countPercentByResultsByIndustries;
+    }
+
+    public Map<String, Map<String, Float>> getCountPercentByTypesByIndustries() {
+        return countPercentByTypesByIndustries;
+    }
+
+    public void setCountPercentByTypesByIndustries(Map<String, Map<String, Float>> countPercentByTypesByIndustries) {
+        this.countPercentByTypesByIndustries = countPercentByTypesByIndustries;
     }
 }
