@@ -21,20 +21,24 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     private EntityManager entityManager;
 
     @Override
-    public long getOldConflictsCount(LocalDate from, LocalDate to) {
+    public long getOldConflictsCount(LocalDate from, LocalDate to, List<Long> countriesIds) {
         return ((BigInteger) entityManager.createNativeQuery(
                 "select count(distinct(c.id))" +
                         " from conflicts c" +
                         " left join events e on e.conflict_id = c.id" +
+                        " left join localities l on e.locality_id = l.id" +
+                        " left join regions r on l.region_id = r.id" +
                         " where e.date >= :from and e.date <= :to" +
+                        " and r.country_id in :countriesIds" +
                         " and c.date_from < :from")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getSingleResult()).longValue();
     }
 
     @Override
-    public Map<String, Integer> getCountByCountries(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByCountries(LocalDate from, LocalDate to, List<Long> countriesIds) {
         // conflict's country is the country of the first conflict's event (first by date)
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "with sub as (" +
@@ -48,9 +52,11 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         "         left join regions r on r.id = l.region_id" +
                         "         left join countries c on c.id = r.country_id" +
                         " where rk = 1" +
+                        " and c.id in :countriesIds" +
                         " group by c.name_ru")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -58,7 +64,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds) {
         // conflict's district is the district of the first conflict's event (first by date)
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "with sub as (" +
@@ -72,9 +78,11 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         "         left join regions r on r.id = l.region_id" +
                         "         left join districts d on d.id = r.district_id" +
                         " where rk = 1" +
+                        " and r.country_id in :countriesIds" +
                         " group by d.name")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -82,7 +90,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Float> getSpecificCountByDistricts(LocalDate from, LocalDate to) {
+    public Map<String, Float> getSpecificCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds) {
         // conflict's district is the district of the first conflict's event (first by date)
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "with sub as (" +
@@ -97,10 +105,12 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         "         left join regions r on r.id = l.region_id" +
                         "         left join districts d on d.id = r.district_id" +
                         " where rk = 1" +
+                        " and r.country_id in :countriesIds" +
                         " group by d.name" +
                         " having d.name is not null")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -108,16 +118,20 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByIndustries(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select i.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
                         " left join industries i on i.id = c.industry_id" +
                         " left join events e on e.conflict_id = c.id" +
+                        " left join localities l on e.locality_id = l.id" +
+                        " left join regions r on l.region_id = r.id" +
                         " where e.date >= :from and e.date <= :to" +
+                        " and r.country_id in :countriesIds" +
                         " group by i.name_ru")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -125,16 +139,20 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByReasons(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByReasons(LocalDate from, LocalDate to, List<Long> countriesIds) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select cr.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
                         " left join conflict_reasons cr on cr.id = c.conflict_reason_id" +
                         " left join events e on e.conflict_id = c.id" +
+                        " left join localities l on e.locality_id = l.id" +
+                        " left join regions r on l.region_id = r.id" +
                         " where e.date >= :from and e.date <= :to" +
+                        " and r.country_id in :countriesIds" +
                         " group by cr.name_ru")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -142,16 +160,20 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByResults(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByResults(LocalDate from, LocalDate to, List<Long> countriesIds) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select cr.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
                         " left join conflict_results cr on cr.id = c.conflict_result_id" +
                         " left join events e on e.conflict_id = c.id" +
+                        " left join localities l on e.locality_id = l.id" +
+                        " left join regions r on l.region_id = r.id" +
                         " where e.date >= :from and e.date <= :to" +
+                        " and r.country_id in :countriesIds" +
                         " group by cr.name_ru")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -159,16 +181,20 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Integer> getCountByTypes(LocalDate from, LocalDate to) {
+    public Map<String, Integer> getCountByTypes(LocalDate from, LocalDate to, List<Long> countriesIds) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "select et.name_ru, count(distinct(c.id))" +
                         " from conflicts c" +
                         " left join event_types et on et.id = c.main_type_id" +
                         " left join events e on e.conflict_id = c.id" +
+                        " left join localities l on e.locality_id = l.id" +
+                        " left join regions r on l.region_id = r.id" +
                         " where e.date >= :from and e.date <= :to" +
+                        " and r.country_id in :countriesIds" +
                         " group by et.name_ru")
                 .setParameter("from", from)
                 .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
@@ -176,7 +202,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Map<String, Float>> getCountPercentByResultsByTypes(LocalDate from, LocalDate to) {
+    public Map<String, Map<String, Float>> getCountPercentByResultsByTypes(LocalDate from, LocalDate to, List<Long> countriesIds) {
         var types = (List<Object[]>) entityManager.createNativeQuery(
                 "select name_ru, id from event_types")
                 .getResultList();
@@ -189,12 +215,16 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                                     "   full outer join (select c.conflict_result_id res_id, count(distinct(c.id))" +
                                     "                   from conflicts c" +
                                     "                   left join events e on e.conflict_id = c.id" +
+                                    "                   left join localities l on e.locality_id = l.id" +
+                                    "                   left join regions r on l.region_id = r.id" +
                                     "                   where e.date >= :from and e.date <= :to" +
+                                    "                   and r.country_id in :countriesIds" +
                                     "                   and c.main_type_id = :mainTypeId" +
                                     "                   group by c.conflict_result_id) sub on sub.res_id = cr.id")
                             .setParameter("mainTypeId", raw[1])
                             .setParameter("from", from)
                             .setParameter("to", to)
+                            .setParameter("countriesIds", countriesIds)
                             .getResultList())
                             .stream().collect(Collectors.toMap(
                                     raw1 -> mapKey(raw1[0]), // name of conflict result
@@ -212,7 +242,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Map<String, Float>> getCountPercentByResultsByIndustries(LocalDate from, LocalDate to) {
+    public Map<String, Map<String, Float>> getCountPercentByResultsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds) {
         var industries = (List<Object[]>) entityManager.createNativeQuery(
                 "select name_ru, id from industries")
                 .getResultList();
@@ -225,12 +255,16 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                                     "   full outer join (select c.conflict_result_id res_id, count(distinct(c.id))" +
                                     "                   from conflicts c" +
                                     "                   left join events e on e.conflict_id = c.id" +
+                                    "                   left join localities l on e.locality_id = l.id" +
+                                    "                   left join regions r on l.region_id = r.id" +
                                     "                   where e.date >= :from and e.date <= :to" +
+                                    "                   and r.country_id in :countriesIds" +
                                     "                   and c.industry_id = :industryId" +
                                     "                   group by c.conflict_result_id) sub on sub.res_id = cr.id")
                             .setParameter("industryId", raw[1])
                             .setParameter("from", from)
                             .setParameter("to", to)
+                            .setParameter("countriesIds", countriesIds)
                             .getResultList())
                             .stream().collect(Collectors.toMap(
                                     raw1 -> mapKey(raw1[0]), // name of conflict result
@@ -248,7 +282,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public Map<String, Map<String, Float>> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to) {
+    public Map<String, Map<String, Float>> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds) {
         var industries = (List<Object[]>) entityManager.createNativeQuery(
                 "select name_ru, id from industries")
                 .getResultList();
@@ -261,12 +295,16 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                                     "   full outer join (select c.main_type_id mtype_id, count(distinct(c.id))" +
                                     "                   from conflicts c" +
                                     "                   left join events e on e.conflict_id = c.id" +
+                                    "                   left join localities l on e.locality_id = l.id" +
+                                    "                   left join regions r on l.region_id = r.id" +
                                     "                   where e.date >= :from and e.date <= :to" +
+                                    "                   and r.country_id in :countriesIds" +
                                     "                   and c.industry_id = :industryId" +
                                     "                   group by c.main_type_id) sub on sub.mtype_id = et.id")
                             .setParameter("industryId", raw[1])
                             .setParameter("from", from)
                             .setParameter("to", to)
+                            .setParameter("countriesIds", countriesIds)
                             .getResultList())
                             .stream().collect(Collectors.toMap(
                                     raw1 -> mapKey(raw1[0]), // name of conflict main type

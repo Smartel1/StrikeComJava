@@ -1,5 +1,7 @@
 package ru.smartel.strike.service.conflict;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,8 @@ import static java.util.stream.Collectors.toList;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class ConflictService {
+    public static final Logger log = LoggerFactory.getLogger(ConflictService.class);
+
     private final ConflictDTOValidator dtoValidator;
     private final FiltersTransformer filtersTransformer;
     private final ConflictRepository conflictRepository;
@@ -113,30 +117,31 @@ public class ConflictService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    public ConflictReportDTO getReportByPeriod(LocalDate from, LocalDate to) {
+    public ConflictReportDTO getReportByPeriod(LocalDate from, LocalDate to, List<Long> countriesIds) {
+        log.debug("Building report for countries {} from {} to {}", countriesIds, from, to);
         var result = new ConflictReportDTO();
-        result.setConflictsBeganBeforeDateFromCount(conflictRepository.getOldConflictsCount(from, to));
-        result.setCountByCountries(conflictRepository.getCountByCountries(from, to));
-        result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to));
-        result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to));
+        result.setConflictsBeganBeforeDateFromCount(conflictRepository.getOldConflictsCount(from, to, countriesIds));
+        result.setCountByCountries(conflictRepository.getCountByCountries(from, to, countriesIds));
+        result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to, countriesIds));
+        result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to, countriesIds));
 
         int totalConflictsCount = result.getCountByCountries().values().stream().reduce(0, Integer::sum);
 
-        result.setCountByIndustries(conflictRepository.getCountByIndustries(from, to));
+        result.setCountByIndustries(conflictRepository.getCountByIndustries(from, to, countriesIds));
         result.getCountByIndustries().forEach((k, v) -> result.getCountPercentByIndustries().put(k, v * 100 / totalConflictsCount));
 
-        result.setCountByReasons(conflictRepository.getCountByReasons(from, to));
+        result.setCountByReasons(conflictRepository.getCountByReasons(from, to, countriesIds));
         result.getCountByReasons().forEach((k, v) -> result.getCountPercentByReasons().put(k, v * 100 / totalConflictsCount));
 
-        result.setCountByResults(conflictRepository.getCountByResults(from, to));
+        result.setCountByResults(conflictRepository.getCountByResults(from, to, countriesIds));
         result.getCountByResults().forEach((k, v) -> result.getCountPercentByResults().put(k, v * 100 / totalConflictsCount));
 
-        result.setCountByTypes(conflictRepository.getCountByTypes(from, to));
+        result.setCountByTypes(conflictRepository.getCountByTypes(from, to, countriesIds));
         result.getCountByTypes().forEach((k, v) -> result.getCountPercentByTypes().put(k, v * 100 / totalConflictsCount));
 
-        result.setCountPercentByResultsByTypes(conflictRepository.getCountPercentByResultsByTypes(from, to));
-        result.setCountPercentByResultsByIndustries(conflictRepository.getCountPercentByResultsByIndustries(from, to));
-        result.setCountPercentByTypesByIndustries(conflictRepository.getCountPercentByTypesByIndustries(from, to));
+        result.setCountPercentByResultsByTypes(conflictRepository.getCountPercentByResultsByTypes(from, to, countriesIds));
+        result.setCountPercentByResultsByIndustries(conflictRepository.getCountPercentByResultsByIndustries(from, to, countriesIds));
+        result.setCountPercentByTypesByIndustries(conflictRepository.getCountPercentByTypesByIndustries(from, to, countriesIds));
         return result;
     }
 
@@ -152,6 +157,7 @@ public class ConflictService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ConflictDetailDTO create(ConflictCreateRequestDTO dto) {
+        log.debug("Creating conflict with dto {}", dto);
         dtoValidator.validateStoreDTO(dto);
 
         Conflict conflict = new Conflict();
@@ -168,6 +174,7 @@ public class ConflictService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public ConflictDetailDTO update(ConflictUpdateRequestDTO dto) {
+        log.debug("Updating conflict with dto {}", dto);
         dtoValidator.validateUpdateDTO(dto);
 
         if (dto.getDateTo() != null && dto.getDateTo().isPresent()) {
@@ -216,6 +223,7 @@ public class ConflictService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public void delete(long conflictId) {
+        log.debug("Removing conflict {}", conflictId);
         Conflict conflict = conflictRepository.findById(conflictId)
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
 

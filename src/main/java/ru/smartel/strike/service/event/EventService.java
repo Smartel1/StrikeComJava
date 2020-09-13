@@ -1,5 +1,7 @@
 package ru.smartel.strike.service.event;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +52,7 @@ import java.util.stream.Stream;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class EventService {
+    public static final Logger log = LoggerFactory.getLogger(EventService.class);
 
     private final TagRepository tagRepository;
     private final BusinessValidationService businessValidationService;
@@ -163,6 +166,7 @@ public class EventService {
 
     @PreAuthorize("isFullyAuthenticated()")
     public void setFavourite(Long eventId, long userId, boolean isFavourite) {
+        log.debug("Change favourite status for event {} to {} for user {}", eventId, userId, isFavourite);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
         Event event = eventRepository.getOne(eventId);
@@ -181,10 +185,14 @@ public class EventService {
 
     @PreAuthorize("isFullyAuthenticated()")
     public EventDetailDTO create(EventCreateRequestDTO dto) {
+        log.debug("Creating event with dto: {}", dto);
         validator.validateStoreDTO(dto);
 
         User user = userRepository.findById(dto.getUser().getId()).orElseThrow(
-                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
+                () -> {
+                    log.debug("Cannot find user {}. Event creation failed", dto.getUser().getId());
+                    return new IllegalStateException("Authorization cannot pass empty user into this method");
+                });
 
         //Only moderator can publish events
         businessValidationService.validate(
@@ -202,9 +210,11 @@ public class EventService {
                 new EventAfterConflictsStart(event.getDate(), event.getConflict().getDateFrom())
         );
         eventRepository.save(event);
+        log.debug("Event {} saved to db", event.getId());
         updateConflictsEventStatuses(event.getConflict().getId());
 
         if (event.getConflict() != null) {
+            log.debug("Refreshing conflict main type, {}", event.getConflict().getId());
             conflictMainTypeService.refreshMainType(event.getConflict().getId());
         }
 
@@ -216,28 +226,31 @@ public class EventService {
             //if event published - notify subscribers and send to networks
             postPublicationService.publishAndSetFlags(event, dto.getPublishTo());
 
-            Map<Locale, String> titlesByLocales = Stream.of(Locale.values())
-                    .filter(loc -> !loc.equals(Locale.ALL))
-                    .filter(loc -> null != event.getTitleByLocale(loc))
-                    .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
+            if (dto.isPushRequired()) {
+                Map<Locale, String> titlesByLocales = Stream.of(Locale.values())
+                        .filter(loc -> !loc.equals(Locale.ALL))
+                        .filter(loc -> null != event.getTitleByLocale(loc))
+                        .collect(Collectors.toMap(Function.identity(), event::getTitleByLocale));
 
-            event.setPushFlagsForLocales(titlesByLocales.keySet());
-            pushService.eventPublished(
-                    event.getId(),
-                    event.getAuthor().getId(),
-                    event.getLongitude(),
-                    event.getLatitude(),
-                    Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
-                    titlesByLocales,
-                    null, //do not send push to author cuz he's moderator
-                    false
-            );
+                event.setPushFlagsForLocales(titlesByLocales.keySet());
+                pushService.eventPublished(
+                        event.getId(),
+                        event.getAuthor().getId(),
+                        event.getLongitude(),
+                        event.getLatitude(),
+                        Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
+                        titlesByLocales,
+                        null, //do not send push to author cuz he's moderator
+                        false
+                );
+            }
         }
         return EventDetailDTO.of(event, dto.getLocale());
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isEventAuthor(#dto.eventId)")
     public EventDetailDTO update(EventUpdateRequestDTO dto) {
+        log.debug("Updating event with dto {}", dto);
         validator.validateUpdateDTO(dto);
 
         Event event = eventRepository.findById(dto.getEventId())
@@ -303,6 +316,7 @@ public class EventService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public void delete(Long eventId) {
+        log.debug("Removing event {}", eventId);
         businessValidationService.validate(
                 new NotAParentEvent(eventId, eventRepository)
         );

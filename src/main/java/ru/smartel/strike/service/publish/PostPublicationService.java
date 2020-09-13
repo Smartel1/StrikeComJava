@@ -1,5 +1,7 @@
 package ru.smartel.strike.service.publish;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.publication.PublishDTO;
 import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
@@ -16,6 +18,8 @@ import static java.util.Objects.nonNull;
 
 @Service
 public class PostPublicationService {
+    public static final Logger log = LoggerFactory.getLogger(PostPublicationService.class);
+
     private final PublicationGateway publicationGateway;
 
     public PostPublicationService(PublicationGateway publicationGateway) {
@@ -24,6 +28,7 @@ public class PostPublicationService {
 
     public void publishAndSetFlags(PostEntity post, Set<Long> publishTo) {
         if (nonNull(post.getTitleRu())) {
+            log.debug("Publishing post {} to networks {}", post, publishTo);
             publicationGateway.publish(new PublishDTOWithNetworks(
                     new PublishDTO(post.getContentRu(), post.getSourceLink(), post.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
                     getNetworkIdsToSendTo(post, publishTo)));

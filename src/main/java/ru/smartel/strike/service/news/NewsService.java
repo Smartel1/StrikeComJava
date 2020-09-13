@@ -1,5 +1,7 @@
 package ru.smartel.strike.service.news;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +42,7 @@ import java.util.stream.Stream;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class NewsService {
+    public static final Logger log = LoggerFactory.getLogger(NewsService.class);
 
     private final NewsDTOValidator validator;
     private final FiltersTransformer filtersTransformer;
@@ -131,8 +134,13 @@ public class NewsService {
 
     @PreAuthorize("isFullyAuthenticated()")
     public void setFavourite(Long newsId, long userId, boolean isFavourite) {
+        log.debug("Change favourite status for news {} to {} for user {}", newsId, userId, isFavourite);
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
+                () -> {
+                    log.debug("Cannot find user {}. Event creation failed", userId);
+                    return new IllegalStateException("Authorization cannot pass empty user into this method");
+                });
+
 
         News news = newsRepository.getOne(newsId);
 
@@ -195,6 +203,7 @@ public class NewsService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or isNewsAuthor(#dto.newsId)")
     public NewsDetailDTO update(NewsUpdateRequestDTO dto) {
+        log.debug("Updating news with dto {}", dto);
         validator.validateUpdateDTO(dto);
 
         News news = newsRepository.findById(dto.getNewsId())
@@ -241,6 +250,7 @@ public class NewsService {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public void delete(Long newsId) {
+        log.debug("Removing news {}", newsId);
         News news = newsRepository.findById(newsId).orElseThrow(
                 () -> new EntityNotFoundException("Новость не найдена"));
         newsRepository.delete(news);
