@@ -10,11 +10,14 @@ import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
-import ru.smartel.strike.dto.response.conflict.ConflictReportDTO;
+import ru.smartel.strike.dto.response.conflict.report.ConflictReportDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictService;
+
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @RestController
 @RequestMapping("/api/v2/{locale}/conflicts")
@@ -43,7 +46,10 @@ public class ConflictController {
 
     @GetMapping("report")
     public DetailWrapperDTO<ConflictReportDTO> report(ConflictReportRequestDTO dto) {
-        return new DetailWrapperDTO<>(conflictService.getReportByPeriod(dto.getFrom(), dto.getTo(), dto.getCountriesIds()));
+        return new DetailWrapperDTO<>(conflictService.getReportByPeriod(
+                LocalDateTime.ofEpochSecond(dto.getFrom(), 0, ZoneOffset.UTC).toLocalDate(),
+                LocalDateTime.ofEpochSecond(dto.getTo(), 0, ZoneOffset.UTC).toLocalDate(),
+                dto.getCountriesIds()));
     }
 
     @GetMapping("{id}/latest-locality")

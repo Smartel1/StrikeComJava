@@ -1,6 +1,7 @@
 package ru.smartel.strike.repository.conflict;
 
 import org.springframework.stereotype.Repository;
+import ru.smartel.strike.dto.response.conflict.report.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,23 +14,23 @@ public interface ReportsConflictRepository {
      */
     long getOldConflictsCount(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByCountries(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByCountry> getCountByCountries(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByDistrict> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds);
 
     Map<String, Float> getSpecificCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByIndustry> getCountByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByReasons(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByReason> getCountByReasons(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByResults(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByResult> getCountByResults(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Integer> getCountByTypes(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByType> getCountByTypes(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Map<String, Float>> getCountPercentByResultsByTypes(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByResultsByType> getCountByResultsByTypes(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Map<String, Float>> getCountPercentByResultsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByResultsByIndustry> getCountByResultsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
 
-    Map<String, Map<String, Float>> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
+    List<CountByTypeByIndustry> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
 }

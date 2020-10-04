@@ -12,7 +12,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictListDTO;
-import ru.smartel.strike.dto.response.conflict.ConflictReportDTO;
+import ru.smartel.strike.dto.response.conflict.report.ConflictReportDTO;
 import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
@@ -116,7 +116,7 @@ public class ConflictService {
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    @PreAuthorize("isAuthenticated()")
     public ConflictReportDTO getReportByPeriod(LocalDate from, LocalDate to, List<Long> countriesIds) {
         log.debug("Building report for countries {} from {} to {}", countriesIds, from, to);
         var result = new ConflictReportDTO();
@@ -125,23 +125,14 @@ public class ConflictService {
         result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to, countriesIds));
         result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to, countriesIds));
 
-        int totalConflictsCount = result.getCountByCountries().values().stream().reduce(0, Integer::sum);
-
         result.setCountByIndustries(conflictRepository.getCountByIndustries(from, to, countriesIds));
-        result.getCountByIndustries().forEach((k, v) -> result.getCountPercentByIndustries().put(k, v * 100 / totalConflictsCount));
-
         result.setCountByReasons(conflictRepository.getCountByReasons(from, to, countriesIds));
-        result.getCountByReasons().forEach((k, v) -> result.getCountPercentByReasons().put(k, v * 100 / totalConflictsCount));
-
         result.setCountByResults(conflictRepository.getCountByResults(from, to, countriesIds));
-        result.getCountByResults().forEach((k, v) -> result.getCountPercentByResults().put(k, v * 100 / totalConflictsCount));
-
         result.setCountByTypes(conflictRepository.getCountByTypes(from, to, countriesIds));
-        result.getCountByTypes().forEach((k, v) -> result.getCountPercentByTypes().put(k, v * 100 / totalConflictsCount));
 
-        result.setCountPercentByResultsByTypes(conflictRepository.getCountPercentByResultsByTypes(from, to, countriesIds));
-        result.setCountPercentByResultsByIndustries(conflictRepository.getCountPercentByResultsByIndustries(from, to, countriesIds));
-        result.setCountPercentByTypesByIndustries(conflictRepository.getCountPercentByTypesByIndustries(from, to, countriesIds));
+        result.setCountByResultsByTypes(conflictRepository.getCountByResultsByTypes(from, to, countriesIds));
+        result.setCountByResultsByIndustries(conflictRepository.getCountByResultsByIndustries(from, to, countriesIds));
+        result.setCountByTypesByIndustries(conflictRepository.getCountPercentByTypesByIndustries(from, to, countriesIds));
         return result;
     }
 

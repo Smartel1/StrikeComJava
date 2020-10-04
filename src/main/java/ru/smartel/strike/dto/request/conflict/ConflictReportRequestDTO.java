@@ -3,33 +3,34 @@ package ru.smartel.strike.dto.request.conflict;
 import io.swagger.annotations.ApiParam;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ConflictReportRequestDTO {
-    @ApiParam(value = "Начальная дата отчета", defaultValue = "1970-01-01")
+    @ApiParam(value = "Начальная дата отчета", defaultValue = "0")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate from = LocalDate.EPOCH;
+    private Long from = 0L;
     @ApiParam(value = "Конечная дата отчета", defaultValue = "сегодня")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate to = LocalDate.now();
+    private Long to = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
     @ApiParam(value = "Идентификаторы стран. В отчет попадут конфликты, которые в отчетном периоде имеют события этих стран", defaultValue = "пустой список")
     private List<Long> countriesIds = new LinkedList<>();
 
-    public LocalDate getFrom() {
+    public Long getFrom() {
         return from;
     }
 
-    public void setFrom(LocalDate from) {
+    public void setFrom(Long from) {
         this.from = from;
     }
 
-    public LocalDate getTo() {
+    public Long getTo() {
         return to;
     }
 
-    public void setTo(LocalDate to) {
+    public void setTo(Long to) {
         this.to = to;
     }
 
