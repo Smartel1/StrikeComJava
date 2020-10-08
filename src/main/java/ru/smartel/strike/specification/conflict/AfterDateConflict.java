@@ -22,7 +22,9 @@ public class AfterDateConflict implements Specification<Conflict> {
 
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        return cb.greaterThanOrEqualTo(root.get("dateTo"),
-                LocalDateTime.ofEpochSecond(dateFrom, 0, ZoneOffset.UTC));
+        // if dateTo not specified, then conflict is in progress, therefore it matches any 'dateFrom' filter
+        return cb.or(cb.isNull(root.get("dateTo")),
+                cb.greaterThanOrEqualTo(root.get("dateTo"),
+                        LocalDateTime.ofEpochSecond(dateFrom, 0, ZoneOffset.UTC)));
     }
 }
