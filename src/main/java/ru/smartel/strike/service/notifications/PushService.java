@@ -67,9 +67,9 @@ public class PushService {
         }
     }
 
-    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
+    public void eventPublished(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, Long regionId, Map<Locale, String> titlesByLocales, String authorFCM, boolean notifyAuthor) {
         for (Map.Entry<Locale, String> titleByLocale : titlesByLocales.entrySet()) {
-            eventPublishedByLocale(eventId, authorId, lng, lat, eventTypeId, titleByLocale.getValue(), titleByLocale.getKey());
+            eventPublishedByLocale(eventId, authorId, lng, lat, eventTypeId, regionId, titleByLocale.getValue(), titleByLocale.getKey());
         }
 
         if (notifyAuthor) {
@@ -182,7 +182,7 @@ public class PushService {
      * @param title    event title by locale
      * @param locale   locale
      */
-    private void eventPublishedByLocale(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, String title, Locale locale) {
+    private void eventPublishedByLocale(Long eventId, Long authorId, Float lng, Float lat, Long eventTypeId, Long regionId, String title, Locale locale) {
         sendAsyncIfEnabled(() -> {
             logger.info("sending notification about event publishing to {} topic. Title: {}", locale, title);
 
@@ -227,6 +227,7 @@ public class PushService {
                     .putData("creatorId", String.valueOf(authorId))
                     .putData("title", title)
                     .putData("eventTypeId", String.valueOf(eventTypeId))
+                    .putData("regionId", String.valueOf(regionId))
                     .putData("type", "news") // wth is that?
                     .build();
         });

@@ -22,6 +22,8 @@ import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EventStatus;
+import ru.smartel.strike.entity.reference.Locality;
+import ru.smartel.strike.entity.reference.Region;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.etc.*;
 import ru.smartel.strike.repository.event.EventRepository;
@@ -239,6 +241,7 @@ public class EventService {
                         event.getLongitude(),
                         event.getLatitude(),
                         Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
+                        Optional.ofNullable(event.getLocality()).map(Locality::getRegion).map(Region::getId).orElse(null),
                         titlesByLocales,
                         null, //do not send push to author cuz he's moderator
                         false
@@ -305,6 +308,7 @@ public class EventService {
                         event.getLongitude(),
                         event.getLatitude(),
                         Optional.ofNullable(event.getType()).map(EntityWithNames::getId).orElse(null),
+                        Optional.ofNullable(event.getLocality()).map(Locality::getRegion).map(Region::getId).orElse(null),
                         titlesToPush,
                         null != event.getAuthor() ? event.getAuthor().getFcm() : null,
                         changingPublicationStatus //whether notify event's author or not
