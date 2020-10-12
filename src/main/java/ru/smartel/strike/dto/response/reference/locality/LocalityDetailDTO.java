@@ -18,6 +18,7 @@ public class LocalityDetailDTO extends ExtendableDTO {
             instance.add("countryRu", locality.getRegion().getCountry().getNameRu());
             instance.add("countryEn", locality.getRegion().getCountry().getNameEn());
             instance.add("countryEs", locality.getRegion().getCountry().getNameEs());
+            instance.add("countryDe", locality.getRegion().getCountry().getNameDe());
         } else {
             instance.add("country", locality.getRegion().getCountry().getNameByLocale(locale));
         }
