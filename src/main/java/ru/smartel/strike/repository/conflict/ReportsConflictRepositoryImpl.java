@@ -67,7 +67,7 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
-    public List<CountByDistrict> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds) {
+    public Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds) {
         // conflict's district is the district of the first conflict's event (first by date)
         List<Object[]> resultList = entityManager.createNativeQuery(
                 "with sub as (" +
@@ -75,21 +75,21 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         "           e.locality_id," +
                         "           ROW_NUMBER() OVER (PARTITION BY e.conflict_id ORDER BY e.date) AS rk" +
                         "    from events e where e.date >= :from and e.date <= :to)" +
-                        " select r.district_id, count(conflict_id)" +
+                        " select d.name, count(conflict_id)" +
                         " from sub" +
                         "         left join localities l on l.id = sub.locality_id" +
                         "         left join regions r on r.id = l.region_id" +
+                        "         left join districts d on d.id = r.district_id" +
                         " where rk = 1" +
                         " and r.country_id in :countriesIds" +
-                        " group by r.district_id")
+                        " group by d.name")
                 .setParameter("from", from)
                 .setParameter("to", to)
                 .setParameter("countriesIds", countriesIds)
                 .getResultList();
 
         return resultList.stream()
-                .map(r -> new CountByDistrict(mapNullableId(r[0]), ((BigInteger) r[1]).longValue()))
-                .collect(toList());
+                .collect(Collectors.toMap(r -> mapKey(r[0]), r -> ((BigInteger) r[1]).intValue()));
     }
 
     @Override

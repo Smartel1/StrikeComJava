@@ -8,7 +8,7 @@ import java.util.Map;
 public class ConflictReportDTO {
     private long conflictsBeganBeforeDateFromCount;
     private List<CountByCountry> countByCountries = new ArrayList<>();
-    private List<CountByDistrict> countByDistricts = new ArrayList<>();
+    private Map<String, Integer> countByDistricts = new HashMap<>();
     private Map<String, Float> specificCountByDistricts = new HashMap<>(); // per citizen
     private List<CountByIndustry> countByIndustries = new ArrayList<>();
     private List<CountByReason> countByReasons = new ArrayList<>();
@@ -34,11 +34,11 @@ public class ConflictReportDTO {
         this.countByCountries = countByCountries;
     }
 
-    public List<CountByDistrict> getCountByDistricts() {
+    public Map<String, Integer> getCountByDistricts() {
         return countByDistricts;
     }
 
-    public void setCountByDistricts(List<CountByDistrict> countByDistricts) {
+    public void setCountByDistricts(Map<String, Integer> countByDistricts) {
         this.countByDistricts = countByDistricts;
     }
 
