@@ -82,7 +82,8 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         "         left join districts d on d.id = r.district_id" +
                         " where rk = 1" +
                         " and r.country_id in :countriesIds" +
-                        " group by d.name")
+                        " group by d.name" +
+                        " having d.name is not null")
                 .setParameter("from", from)
                 .setParameter("to", to)
                 .setParameter("countriesIds", countriesIds)
