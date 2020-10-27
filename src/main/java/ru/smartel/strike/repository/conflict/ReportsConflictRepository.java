@@ -32,5 +32,7 @@ public interface ReportsConflictRepository {
 
     List<CountByResultsByIndustry> getCountByResultsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
 
+    List<CountByReasonsByIndustry> getCountByReasonsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
+
     List<CountByTypeByIndustry> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);
 }

@@ -291,6 +291,48 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
     }
 
     @Override
+    public List<CountByReasonsByIndustry> getCountByReasonsByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds) {
+        var industryIds = (List<Integer>) entityManager.createNativeQuery(
+                "select id from industries")
+                .getResultList();
+        return industryIds.stream()
+                .map(industryId -> new CountByReasonsByIndustry(industryId.longValue(), getCountByReasonByIndustry(from, to, countriesIds, industryId.longValue())))
+                .collect(toList());
+    }
+
+    private List<CountByReason> getCountByReasonByIndustry(LocalDate from, LocalDate to, List<Long> countriesIds, long industryId) {
+        var countToReason = ((List<Object[]>) entityManager.createNativeQuery(
+                "select cr.id, sub.count" +
+                        " from conflict_reasons cr" +
+                        "   full outer join (select c.conflict_reason_id res_id, count(distinct(c.id))" +
+                        "                   from conflicts c" +
+                        "                   left join events e on e.conflict_id = c.id" +
+                        "                   left join localities l on e.locality_id = l.id" +
+                        "                   left join regions r on l.region_id = r.id" +
+                        "                   where e.date >= :from and e.date <= :to" +
+                        "                   and r.country_id in :countriesIds" +
+                        "                   and c.industry_id = :industryId" +
+                        "                   group by c.conflict_reason_id) sub on sub.res_id = cr.id")
+                .setParameter("industryId", industryId)
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
+                .getResultList())
+                .stream()
+                .map(raw -> new CountByReason(
+                        Optional.ofNullable((Integer) raw[0]).map(Integer::longValue).orElse(null), // may be null
+                        Optional.ofNullable(raw[1])
+                                .map(count -> ((BigInteger) count).intValue())
+                                .orElse(0))) // count of conflicts)
+                .collect(toList());
+        // to always return not specified count
+        if (countToReason.stream().noneMatch(ctr -> ctr.getReasonId() == null)) {
+            countToReason.add(new CountByReason(null, 0));
+        }
+        return countToReason;
+    }
+
+    @Override
     public List<CountByTypeByIndustry> getCountPercentByTypesByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds) {
         var industryIds = (List<Integer>) entityManager.createNativeQuery(
                 "select id from industries")

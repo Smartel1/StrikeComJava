@@ -132,6 +132,7 @@ public class ConflictService {
 
         result.setCountByResultsByTypes(conflictRepository.getCountByResultsByTypes(from, to, countriesIds));
         result.setCountByResultsByIndustries(conflictRepository.getCountByResultsByIndustries(from, to, countriesIds));
+        result.setCountByReasonsByIndustries(conflictRepository.getCountByReasonsByIndustries(from, to, countriesIds));
         result.setCountByTypesByIndustries(conflictRepository.getCountPercentByTypesByIndustries(from, to, countriesIds));
         return result;
     }

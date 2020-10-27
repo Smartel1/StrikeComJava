@@ -16,6 +16,7 @@ public class ConflictReportDTO {
     private List<CountByType> countByTypes = new ArrayList<>();
     private List<CountByResultsByType> countByResultsByTypes = new ArrayList<>();
     private List<CountByResultsByIndustry> countByResultsByIndustries = new ArrayList<>();
+    private List<CountByReasonsByIndustry> countByReasonsByIndustries = new ArrayList<>();
     private List<CountByTypeByIndustry> countByTypesByIndustries = new ArrayList<>();
 
     public long getConflictsBeganBeforeDateFromCount() {
@@ -96,6 +97,14 @@ public class ConflictReportDTO {
 
     public void setCountByResultsByIndustries(List<CountByResultsByIndustry> countByResultsByIndustries) {
         this.countByResultsByIndustries = countByResultsByIndustries;
+    }
+
+    public List<CountByReasonsByIndustry> getCountByReasonsByIndustries() {
+        return countByReasonsByIndustries;
+    }
+
+    public void setCountByReasonsByIndustries(List<CountByReasonsByIndustry> countByReasonsByIndustries) {
+        this.countByReasonsByIndustries = countByReasonsByIndustries;
     }
 
     public List<CountByTypeByIndustry> getCountByTypesByIndustries() {
