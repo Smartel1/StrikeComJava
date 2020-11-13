@@ -35,6 +35,9 @@ public class NewsSortDTO {
             case "date":
                 instance.orderField = OrderField.DATE;
                 break;
+            case "views":
+                instance.orderField = OrderField.VIEWS;
+                break;
             default:
                 throw new IllegalStateException("Unknown sorting field for news: " + sort.getField());
         }
@@ -64,10 +67,11 @@ public class NewsSortDTO {
 
     private enum OrderField {
         CREATED_AT((root) -> root.get("createdAt"), (c1, c2) -> c1.getCreatedAt().compareTo(c2.getCreatedAt())),
-        DATE((root) -> root.get("post").get("date"), (c1, c2) -> c1.getDate().compareTo(c2.getDate()));
+        DATE((root) -> root.get("post").get("date"), (c1, c2) -> c1.getDate().compareTo(c2.getDate())),
+        VIEWS((root) -> root.get("post").get("views"), (c1, c2) -> c1.getViews().compareTo(c2.getViews()));
 
-        private Function<Root<News>, Path<News>> pathMaker;
-        private Comparator<News> comparator;
+        private final Function<Root<News>, Path<News>> pathMaker;
+        private final Comparator<News> comparator;
 
         OrderField(Function<Root<News>, Path<News>> pathMaker, Comparator<News> comparator) {
             this.pathMaker = pathMaker;
@@ -87,7 +91,7 @@ public class NewsSortDTO {
         ASC(CriteriaBuilder::asc),
         DESC(CriteriaBuilder::desc);
 
-        private BiFunction<CriteriaBuilder, Path<News>, Order> orderMaker;
+        private final BiFunction<CriteriaBuilder, Path<News>, Order> orderMaker;
 
         OrderDirection(BiFunction<CriteriaBuilder, Path<News>, Order> orderMaker) {
             this.orderMaker = orderMaker;

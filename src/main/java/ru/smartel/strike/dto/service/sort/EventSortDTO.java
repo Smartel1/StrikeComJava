@@ -35,6 +35,9 @@ public class EventSortDTO {
             case "date":
                 instance.orderField = OrderField.DATE;
                 break;
+            case "views":
+                instance.orderField = OrderField.VIEWS;
+                break;
             default:
                 throw new IllegalStateException("Unknown sorting field for event: " + sort.getField());
         }
@@ -64,10 +67,11 @@ public class EventSortDTO {
 
     private enum OrderField {
         CREATED_AT((root) -> root.get("createdAt"), (c1, c2) -> c1.getCreatedAt().compareTo(c2.getCreatedAt())),
-        DATE((root) -> root.get("post").get("date"), (c1, c2) -> c1.getDate().compareTo(c2.getDate()));
+        DATE((root) -> root.get("post").get("date"), (c1, c2) -> c1.getDate().compareTo(c2.getDate())),
+        VIEWS((root) -> root.get("post").get("views"), (c1, c2) -> c1.getViews().compareTo(c2.getViews()));
 
-        private Function<Root<Event>, Path<Event>> pathMaker;
-        private Comparator<Event> comparator;
+        private final Function<Root<Event>, Path<Event>> pathMaker;
+        private final Comparator<Event> comparator;
 
         OrderField(Function<Root<Event>, Path<Event>> pathMaker, Comparator<Event> comparator) {
             this.pathMaker = pathMaker;
@@ -87,7 +91,7 @@ public class EventSortDTO {
         ASC(CriteriaBuilder::asc),
         DESC(CriteriaBuilder::desc);
 
-        private BiFunction<CriteriaBuilder, Path<Event>, Order> orderMaker;
+        private final BiFunction<CriteriaBuilder, Path<Event>, Order> orderMaker;
 
         OrderDirection(BiFunction<CriteriaBuilder, Path<Event>, Order> orderMaker) {
             this.orderMaker = orderMaker;
