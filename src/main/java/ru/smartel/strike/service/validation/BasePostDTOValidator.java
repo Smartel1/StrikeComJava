@@ -27,7 +27,7 @@ public class BasePostDTOValidator {
             if (dto.getSort().getField() == null) {
                 addErrorMessage("sort.field", notNull(), errors);
             } else {
-                List<String> availableSortFields = Arrays.asList("createdAt", "date");
+                List<String> availableSortFields = Arrays.asList("createdAt", "date", "views");
                 if (!availableSortFields.contains(dto.getSort().getField())) {
                     addErrorMessage("sort.field", oneOf(availableSortFields), errors);
                 }
