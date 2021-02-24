@@ -2,11 +2,9 @@ package ru.smartel.strike.specification.conflict;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.Conflict;
+import ru.smartel.strike.entity.Event;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
@@ -14,7 +12,7 @@ import java.time.ZoneOffset;
  * Conflicts after specified date only
  */
 public class AfterDateConflict implements Specification<Conflict> {
-    private int dateFrom;
+    private final int dateFrom;
 
     public AfterDateConflict(int dateFrom) {
         this.dateFrom = dateFrom;
@@ -22,9 +20,9 @@ public class AfterDateConflict implements Specification<Conflict> {
 
     @Override
     public Predicate toPredicate(Root<Conflict> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        // if dateTo not specified, then conflict is in progress, therefore it matches any 'dateFrom' filter
-        return cb.or(cb.isNull(root.get("dateTo")),
-                cb.greaterThanOrEqualTo(root.get("dateTo"),
-                        LocalDateTime.ofEpochSecond(dateFrom, 0, ZoneOffset.UTC)));
+        Join<Conflict, Event> join = root.join("events", JoinType.LEFT);
+        return cb.or(
+                cb.greaterThanOrEqualTo(join.get("post").get("date"),
+                LocalDateTime.ofEpochSecond(dateFrom, 0, ZoneOffset.UTC)));
     }
 }
