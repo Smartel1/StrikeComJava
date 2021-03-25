@@ -84,6 +84,7 @@ public class FiltersTransformer {
         if (null != filters.getFulltext()) result = result.and(new TextMentionConflict(filters.getFulltext()));
         if (null != filters.getConflictResultIds()) result = result.and(new MatchResultsConflict(filters.getConflictResultIds()));
         if (null != filters.getConflictReasonIds()) result = result.and(new MatchReasonsConflict(filters.getConflictReasonIds()));
+        if (null != filters.getIndustryIds()) result = result.and(new MatchIndustriesConflict(filters.getIndustryIds()));
         if (null != filters.getMainTypeIds()) result = result.and(new MatchMainTypesConflict(filters.getMainTypeIds()));
         if (null != filters.getAncestorsOf()) {
             Conflict descendant = conflictRepository.findById(filters.getAncestorsOf()).orElse(null);

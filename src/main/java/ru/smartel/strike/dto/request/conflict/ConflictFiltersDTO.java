@@ -15,6 +15,8 @@ public class ConflictFiltersDTO {
     private List<Long> conflictResultIds;
     @ApiParam(value = "Id причины конфликта (из справочника)")
     private List<Long> conflictReasonIds;
+    @ApiParam(value = "Id отрасли конфликта (из справочника)")
+    private List<Long> industryIds;
     @ApiParam(value = "Id основной формы конфликта (из справочника типов событий). Допускается null")
     private List<String> mainTypeIds;
     @ApiParam(value = "Id конфликта. Фильтр выводит только те конфликты, которые являются родителями (не только прямыми) переданного конфликта")
@@ -61,6 +63,14 @@ public class ConflictFiltersDTO {
 
     public void setConflictReasonIds(List<Long> conflictReasonIds) {
         this.conflictReasonIds = conflictReasonIds;
+    }
+
+    public List<Long> getIndustryIds() {
+        return industryIds;
+    }
+
+    public void setIndustryIds(List<Long> industryIds) {
+        this.industryIds = industryIds;
     }
 
     public List<String> getMainTypeIds() {

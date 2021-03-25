@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.smartel.strike.dto.request.region.RegionCreateRequestDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
+import ru.smartel.strike.dto.response.reference.locality.LocalityDetailDTO;
 import ru.smartel.strike.dto.response.reference.region.RegionDetailDTO;
 import ru.smartel.strike.entity.reference.Region;
 import ru.smartel.strike.repository.etc.CountryRepository;
@@ -13,6 +14,7 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.region.NamePatternRegion;
 import ru.smartel.strike.specification.region.RegionOfCountry;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,9 +23,9 @@ import java.util.stream.Collectors;
 @Transactional(rollbackFor = Exception.class)
 public class RegionService {
 
-    private RegionRepository regionRepository;
-    private CountryRepository countryRepository;
-    private RegionDTOValidator validator;
+    private final RegionRepository regionRepository;
+    private final CountryRepository countryRepository;
+    private final RegionDTOValidator validator;
 
     public RegionService(RegionRepository regionRepository,
                          CountryRepository countryRepository,
@@ -43,6 +45,7 @@ public class RegionService {
         return new ListWrapperDTO<>(
                 regions.stream()
                         .map(region -> RegionDetailDTO.of(region, locale))
+                        .sorted(Comparator.comparing(RegionDetailDTO::getName))
                         .collect(Collectors.toList()),
                 null
         );

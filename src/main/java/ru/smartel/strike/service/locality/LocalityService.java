@@ -13,9 +13,12 @@ import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.specification.locality.LocalityOfRegion;
 import ru.smartel.strike.specification.locality.NamePatternLocality;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ru.smartel.strike.dto.response.NamesExtendableDTO.byName;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -43,6 +46,7 @@ public class LocalityService {
         return new ListWrapperDTO<>(
                 localities.stream()
                         .map(locality -> LocalityDetailDTO.of(locality, locale))
+                        .sorted(Comparator.comparing(LocalityDetailDTO::getName))
                         .collect(Collectors.toList()),
                 null
         );

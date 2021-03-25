@@ -15,12 +15,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ru.smartel.strike.dto.response.NamesExtendableDTO.byName;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class CountryService {
 
-    private CountryRepository countryRepository;
-    private CountryDTOValidator validator;
+    private final CountryRepository countryRepository;
+    private final CountryDTOValidator validator;
 
     public CountryService(CountryRepository countryRepository,
                           CountryDTOValidator validator) {
@@ -36,6 +38,7 @@ public class CountryService {
         return new ListWrapperDTO<>(
                 countries.stream()
                         .map(country -> CountryDTO.of(country, locale))
+                        .sorted(byName())
                         .collect(Collectors.toList()),
                 null
         );
