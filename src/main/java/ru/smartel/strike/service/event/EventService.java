@@ -199,7 +199,8 @@ public class EventService {
         //Only moderator can publish events
         businessValidationService.validate(
                 new UserCanModerate(user).when(
-                        null != dto.getPublished() && dto.getPublished().orElse(false) || null != dto.getLocalityId()
+                        null != dto.getPublished() && dto.getPublished().orElse(false)
+                                || null != dto.getLocalityId() && dto.getLocalityId().isPresent()
                 )
         );
 
