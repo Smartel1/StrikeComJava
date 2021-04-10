@@ -6,6 +6,7 @@ import ru.smartel.strike.dto.request.conflict.ConflictCreateRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictListRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictReportRequestDTO;
 import ru.smartel.strike.dto.request.conflict.ConflictUpdateRequestDTO;
+import ru.smartel.strike.dto.request.event.EventFavouritesRequestDTO;
 import ru.smartel.strike.dto.response.DetailWrapperDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.conflict.ConflictDetailDTO;
@@ -18,6 +19,7 @@ import ru.smartel.strike.service.conflict.ConflictService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v2/{locale}/conflicts")
@@ -42,6 +44,14 @@ public class ConflictController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long conflictId) {
         return new DetailWrapperDTO<>(conflictService.get(conflictId, locale));
+    }
+
+    @PostMapping("{id}/favourites")
+    public void setFavourite(
+            @PathVariable("id") long eventId,
+            @RequestBody EventFavouritesRequestDTO dto,
+            @AuthenticationPrincipal UserPrincipal user) {
+        Optional.ofNullable(user).ifPresent(usr -> conflictService.setFavourite(eventId, usr.getId(), dto.isFavourite()));
     }
 
     @GetMapping("report")

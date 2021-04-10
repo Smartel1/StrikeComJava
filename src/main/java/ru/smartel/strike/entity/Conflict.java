@@ -9,20 +9,12 @@ import ru.smartel.strike.entity.reference.ConflictResult;
 import ru.smartel.strike.entity.reference.EventType;
 import ru.smartel.strike.entity.reference.Industry;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "conflicts")
@@ -108,6 +100,9 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Industry industry;
+
+    @ManyToMany(mappedBy = "favouriteConflicts")
+    private Set<User> likedUsers = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -292,6 +287,14 @@ public class Conflict implements NestedNode<Long>, HavingTitles {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Set<User> getLikedUsers() {
+        return likedUsers;
+    }
+
+    public void setLikedUsers(Set<User> likedUsers) {
+        this.likedUsers = likedUsers;
     }
 
     @Override

@@ -103,6 +103,9 @@ public class FiltersTransformer {
                             filters.getNear().getRadius()
                     )
             );
+        if (null != filters.getFavourites() && filters.getFavourites() && null != userId) {
+            result = result.and(new FavouriteConflict(userId));
+        }
         return result;
     }
 

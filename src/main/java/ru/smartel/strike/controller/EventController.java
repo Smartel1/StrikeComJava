@@ -33,8 +33,9 @@ public class EventController {
     }
 
     @GetMapping("{id}")
-    public DetailWrapperDTO<EventDetailDTO> show(EventShowDetailRequestDTO dto) {
-        return new DetailWrapperDTO<>(eventService.incrementViewsAndGet(dto));
+    public DetailWrapperDTO<EventDetailDTO> show(EventShowDetailRequestDTO dto,
+                                                 @AuthenticationPrincipal UserPrincipal user) {
+        return new DetailWrapperDTO<>(eventService.incrementViewsAndGet(dto, user));
     }
 
     @PostMapping("{id}/favourites")

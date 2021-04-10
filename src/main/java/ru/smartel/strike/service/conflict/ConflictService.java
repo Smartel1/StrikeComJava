@@ -17,11 +17,13 @@ import ru.smartel.strike.dto.response.reference.locality.ExtendedLocalityDTO;
 import ru.smartel.strike.dto.service.sort.ConflictSortDTO;
 import ru.smartel.strike.entity.Conflict;
 import ru.smartel.strike.entity.Event;
+import ru.smartel.strike.entity.User;
 import ru.smartel.strike.exception.ValidationException;
 import ru.smartel.strike.repository.conflict.ConflictReasonRepository;
 import ru.smartel.strike.repository.conflict.ConflictRepository;
 import ru.smartel.strike.repository.conflict.ConflictResultRepository;
 import ru.smartel.strike.repository.etc.IndustryRepository;
+import ru.smartel.strike.repository.etc.UserRepository;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.event.EventTypeRepository;
 import ru.smartel.strike.service.Locale;
@@ -54,6 +56,7 @@ public class ConflictService {
     private final EventRepository eventRepository;
     private final EventService eventService;
     private final EventTypeRepository eventTypeRepository;
+    private final UserRepository userRepository;
 
     public ConflictService(ConflictDTOValidator dtoValidator,
                            FiltersTransformer filtersTransformer,
@@ -63,7 +66,7 @@ public class ConflictService {
                            IndustryRepository industryRepository,
                            EventRepository eventRepository,
                            EventService eventService,
-                           EventTypeRepository eventTypeRepository) {
+                           EventTypeRepository eventTypeRepository, UserRepository userRepository) {
         this.dtoValidator = dtoValidator;
         this.filtersTransformer = filtersTransformer;
         this.conflictRepository = conflictRepository;
@@ -73,6 +76,7 @@ public class ConflictService {
         this.eventRepository = eventRepository;
         this.eventService = eventService;
         this.eventTypeRepository = eventTypeRepository;
+        this.userRepository = userRepository;
     }
 
     @PreAuthorize("permitAll()")
@@ -114,6 +118,25 @@ public class ConflictService {
         return conflictRepository.findById(conflictId)
                 .map(c -> ConflictDetailDTO.of(c, locale))
                 .orElseThrow(() -> new EntityNotFoundException("Конфликт не найден"));
+    }
+
+    @PreAuthorize("isFullyAuthenticated()")
+    public void setFavourite(Long conflictId, long userId, boolean isFavourite) {
+        log.debug("Change favourite status for conflict {} to {} for user {}", conflictId, userId, isFavourite);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("Authorization cannot pass empty user into this method"));
+        Conflict conflict = conflictRepository.getOne(conflictId);
+
+        List<Conflict> currentFavourites = user.getFavouriteConflicts();
+
+        if (isFavourite) {
+            //If not in favourites - add it
+            if (!currentFavourites.contains(conflict)) {
+                currentFavourites.add(conflict);
+            }
+        } else {
+            currentFavourites.remove(conflict);
+        }
     }
 
     @PreAuthorize("isAuthenticated()")

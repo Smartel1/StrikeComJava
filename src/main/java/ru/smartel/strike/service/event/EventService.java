@@ -33,6 +33,7 @@ import ru.smartel.strike.rules.EventAfterConflictsStart;
 import ru.smartel.strike.rules.EventBeforeConflictsEnd;
 import ru.smartel.strike.rules.NotAParentEvent;
 import ru.smartel.strike.rules.UserCanModerate;
+import ru.smartel.strike.security.token.UserPrincipal;
 import ru.smartel.strike.service.Locale;
 import ru.smartel.strike.service.conflict.ConflictMainTypeService;
 import ru.smartel.strike.service.filters.FiltersTransformer;
@@ -50,6 +51,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static ru.smartel.strike.entity.User.ROLE_ADMIN;
+import static ru.smartel.strike.entity.User.ROLE_MODERATOR;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -151,7 +155,7 @@ public class EventService {
 
     @PreAuthorize("permitAll()")
     @PostAuthorize("hasAnyRole('ADMIN', 'MODERATOR') or returnObject.published")
-    public EventDetailDTO incrementViewsAndGet(EventShowDetailRequestDTO dto) {
+    public EventDetailDTO incrementViewsAndGet(EventShowDetailRequestDTO dto, UserPrincipal user) {
         Event event = eventRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Событие не найдено"));
 
@@ -160,7 +164,8 @@ public class EventService {
         EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
 
         if (dto.isWithRelatives()) {
-            result.add("relatives", getRelatives(event, dto.getLocale()));
+            var userIsModerator = user.getRoles().contains(ROLE_ADMIN) || user.getRoles().contains(ROLE_MODERATOR);
+            result.add("relatives", getRelatives(event, dto.getLocale(), userIsModerator));
         }
 
         return result;
@@ -508,12 +513,8 @@ public class EventService {
     /**
      * Get related events grouped by containing conflicts.
      * Related means they belongs to same root conflict
-     *
-     * @param event
-     * @param locale
-     * @return
      */
-    private List<BriefConflictWithEventsDTO> getRelatives(Event event, Locale locale) {
+    private List<BriefConflictWithEventsDTO> getRelatives(Event event, Locale locale, boolean includeNotPublished) {
         Conflict conflict = event.getConflict();
         if (conflict == null) {
             return new ArrayList<>();
@@ -534,6 +535,7 @@ public class EventService {
                     confDTO.setParentEventId(
                             Optional.ofNullable(conf.getParentEvent()).map(Event::getId).orElse(null));
                     confDTO.setEvents(conf.getEvents().stream()
+                            .filter(e -> includeNotPublished || e.isPublished())
                             .map(evn -> {
                                 BriefEventDTO eventDTO = new BriefEventDTO();
                                 eventDTO.setId(evn.getId());

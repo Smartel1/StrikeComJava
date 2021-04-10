@@ -24,6 +24,8 @@ public class ConflictFiltersDTO {
     @ApiParam(value = "Id конфликта. Фильтр выводит только те конфликты, которые являются прямыми потомками переданного конфликта")
     private Long childrenOf;
     private SearchArea near;
+    @ApiParam(value = "true - выведутся только избранные, иначе - все. Работает только для аутентифицированных пользователей")
+    private Boolean favourites;
 
     public Integer getDateFrom() {
         return dateFrom;
@@ -103,6 +105,14 @@ public class ConflictFiltersDTO {
 
     public void setNear(SearchArea near) {
         this.near = near;
+    }
+
+    public Boolean getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(Boolean favourites) {
+        this.favourites = favourites;
     }
 
     public static class SearchArea {

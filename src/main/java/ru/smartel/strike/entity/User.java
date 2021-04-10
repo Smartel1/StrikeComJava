@@ -84,6 +84,14 @@ public class User {
     )
     private List<News> favouriteNews;
 
+    @ManyToMany
+    @JoinTable(
+            name = "favourite_conflicts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "conflict_id")
+    )
+    private List<Conflict> favouriteConflicts;
+
     public List<String> getRolesAsList() {
         List<String> roles = new ArrayList<>();
         for (JsonNode role : this.roles) {
@@ -187,5 +195,13 @@ public class User {
 
     public void setFavouriteNews(List<News> favouriteNews) {
         this.favouriteNews = favouriteNews;
+    }
+
+    public List<Conflict> getFavouriteConflicts() {
+        return favouriteConflicts;
+    }
+
+    public void setFavouriteConflicts(List<Conflict> favouriteConflicts) {
+        this.favouriteConflicts = favouriteConflicts;
     }
 }
