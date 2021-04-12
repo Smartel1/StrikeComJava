@@ -164,7 +164,7 @@ public class EventService {
         EventDetailDTO result = EventDetailDTO.of(event, dto.getLocale());
 
         if (dto.isWithRelatives()) {
-            var userIsModerator = user.getRoles().contains(ROLE_ADMIN) || user.getRoles().contains(ROLE_MODERATOR);
+            var userIsModerator = user != null && (user.getRoles().contains(ROLE_ADMIN) || user.getRoles().contains(ROLE_MODERATOR));
             result.add("relatives", getRelatives(event, dto.getLocale(), userIsModerator));
         }
 
