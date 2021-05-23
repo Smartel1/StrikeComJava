@@ -64,6 +64,7 @@ public class VkService {
                 text = text + "\n";
             }
             text = text + "\n" + data.getSourceUrl();
+            text = text + "\n" + data.getSitePageUrl();
         }
         payload.add("message", text);
 

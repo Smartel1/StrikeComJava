@@ -48,8 +48,10 @@ public class TelegramService {
         if (nonNull(data.getSourceUrl())) {
             if (data.getVideoUrls().isEmpty()) {
                 text = text + "\n\n<i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
+                text = text + "\n\n<i><a href='" + data.getSitePageUrl() + "'>на сайте</a></i>";
             } else {
                 text = text + "; <i><a href='" + data.getSourceUrl() + "'>источник</a></i>";
+                text = text + "; <i><a href='" + data.getSitePageUrl() + "'>на сайте</a></i>";
             }
         }
 

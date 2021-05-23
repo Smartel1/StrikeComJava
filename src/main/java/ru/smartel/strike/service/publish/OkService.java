@@ -60,6 +60,7 @@ public class OkService {
         if (nonNull(data.getSourceUrl())) {
             attachmentDto.media.add(new LinkMedia(data.getSourceUrl()));
         }
+        attachmentDto.media.add(new LinkMedia(data.getSitePageUrl()));
 
         String attachmentJson;
         try {

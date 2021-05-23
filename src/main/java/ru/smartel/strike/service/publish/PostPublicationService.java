@@ -9,6 +9,7 @@ import ru.smartel.strike.dto.service.sort.network.Network;
 import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.integration.PublicationGateway;
+import ru.smartel.strike.service.url.UrlService;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,16 +22,19 @@ public class PostPublicationService {
     public static final Logger log = LoggerFactory.getLogger(PostPublicationService.class);
 
     private final PublicationGateway publicationGateway;
+    private final UrlService urlService;
 
-    public PostPublicationService(PublicationGateway publicationGateway) {
+    public PostPublicationService(PublicationGateway publicationGateway, UrlService urlService) {
         this.publicationGateway = publicationGateway;
+        this.urlService = urlService;
     }
 
     public void publishAndSetFlags(PostEntity post, Set<Long> publishTo) {
         if (nonNull(post.getTitleRu())) {
             log.debug("Publishing post {} to networks {}", post, publishTo);
+            var sitePageUrl = urlService.getUrl(post);
             publicationGateway.publish(new PublishDTOWithNetworks(
-                    new PublishDTO(post.getContentRu(), post.getSourceLink(), post.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
+                    new PublishDTO(post.getContentRu(), post.getSourceLink(), sitePageUrl, post.getVideos().stream().map(Video::getUrl).collect(Collectors.toList())),
                     getNetworkIdsToSendTo(post, publishTo)));
             setSentToFlags(post, publishTo);
         }
