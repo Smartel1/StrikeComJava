@@ -66,7 +66,7 @@ public class OkService {
         try {
             attachmentJson = objectMapper.writeValueAsString(attachmentDto);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("Error occurred while serializing request", e);
             return;
         }
         String signature = getSig(properties.getAppKey(), attachmentJson, properties.getGid(),

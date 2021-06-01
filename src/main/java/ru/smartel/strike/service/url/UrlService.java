@@ -10,7 +10,7 @@ import ru.smartel.strike.entity.interfaces.PostEntity;
 public class UrlService {
    private final String siteUrl;
 
-    public UrlService(@Value("site-url") String siteUrl) {
+    public UrlService(@Value("${site-url}") String siteUrl) {
         this.siteUrl = siteUrl;
     }
 
