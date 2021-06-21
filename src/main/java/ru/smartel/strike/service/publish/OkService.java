@@ -57,10 +57,10 @@ public class OkService {
         if (!data.getVideoUrls().isEmpty()) {
             data.getVideoUrls().forEach(url -> attachmentDto.media.add(new LinkMedia(url)));
         }
+        attachmentDto.media.add(new LinkMedia(data.getSitePageUrl()));
         if (nonNull(data.getSourceUrl())) {
             attachmentDto.media.add(new LinkMedia(data.getSourceUrl()));
         }
-        attachmentDto.media.add(new LinkMedia(data.getSitePageUrl()));
 
         String attachmentJson;
         try {

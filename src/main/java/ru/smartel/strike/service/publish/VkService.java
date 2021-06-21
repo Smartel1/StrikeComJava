@@ -52,20 +52,22 @@ public class VkService {
         payload.add("v", API_VERSION);
         payload.add("from_group", "1");
 
-        String text = data.getText();
+        String text = data.getText() + "\n\n";
         if (!data.getVideoUrls().isEmpty()) {
             text = text + data.getVideoUrls().stream()
-                    .collect(Collectors.joining("\n", "\n\n", ""));
+                    .collect(Collectors.joining("\n", "", "\n"));
             payload.add("attachments", data.getVideoUrls().stream().findFirst().orElse(null));
         }
-        if (nonNull(data.getSourceUrl())) {
-            if (data.getVideoUrls().isEmpty()) {
-                payload.add("attachments", data.getSourceUrl());
-                text = text + "\n";
-            }
-            text = text + "\n" + data.getSourceUrl();
-            text = text + "\n" + data.getSitePageUrl();
+
+        text = text + data.getSitePageUrl();
+        if (data.getVideoUrls().isEmpty()) {
+            payload.add("attachments", data.getSourceUrl());
         }
+
+        if (nonNull(data.getSourceUrl())) {
+            text = text + "\n" + data.getSourceUrl();
+        }
+
         payload.add("message", text);
 
         try {
