@@ -17,6 +17,7 @@ import ru.smartel.strike.dto.response.conflict.BriefConflictWithEventsDTO;
 import ru.smartel.strike.dto.response.event.BriefEventDTO;
 import ru.smartel.strike.dto.response.event.EventDetailDTO;
 import ru.smartel.strike.dto.response.event.EventListDTO;
+import ru.smartel.strike.dto.response.post.PostListDTO;
 import ru.smartel.strike.dto.service.sort.EventSortDTO;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.entity.interfaces.PostEntity;
@@ -149,6 +150,8 @@ public class EventService {
                 .sorted(sortDTO.toComparator())
                 .map(e -> EventListDTO.of(e, dto.getLocale()))
                 .collect(Collectors.toList());
+
+        eventRepository.incrementViews(eventListDTOs.stream().map(PostListDTO::getId).collect(Collectors.toList()));
 
         return new ListWrapperDTO<>(eventListDTOs, responseMeta);
     }

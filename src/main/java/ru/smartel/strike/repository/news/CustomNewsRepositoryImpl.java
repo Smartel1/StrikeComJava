@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -29,5 +30,12 @@ public class CustomNewsRepositoryImpl implements CustomNewsRepository {
                 .setMaxResults(perPage)
                 .setFirstResult((page - 1) * perPage)
                 .getResultList();
+    }
+
+    @Override
+    public void incrementViews(Collection<Long> ids) {
+        entityManager.createNativeQuery("update news set views = views + 1 where id in :ids")
+                .setParameter("ids", ids)
+                .executeUpdate();
     }
 }

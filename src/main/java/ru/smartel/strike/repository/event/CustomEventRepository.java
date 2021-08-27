@@ -6,6 +6,7 @@ import ru.smartel.strike.dto.service.event.type.EventTypeCountDTO;
 import ru.smartel.strike.dto.service.sort.EventSortDTO;
 import ru.smartel.strike.entity.Event;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -20,4 +21,6 @@ public interface CustomEventRepository {
      * @return typeId to count
      */
     List<EventTypeCountDTO> getEventTypesCountByConflictId(long conflictId);
+
+    void incrementViews(Collection<Long> ids);
 }

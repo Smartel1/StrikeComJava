@@ -15,6 +15,7 @@ import ru.smartel.strike.dto.request.video.VideoDTO;
 import ru.smartel.strike.dto.response.ListWrapperDTO;
 import ru.smartel.strike.dto.response.news.NewsDetailDTO;
 import ru.smartel.strike.dto.response.news.NewsListDTO;
+import ru.smartel.strike.dto.response.post.PostListDTO;
 import ru.smartel.strike.dto.service.sort.NewsSortDTO;
 import ru.smartel.strike.entity.*;
 import ru.smartel.strike.repository.etc.*;
@@ -117,6 +118,8 @@ public class NewsService {
                 .sorted(sortDTO.toComparator())
                 .map(e -> NewsListDTO.of(e, dto.getLocale()))
                 .collect(Collectors.toList());
+
+        newsRepository.incrementViews(newsListDTOs.stream().map(PostListDTO::getId).collect(Collectors.toList()));
 
         return new ListWrapperDTO<>(newsListDTOs, responseMeta);
     }

@@ -12,6 +12,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,5 +63,12 @@ public class CustomEventRepositoryImpl implements CustomEventRepository {
         return countByTypeId.stream()
                 .map(raw -> new EventTypeCountDTO((long) (int) raw[0], ((BigInteger) raw[1]).longValue(), (int) raw[2]))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void incrementViews(Collection<Long> ids) {
+        entityManager.createNativeQuery("update events set views = views + 1 where id in :ids")
+                .setParameter("ids", ids)
+                .executeUpdate();
     }
 }
