@@ -18,6 +18,8 @@ public interface ReportsConflictRepository {
 
     Map<String, Integer> getCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds);
 
+    Map<String, Integer> getCountByRegions(LocalDate from, LocalDate to, List<Long> countriesIds);
+
     Map<String, Float> getSpecificCountByDistricts(LocalDate from, LocalDate to, List<Long> countriesIds);
 
     List<CountByIndustry> getCountByIndustries(LocalDate from, LocalDate to, List<Long> countriesIds);

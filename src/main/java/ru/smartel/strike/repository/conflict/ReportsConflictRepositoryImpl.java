@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,6 +83,33 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                         " and r.country_id in :countriesIds" +
                         " group by d.name" +
                         " having d.name is not null")
+                .setParameter("from", from)
+                .setParameter("to", to)
+                .setParameter("countriesIds", countriesIds)
+                .getResultList();
+
+        return resultList.stream()
+                .collect(Collectors.toMap(r -> mapKey(r[0]), r -> ((BigInteger) r[1]).intValue()));
+    }
+
+    @Override
+    public Map<String, Integer> getCountByRegions(LocalDate from, LocalDate to, List<Long> countriesIds) {
+        // Conflict's region is the region of the first conflict's event (first by date).
+        // Small part of conflicts include events from several regions, so this approximation is good enough
+        List<Object[]> resultList = entityManager.createNativeQuery(
+                "with sub as (" +
+                        "    select e.conflict_id," +
+                        "           e.locality_id," +
+                        "           ROW_NUMBER() OVER (PARTITION BY e.conflict_id ORDER BY e.date) AS rk" +
+                        "    from events e where e.date >= :from and e.date <= :to)" +
+                        " select r.name, count(conflict_id)" +
+                        " from sub" +
+                        "         left join localities l on l.id = sub.locality_id" +
+                        "         left join regions r on r.id = l.region_id" +
+                        " where rk = 1" +
+                        " and r.country_id in :countriesIds" +
+                        " group by r.name" +
+                        " having r.name is not null")
                 .setParameter("from", from)
                 .setParameter("to", to)
                 .setParameter("countriesIds", countriesIds)

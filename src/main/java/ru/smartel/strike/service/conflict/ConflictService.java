@@ -146,6 +146,7 @@ public class ConflictService {
         result.setConflictsBeganBeforeDateFromCount(conflictRepository.getOldConflictsCount(from, to, countriesIds));
         result.setCountByCountries(conflictRepository.getCountByCountries(from, to, countriesIds));
         result.setCountByDistricts(conflictRepository.getCountByDistricts(from, to, countriesIds));
+        result.setCountByRegions(conflictRepository.getCountByRegions(from, to, countriesIds));
         result.setSpecificCountByDistricts(conflictRepository.getSpecificCountByDistricts(from, to, countriesIds));
 
         result.setCountByIndustries(conflictRepository.getCountByIndustries(from, to, countriesIds));

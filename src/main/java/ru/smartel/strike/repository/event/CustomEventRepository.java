@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface CustomEventRepository {
     boolean isNotParentForAnyConflicts(long eventId);
+
     List<Long> findIds(Specification<Event> specification, EventSortDTO sortDTO, Integer page, Integer perPage);
 
     /**

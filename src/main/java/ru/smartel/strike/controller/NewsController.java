@@ -59,7 +59,7 @@ public class NewsController {
             @PathVariable("locale") Locale locale,
             @PathVariable("id") long newsId,
             @AuthenticationPrincipal UserPrincipal user,
-            @RequestBody NewsUpdateRequestDTO dto ) {
+            @RequestBody NewsUpdateRequestDTO dto) {
         dto.setNewsId(newsId);
         dto.setLocale(locale);
         dto.setUser(user);

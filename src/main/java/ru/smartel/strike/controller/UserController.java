@@ -40,6 +40,6 @@ public class UserController {
     @DeleteMapping
     @PreAuthorize("isFullyAuthenticated()")
     public void delete(@AuthenticationPrincipal UserPrincipal user) {
-       userService.delete(user.getId());
+        userService.delete(user.getId());
     }
 }

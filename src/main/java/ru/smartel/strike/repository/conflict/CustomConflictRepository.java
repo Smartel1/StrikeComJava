@@ -17,13 +17,15 @@ public interface CustomConflictRepository {
     /**
      * Persist conflict as child of another conflict or as root (if parent == null).
      * In case of conflict already exists in tree - replace
+     *
      * @param conflict transient or persistent conflict
-     * @param parent persistent parent conflict or null
+     * @param parent   persistent parent conflict or null
      */
     void insertAsLastChildOf(Conflict conflict, Conflict parent);
 
     /**
      * Return true if conflict has children
+     *
      * @param conflict conflict to check
      * @return true if conflict has child conflicts
      */
@@ -31,6 +33,7 @@ public interface CustomConflictRepository {
 
     /**
      * Get root conflict of conflict tree
+     *
      * @param conflict
      * @return
      */
@@ -38,6 +41,7 @@ public interface CustomConflictRepository {
 
     /**
      * Get conflict's descendants (not only children)
+     *
      * @param conflict
      * @return
      */
@@ -45,6 +49,7 @@ public interface CustomConflictRepository {
 
     /**
      * Remove conflict from tree
+     *
      * @param conflict conflict to remove
      */
     void deleteFromTree(Conflict conflict);
