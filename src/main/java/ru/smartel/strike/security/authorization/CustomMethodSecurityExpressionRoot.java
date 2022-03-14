@@ -2,22 +2,17 @@ package ru.smartel.strike.security.authorization;
 
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import ru.smartel.strike.entity.Event;
-import ru.smartel.strike.entity.News;
 import ru.smartel.strike.entity.User;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.repository.event.EventRepository;
 import ru.smartel.strike.repository.news.NewsRepository;
 import ru.smartel.strike.security.token.UserPrincipal;
 
-import javax.persistence.EntityNotFoundException;
-
 public class CustomMethodSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
-    private EventRepository eventRepository;
-    private NewsRepository newsRepository;
+    private final EventRepository eventRepository;
+    private final NewsRepository newsRepository;
 
     private Object filterObject;
     private Object returnObject;
