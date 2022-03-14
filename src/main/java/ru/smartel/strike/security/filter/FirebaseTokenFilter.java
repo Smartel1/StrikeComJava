@@ -70,7 +70,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        String bearer = (request).getHeader("Authorization");
+        String bearer = request.getHeader("Authorization");
 
         try {
             if (bearer != null) {
@@ -103,7 +103,7 @@ public class FirebaseTokenFilter extends OncePerRequestFilter {
                 0,
                 ZoneOffset.ofHours(3));
 
-        // If token was issued before user was updated last time, then update user fields (async)
+        // If token was issued after user was updated last time, then update user fields (async)
         if (user.getUpdatedAt().compareTo(tokenIssuedAt) < 0) {
             CompletableFuture.runAsync(() -> firebaseService.syncUserFields(uid));
         }
