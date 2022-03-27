@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.publication.PublishDTO;
 import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
-import ru.smartel.strike.dto.service.sort.network.Network;
+import ru.smartel.strike.dto.service.network.Network;
 import ru.smartel.strike.entity.Video;
 import ru.smartel.strike.entity.interfaces.PostEntity;
 import ru.smartel.strike.integration.PublicationGateway;

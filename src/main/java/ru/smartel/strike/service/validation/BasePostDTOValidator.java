@@ -3,7 +3,7 @@ package ru.smartel.strike.service.validation;
 import ru.smartel.strike.dto.request.BaseListRequestDTO;
 import ru.smartel.strike.dto.request.post.PostRequestDTO;
 import ru.smartel.strike.dto.request.video.VideoDTO;
-import ru.smartel.strike.dto.service.sort.network.Network;
+import ru.smartel.strike.dto.service.network.Network;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.smartel.strike.dto.response.reference.ReferenceCodeDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesDTO;
 import ru.smartel.strike.dto.response.reference.ReferenceNamesSlugDTO;
-import ru.smartel.strike.dto.service.sort.network.Network;
+import ru.smartel.strike.dto.service.network.Network;
 import ru.smartel.strike.entity.reference.EntityWithNames;
 import ru.smartel.strike.entity.reference.EntityWithNamesAndSlug;
 import ru.smartel.strike.entity.reference.ReferenceWithCode;

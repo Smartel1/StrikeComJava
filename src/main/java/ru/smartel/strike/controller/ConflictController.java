@@ -48,10 +48,10 @@ public class ConflictController {
 
     @PostMapping("{id}/favourites")
     public void setFavourite(
-            @PathVariable("id") long eventId,
+            @PathVariable("id") long conflictId,
             @RequestBody EventFavouritesRequestDTO dto,
             @AuthenticationPrincipal UserPrincipal user) {
-        Optional.ofNullable(user).ifPresent(usr -> conflictService.setFavourite(eventId, usr.getId(), dto.isFavourite()));
+        Optional.ofNullable(user).ifPresent(usr -> conflictService.setFavourite(conflictId, usr.getId(), dto.isFavourite()));
     }
 
     @GetMapping("report")

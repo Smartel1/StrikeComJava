@@ -1,4 +1,4 @@
-package ru.smartel.strike.dto.service.sort.network;
+package ru.smartel.strike.dto.service.network;
 
 public enum Network {
     TELEGRAM(1L, "telegram"),

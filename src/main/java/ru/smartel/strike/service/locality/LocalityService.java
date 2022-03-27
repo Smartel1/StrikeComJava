@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ru.smartel.strike.dto.response.NamesExtendableDTO.byName;
-
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class LocalityService {

@@ -2,6 +2,7 @@ package ru.smartel.strike.specification.locality;
 
 import org.springframework.data.jpa.domain.Specification;
 import ru.smartel.strike.entity.reference.Locality;
+import ru.smartel.strike.entity.reference.Region;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

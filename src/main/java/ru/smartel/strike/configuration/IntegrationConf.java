@@ -8,7 +8,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import ru.smartel.strike.dto.publication.PublishDTO;
 import ru.smartel.strike.dto.publication.PublishDTOWithNetworks;
-import ru.smartel.strike.dto.service.sort.network.Network;
+import ru.smartel.strike.dto.service.network.Network;
 
 import java.util.stream.Collectors;
 

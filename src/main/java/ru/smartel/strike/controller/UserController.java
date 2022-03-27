@@ -12,7 +12,6 @@ import ru.smartel.strike.service.user.UserService;
 
 @RestController
 @RequestMapping("/api/v2/{locale}/me")
-
 public class UserController {
 
     private final UserService userService;

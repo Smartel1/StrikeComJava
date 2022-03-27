@@ -30,7 +30,7 @@ public class LocalityController {
         return localityService.list(name, regionId, locale);
     }
 
-    @PostMapping(consumes = {"application/json"})
+    @PostMapping
     public DetailWrapperDTO<LocalityDetailDTO> create(
             @PathVariable("locale") Locale locale,
             @RequestBody LocalityCreateRequestDTO dto) {
