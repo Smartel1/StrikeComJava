@@ -79,7 +79,8 @@ public class ConflictMainTypeService {
         // If one of the types present with maximum events count and has maximum priority - it wins
         int maxTypePriority = presentTypes.stream()
                 .map(EventTypeCountDTO::getPriority)
-                .max(Integer::compareTo).orElseThrow(() -> new IllegalStateException("type priority cannot be null"));
+                .max(Integer::compareTo)
+                .orElseThrow(() -> new IllegalStateException("type priority cannot be null"));
 
         if (maxTypePriority == 0) {
             return null;

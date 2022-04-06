@@ -22,6 +22,6 @@ public class EventAfterConflictsStart extends BusinessRule {
 
     @Override
     public String message() {
-        return "Событие не должно произойти до начала конфликта";
+            return "Событие не должно произойти до начала конфликта";
     }
 }
