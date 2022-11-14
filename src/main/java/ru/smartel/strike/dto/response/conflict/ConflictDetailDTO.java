@@ -36,7 +36,7 @@ public class ConflictDetailDTO extends TitlesExtendableDTO {
         instance.setDateFrom(ofNullable(conflict.getDateFrom()).map(df -> df.toEpochSecond(ZoneOffset.UTC)).orElse(null));
         instance.setDateTo(ofNullable(conflict.getDateTo()).map(df -> df.toEpochSecond(ZoneOffset.UTC)).orElse(null));
         instance.setConflictReasonId(ofNullable(conflict.getReason()).map(EntityWithNames::getId).orElse(null));
-        instance.setConflictResultId(ofNullable(conflict.getResult()).map(EntityWithNames::getId).orElse(null));
+        instance.setConflictResultId(conflict.getResult().getId());
         instance.setIndustryId(ofNullable(conflict.getIndustry()).map(EntityWithNames::getId).orElse(null));
         instance.setParentEventId(ofNullable(conflict.getParentEvent()).map(Event::getId).orElse(null));
         instance.setCreatedAt(ofNullable(conflict.getCreatedAt()).map(d -> d.toEpochSecond(ZoneOffset.UTC)).orElse(null));

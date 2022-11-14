@@ -297,7 +297,7 @@ public class ConflictService {
         if (null != dto.getConflictResultId()) {
             conflict.setResult(dto.getConflictResultId()
                     .map(conflictResultRepository::getOne)
-                    .orElse(null));
+                    .orElseThrow());
         }
         if (null != dto.getIndustryId()) {
             conflict.setIndustry(dto.getIndustryId()

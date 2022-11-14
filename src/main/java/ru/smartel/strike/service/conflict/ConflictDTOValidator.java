@@ -134,6 +134,12 @@ public class ConflictDTOValidator {
             addErrorMessage("conflictReasonId", notNull(), errors);
         }
 
+        if (null == dto.getConflictResultId()) {
+            addErrorMessage("conflictResultId", required(), errors);
+        } else if (dto.getConflictResultId().isEmpty()) {
+            addErrorMessage("conflictResultId", notNull(), errors);
+        }
+
         throwIfErrorsExist(errors);
     }
 
@@ -190,6 +196,10 @@ public class ConflictDTOValidator {
                     addErrorMessage("companyName", max(500), errors);
                 }
             });
+        }
+
+        if (null != dto.getConflictResultId() && dto.getConflictResultId().isEmpty()) {
+            addErrorMessage("conflictResultId", notNull(), errors);
         }
 
         throwIfErrorsExist(errors);

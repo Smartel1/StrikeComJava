@@ -30,7 +30,7 @@ public class ConflictListDTO extends TitlesExtendableDTO {
             instance.add("dateFrom", null != conflict.getDateFrom() ? conflict.getDateFrom().toEpochSecond(ZoneOffset.UTC) : null);
             instance.add("dateTo", null != conflict.getDateTo() ? conflict.getDateTo().toEpochSecond(ZoneOffset.UTC) : null);
             instance.add("conflictReasonId", null != conflict.getReason() ? conflict.getReason().getId() : null);
-            instance.add("conflictResultId", null != conflict.getResult() ? conflict.getResult().getId() : null);
+            instance.add("conflictResultId", conflict.getResult().getId());
             instance.add("industryId", null != conflict.getIndustry() ? conflict.getIndustry().getId() : null);
             instance.add("parentEventId", null != conflict.getParentEvent() ? conflict.getParentEvent().getId() : null);
             instance.add("createdAt", Optional.ofNullable(conflict.getCreatedAt())
