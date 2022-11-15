@@ -266,10 +266,6 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                                 .map(count -> ((BigInteger) count).intValue())
                                 .orElse(0))) // count of conflicts)
                 .collect(toList());
-        // to always return not specified count
-        if (countToResult.stream().noneMatch(ctr -> ctr.getResultId() == null)) {
-            countToResult.add(new CountByResult(null, 0));
-        }
 
         return countToResult;
     }
@@ -309,10 +305,6 @@ public class ReportsConflictRepositoryImpl implements ReportsConflictRepository 
                                 .map(count -> ((BigInteger) count).intValue())
                                 .orElse(0))) // count of conflicts)
                 .collect(toList());
-        // to always return not specified count
-        if (countToResult.stream().noneMatch(ctr -> ctr.getResultId() == null)) {
-            countToResult.add(new CountByResult(null, 0));
-        }
         return countToResult;
     }
 
